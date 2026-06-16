@@ -1,0 +1,14 @@
+# GitHub Pages should publish only the static public site.
+server.py
+admin.html
+admin.css
+admin.js
+login.html
+login.js
+backups/
+README.md
+
+# Local/generated files.
+__pycache__/
+*.pyc
+*.tmp

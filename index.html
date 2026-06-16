@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="个人技术博客，记录 C++、计算机图形学、数据结构、工程工具链与项目复盘。"
+    />
+    <title>几何与代码 | 个人博客</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#home" aria-label="回到首页">
+        <span class="brand-mark" aria-hidden="true">GC</span>
+        <span class="brand-text">几何与代码</span>
+      </a>
+
+      <nav class="desktop-nav" aria-label="主导航">
+        <a href="#notes">学习笔记</a>
+        <a href="#projects">项目复盘</a>
+        <a href="#timeline">时间线</a>
+        <a href="#about">关于</a>
+        <a href="./admin.html" data-local-admin hidden>后台</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="search-trigger" type="button" data-open-search>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m21 21-4.3-4.3m1.3-5.2a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" />
+          </svg>
+          <span>搜索</span>
+          <kbd>Ctrl K</kbd>
+        </button>
+        <button class="icon-button" type="button" data-theme-toggle aria-label="切换主题">
+          <svg class="sun" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 4V2m0 20v-2m8-8h2M2 12h2m14.1 6.1 1.4 1.4M4.5 4.5l1.4 1.4m0 12.2-1.4 1.4M19.5 4.5l-1.4 1.4" />
+            <circle cx="12" cy="12" r="4" />
+          </svg>
+          <svg class="moon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M20.5 15.2A8.4 8.4 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z" />
+          </svg>
+        </button>
+        <button class="icon-button menu-button" type="button" data-menu-toggle aria-label="打开菜单">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="mobile-menu" data-mobile-menu>
+      <a href="#notes">学习笔记</a>
+      <a href="#projects">项目复盘</a>
+      <a href="#timeline">时间线</a>
+      <a href="#about">关于</a>
+      <a href="./admin.html" data-local-admin hidden>后台</a>
+    </div>
+
+    <main id="home" class="page-shell">
+      <section class="hero-grid" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow">Learning Log</p>
+          <h1 id="hero-title">把算法、图形和工程经验写清楚。</h1>
+          <p class="hero-lead">
+            这里整理 C++ 学习、计算机图形学、数据结构、工具链配置和项目复盘。每篇笔记都尽量保留问题背景、推导过程和可复现代码。
+          </p>
+          <div class="hero-actions">
+            <a class="primary-link" href="#latest">开始阅读</a>
+            <button class="secondary-link" type="button" data-open-search>快速搜索</button>
+          </div>
+          <dl class="stats-strip" aria-label="博客数据概览">
+            <div>
+              <dt data-stat-posts>0</dt>
+              <dd>学习笔记</dd>
+            </div>
+            <div>
+              <dt>6</dt>
+              <dd>项目复盘</dd>
+            </div>
+            <div>
+              <dt>4</dt>
+              <dd>长期专题</dd>
+            </div>
+          </dl>
+        </div>
+
+        <aside class="visual-panel" aria-label="当前学习状态">
+          <img src="./assets/study-visual.png" alt="几何与代码博客视觉插画" />
+          <div class="focus-list">
+            <p class="panel-label">Current Focus</p>
+            <ul>
+              <li>OpenGL 渲染管线</li>
+              <li>RAII 与现代 C++</li>
+              <li>博客系统自动化</li>
+            </ul>
+          </div>
+        </aside>
+      </section>
+
+      <section id="notes" class="section-block" aria-labelledby="notes-title">
+        <div class="section-heading">
+          <p class="eyebrow">Notes</p>
+          <h2 id="notes-title">学习入口</h2>
+          <p>按长期主题组织，适合像文档站一样连续阅读。</p>
+        </div>
+        <div class="topic-grid">
+          <a class="topic-card" href="#latest" data-topic="C++">
+            <span class="topic-icon">C++</span>
+            <h3>C++ 基础与工程习惯</h3>
+            <p>对象生命周期、模板、标准库、编译模型和调试技巧。</p>
+          </a>
+          <a class="topic-card" href="#latest" data-topic="图形学">
+            <span class="topic-icon">GL</span>
+            <h3>计算机图形学</h3>
+            <p>矩阵变换、着色器、光照模型、纹理采样与渲染管线。</p>
+          </a>
+          <a class="topic-card" href="#latest" data-topic="数据结构">
+            <span class="topic-icon">DS</span>
+            <h3>数据结构与算法</h3>
+            <p>把复杂度、边界条件和题解复盘写成可复用方法。</p>
+          </a>
+          <a class="topic-card" href="#latest" data-topic="工具链">
+            <span class="topic-icon">CLI</span>
+            <h3>工具链与效率</h3>
+            <p>Git、CMake、脚本化工作流、编辑器配置和部署记录。</p>
+          </a>
+        </div>
+      </section>
+
+      <section id="latest" class="content-layout" aria-labelledby="latest-title">
+        <div class="article-column">
+          <div class="section-heading compact">
+            <p class="eyebrow">Latest</p>
+            <h2 id="latest-title">最近文章</h2>
+          </div>
+          <div class="article-list" data-post-list></div>
+        </div>
+
+        <aside class="sidebar" aria-label="侧边栏">
+          <div class="sidebar-block">
+            <h2>目录</h2>
+            <a href="#notes">学习入口</a>
+            <a href="#latest">最近文章</a>
+            <a href="#projects">项目复盘</a>
+            <a href="#timeline">时间线</a>
+          </div>
+          <div class="sidebar-block">
+            <h2>标签</h2>
+            <div class="tag-cloud" data-tag-cloud></div>
+          </div>
+        </aside>
+      </section>
+
+      <section id="projects" class="section-block" aria-labelledby="projects-title">
+        <div class="section-heading">
+          <p class="eyebrow">Projects</p>
+          <h2 id="projects-title">项目复盘</h2>
+          <p>每个项目都沉淀可复用的设计取舍、失败原因和后续改进。</p>
+        </div>
+        <div class="project-grid">
+          <article class="project-card">
+            <span>Renderer</span>
+            <h3>小型实时渲染器</h3>
+            <p>从模型加载到 PBR 材质的渐进式实现记录。</p>
+          </article>
+          <article class="project-card">
+            <span>Blog</span>
+            <h3>后台管理工作流</h3>
+            <p>文章元数据、登录权限、搜索索引和写作规范。</p>
+          </article>
+          <article class="project-card">
+            <span>CLI</span>
+            <h3>学习笔记整理器</h3>
+            <p>用命令行把零散 Markdown 整理成可发布目录。</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="timeline" class="section-block timeline-block" aria-labelledby="timeline-title">
+        <div class="section-heading">
+          <p class="eyebrow">Timeline</p>
+          <h2 id="timeline-title">更新节奏</h2>
+        </div>
+        <ol class="timeline">
+          <li>
+            <time datetime="2026-06">2026.06</time>
+            <span>加入后台管理，文章内容改为 JSON 存储并由接口读取。</span>
+          </li>
+          <li>
+            <time datetime="2026-05">2026.05</time>
+            <span>完成 OpenGL 入门系列草稿，补齐矩阵变换推导。</span>
+          </li>
+          <li>
+            <time datetime="2026-04">2026.04</time>
+            <span>整理 C++ 对象生命周期和异常安全笔记。</span>
+          </li>
+        </ol>
+      </section>
+
+      <section id="about" class="about-band" aria-labelledby="about-title">
+        <div>
+          <p class="eyebrow">About</p>
+          <h2 id="about-title">写作原则</h2>
+        </div>
+        <p>
+          文章尽量从“遇到了什么问题”开始，给出最小示例、推导过程、验证方法和可继续阅读的资料。这里不是一次性发布的作品集，而是持续更新的个人知识库。
+        </p>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>© 2026 几何与代码</p>
+      <a href="#home">回到顶部</a>
+    </footer>
+
+    <div class="modal-backdrop" data-search-modal hidden>
+      <section class="search-modal" role="dialog" aria-modal="true" aria-labelledby="search-title">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m21 21-4.3-4.3m1.3-5.2a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" />
+          </svg>
+          <input id="site-search" type="search" placeholder="搜索文章、标签或专题" autocomplete="off" />
+          <button type="button" data-close-search aria-label="关闭搜索">Esc</button>
+        </div>
+        <h2 id="search-title">搜索结果</h2>
+        <div class="search-results" data-search-results></div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" data-post-modal hidden>
+      <article class="post-modal" role="dialog" aria-modal="true" aria-labelledby="post-title">
+        <button class="close-post" type="button" data-close-post aria-label="关闭文章">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
+        <p class="eyebrow" data-post-meta></p>
+        <h2 id="post-title" data-post-title></h2>
+        <div class="post-body" data-post-body></div>
+      </article>
+    </div>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
