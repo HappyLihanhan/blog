@@ -868,6 +868,7 @@ function initMusicPlayer() {
   let currentIndex = 0;
   let isSeeking = false;
   let pendingTime = 0;
+  let lastKnownTime = 0;
   let lastStateSave = 0;
   let desiredPlaying = true;
   let userPaused = false;
@@ -893,6 +894,7 @@ function initMusicPlayer() {
     url: "./assets/music/andrew-prahlow-travelers.mp3"
   };
   let playerState = readPlayerState();
+  lastKnownTime = Math.max(0, Number(playerState.currentTime) || 0);
   userPaused = playerState.userPaused === true;
   desiredPlaying = !userPaused;
 
@@ -916,31 +918,42 @@ function initMusicPlayer() {
     }
   }
 
-  function savePlayerState({ force = false, playing = null, currentTime = null } = {}) {
+  function updateLastKnownTime(value, { allowZero = false } = {}) {
+    const nextTime = Number(value);
+    if (!Number.isFinite(nextTime) || nextTime < 0) return lastKnownTime;
+    if (nextTime > 0.25 || allowZero) lastKnownTime = nextTime;
+    return lastKnownTime;
+  }
+
+  function getStableCurrentTime() {
+    if (pendingTime > 0) return pendingTime;
+    if (Number.isFinite(audio.currentTime) && audio.currentTime > 0.25) {
+      return updateLastKnownTime(audio.currentTime);
+    }
+    return lastKnownTime || 0;
+  }
+
+  function savePlayerState({ force = false, playing = null, currentTime = null, allowZeroTime = false } = {}) {
     const nowMs = Date.now();
     if (!force && nowMs - lastStateSave < 800) return;
     lastStateSave = nowMs;
     const track = tracks[currentIndex];
-    const savedTime =
-      typeof currentTime === "number"
-        ? currentTime
-        : pendingTime && (!Number.isFinite(audio.currentTime) || audio.currentTime < 0.25)
-          ? pendingTime
-          : Number.isFinite(audio.currentTime)
-            ? audio.currentTime
-            : 0;
-    localStorage.setItem(
-      stateKey,
-      JSON.stringify({
-        trackId: track?.id || "",
-        currentTime: savedTime,
-        mode: playerState.mode || "list",
-        playing: typeof playing === "boolean" ? playing : desiredPlaying,
-        userPaused,
-        volume: defaultVolume,
-        updatedAt: nowMs
-      })
-    );
+    const hasExplicitTime = currentTime !== null && currentTime !== undefined;
+    const explicitTime = Number(currentTime);
+    const savedTime = hasExplicitTime && Number.isFinite(explicitTime)
+      ? updateLastKnownTime(explicitTime, { allowZero: allowZeroTime || explicitTime === 0 })
+      : getStableCurrentTime();
+    playerState = {
+      ...playerState,
+      trackId: track?.id || "",
+      currentTime: savedTime,
+      mode: playerState.mode || "list",
+      playing: typeof playing === "boolean" ? playing : desiredPlaying,
+      userPaused,
+      volume: defaultVolume,
+      updatedAt: nowMs
+    };
+    localStorage.setItem(stateKey, JSON.stringify(playerState));
   }
 
   function normalizeTrack(track, index = 0) {
@@ -989,7 +1002,9 @@ function initMusicPlayer() {
 
   function syncProgress() {
     const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
-    const currentTime = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
+    const rawCurrentTime = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
+    const currentTime = rawCurrentTime > 0.25 || !lastKnownTime ? rawCurrentTime : lastKnownTime;
+    if (rawCurrentTime > 0.25) updateLastKnownTime(rawCurrentTime);
     if (!isSeeking) {
       setProgressValue(duration ? (currentTime / duration) * 1000 : 0);
     }
@@ -1003,9 +1018,11 @@ function initMusicPlayer() {
       return;
     }
     const ratio = Math.min(1, Math.max(0, getProgressValue() / 1000));
-    audio.currentTime = ratio * duration;
-    timeLabel.textContent = `${formatTime(audio.currentTime)} / ${formatTime(duration)}`;
-    savePlayerState({ force: true, playing: desiredPlaying });
+    const nextTime = ratio * duration;
+    audio.currentTime = nextTime;
+    updateLastKnownTime(nextTime, { allowZero: true });
+    timeLabel.textContent = `${formatTime(nextTime)} / ${formatTime(duration)}`;
+    savePlayerState({ force: true, playing: desiredPlaying, currentTime: nextTime, allowZeroTime: true });
   }
 
   function seekFromClientX(clientX) {
@@ -1110,10 +1127,12 @@ function initMusicPlayer() {
 
   function applyPendingTime() {
     if (!pendingTime || !Number.isFinite(audio.duration)) return;
-    audio.currentTime = Math.min(Math.max(0, pendingTime), Math.max(0, audio.duration - 0.25));
+    const nextTime = Math.min(Math.max(0, pendingTime), Math.max(0, audio.duration - 0.25));
+    audio.currentTime = nextTime;
+    updateLastKnownTime(nextTime, { allowZero: true });
     pendingTime = 0;
     syncProgress();
-    savePlayerState({ force: true, playing: desiredPlaying });
+    savePlayerState({ force: true, playing: desiredPlaying, currentTime: nextTime, allowZeroTime: true });
   }
 
   function setTrack(track, { autoplay = true, currentTime = 0 } = {}) {
@@ -1122,7 +1141,9 @@ function initMusicPlayer() {
     title.textContent = track.title;
     artist.textContent = track.artist || "未知歌手";
     now.textContent = track.title;
-    pendingTime = currentTime || 0;
+    const startTime = Math.max(0, Number(currentTime) || 0);
+    pendingTime = startTime;
+    updateLastKnownTime(startTime, { allowZero: true });
     if (audio.getAttribute("src") !== track.url) {
       audio.src = track.url;
       audio.load();
@@ -1135,7 +1156,7 @@ function initMusicPlayer() {
     userPaused = !autoplay;
     desiredPlaying = autoplay;
     if (autoplay) playAudio();
-    savePlayerState({ force: true, playing: autoplay, currentTime: currentTime || 0 });
+    savePlayerState({ force: true, playing: autoplay, currentTime: startTime, allowZeroTime: true });
   }
 
   function selectTrackByIndex(index, options = {}) {
@@ -1310,8 +1331,8 @@ function initMusicPlayer() {
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") setPanelOpen(false);
   });
-  window.addEventListener("pagehide", () => savePlayerState({ force: true, playing: desiredPlaying }));
-  window.addEventListener("beforeunload", () => savePlayerState({ force: true, playing: desiredPlaying }));
+  window.addEventListener("pagehide", () => savePlayerState({ force: true, playing: desiredPlaying, currentTime: getStableCurrentTime() }));
+  window.addEventListener("beforeunload", () => savePlayerState({ force: true, playing: desiredPlaying, currentTime: getStableCurrentTime() }));
   bootMusicPlayer().catch(() => {
     tracks = [normalizeTrack(bundledDefaultTrack)];
     setTrack(tracks[0], { autoplay: true });
