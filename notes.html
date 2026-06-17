@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="ian's Blog 的学习笔记列表，记录 C++、图形学、数据结构和项目复盘。" />
     <title>学习笔记 | ian's Blog</title>
-    <link rel="stylesheet" href="./styles.css?v=20260617-search" />
+    <link rel="stylesheet" href="./styles.css?v=20260617-categories" />
   </head>
   <body data-page="notes">
     <header class="site-header">
@@ -16,8 +16,8 @@
       <nav class="desktop-nav" aria-label="主导航">
         <a href="./index.html">首页</a>
         <a href="./notes.html">学习笔记</a>
-        <a href="./resume.html">个人简历</a>
         <a href="./projects.html">项目复盘</a>
+        <a href="./resume.html">关于博主</a>
         <a href="./admin.html" data-local-admin hidden>后台</a>
       </nav>
       <div class="header-actions">
@@ -48,8 +48,8 @@
     <div class="mobile-menu" data-mobile-menu>
       <a href="./index.html">首页</a>
       <a href="./notes.html">学习笔记</a>
-      <a href="./resume.html">个人简历</a>
       <a href="./projects.html">项目复盘</a>
+      <a href="./resume.html">关于博主</a>
       <a href="./admin.html" data-local-admin hidden>后台</a>
     </div>
 
@@ -66,17 +66,11 @@
             <p class="eyebrow">Latest</p>
             <h2 id="latest-title">最近文章</h2>
           </div>
+          <div class="note-category-tabs" data-category-tabs aria-label="学习笔记栏目"></div>
           <div class="article-list" data-post-list></div>
         </div>
 
-        <aside class="sidebar" aria-label="侧边栏">
-          <div class="sidebar-block">
-            <h2>目录</h2>
-            <a href="./index.html#notes">学习入口</a>
-            <a href="./notes.html">最近文章</a>
-            <a href="./resume.html">个人简历</a>
-            <a href="./projects.html">项目复盘</a>
-          </div>
+        <aside class="sidebar notes-sidebar" aria-label="侧边栏">
           <div class="sidebar-block">
             <h2>标签</h2>
             <div class="tag-cloud" data-tag-cloud></div>
@@ -117,6 +111,6 @@
       </article>
     </div>
 
-    <script src="./script.js?v=20260617-search"></script>
+    <script src="./script.js?v=20260617-categories"></script>
   </body>
 </html>

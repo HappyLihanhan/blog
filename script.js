@@ -4,6 +4,7 @@ const fallbackPosts = [
     title: "RAII 为什么能降低异常路径的复杂度",
     date: "2026-06-12",
     readTime: "8 min",
+    category: "C++",
     tags: ["C++", "工程习惯"],
     summary: "用资源所有权视角解释构造、析构、异常传播和智能指针的边界。",
     body: [
@@ -17,6 +18,7 @@ const fallbackPosts = [
     title: "从坐标系理解 MVP 矩阵",
     date: "2026-06-04",
     readTime: "10 min",
+    category: "计算机图形学",
     tags: ["图形学", "OpenGL"],
     summary: "把模型、观察、投影三个矩阵拆开，减少凭公式记忆带来的混乱。",
     body: [
@@ -30,6 +32,7 @@ const fallbackPosts = [
     title: "哈希表复杂度的真实前提",
     date: "2026-05-28",
     readTime: "6 min",
+    category: "计算机基础",
     tags: ["数据结构", "算法"],
     summary: "记录负载因子、冲突处理和扩容策略对实际性能的影响。",
     body: [
@@ -43,6 +46,7 @@ const fallbackPosts = [
     title: "CMake 项目从能编译到可维护",
     date: "2026-05-17",
     readTime: "7 min",
+    category: "计算机基础",
     tags: ["工具链", "CMake"],
     summary: "从 target、include 边界和构建选项三个角度整理 CMake 结构。",
     body: [
@@ -127,10 +131,31 @@ const fallbackResume = {
   selfEvaluation: "本人有计算机学科基础技能和较强的自学能力，乐于团队合作完成项目。"
 };
 
+const defaultPostCategories = ["C++", "计算机图形学", "Hot100", "计算机基础", "Unity3D"];
+const categoryAliases = new Map([
+  ["图形学", "计算机图形学"],
+  ["OpenGL", "计算机图形学"],
+  ["Unity", "Unity3D"],
+  ["Unity 3D", "Unity3D"],
+  ["Unity3D", "Unity3D"],
+  ["Hot100", "Hot100"],
+  ["LeetCode", "Hot100"],
+  ["算法", "Hot100"],
+  ["数据结构", "计算机基础"],
+  ["操作系统", "计算机基础"],
+  ["计算机网络", "计算机基础"],
+  ["数据库", "计算机基础"],
+  ["CMake", "计算机基础"],
+  ["工具链", "计算机基础"]
+]);
+
 let posts = [];
 let projects = [];
 let resume = null;
 let activeProjectName = "";
+let activePostCategory = "";
+let activePostTag = "";
+let musicObjectUrl = "";
 
 const selectors = {
   html: document.documentElement,
@@ -146,6 +171,7 @@ const selectors = {
   postMeta: document.querySelector("[data-post-meta]"),
   postBody: document.querySelector("[data-post-body]"),
   mobileMenu: document.querySelector("[data-mobile-menu]"),
+  categoryTabs: document.querySelector("[data-category-tabs]"),
   tagCloud: document.querySelector("[data-tag-cloud]"),
   resumeRoot: document.querySelector("[data-resume-root]"),
   statPosts: document.querySelector("[data-stat-posts]"),
@@ -163,6 +189,75 @@ function escapeHtml(value) {
 
 function formatInline(value) {
   return escapeHtml(value).replace(/`([^`]+)`/g, "<code>$1</code>");
+}
+
+function normalizeCodeLanguage(value) {
+  return String(value || "")
+    .trim()
+    .replace(/[^\w+#.-]/g, "")
+    .slice(0, 24);
+}
+
+function renderCodeBlock(block) {
+  const match = String(block).match(/^```([^\r\n`]*)\r?\n([\s\S]*?)\r?\n```$/);
+  if (!match) return "";
+
+  const language = normalizeCodeLanguage(match[1]) || "code";
+  const code = match[2].replace(/\s+$/g, "");
+  return `
+    <figure class="post-code-block">
+      <figcaption>${escapeHtml(language)}</figcaption>
+      <pre><code>${escapeHtml(code)}</code></pre>
+    </figure>
+  `;
+}
+
+function normalizeCategoryName(value) {
+  return String(value || "").trim().replace(/\s+/g, " ");
+}
+
+function inferPostCategory(category, tags = []) {
+  const explicit = normalizeCategoryName(category);
+  if (explicit) {
+    return categoryAliases.get(explicit) || explicit;
+  }
+
+  for (const tag of tags) {
+    const normalized = normalizeCategoryName(tag);
+    if (defaultPostCategories.includes(normalized)) return normalized;
+    if (categoryAliases.has(normalized)) return categoryAliases.get(normalized);
+  }
+
+  return defaultPostCategories[0];
+}
+
+function getPostCategories() {
+  const categories = new Set(defaultPostCategories);
+  posts.forEach((post) => {
+    const category = normalizeCategoryName(post.category);
+    if (category) categories.add(category);
+  });
+  return Array.from(categories).sort((a, b) => {
+    const aIndex = defaultPostCategories.indexOf(a);
+    const bIndex = defaultPostCategories.indexOf(b);
+    if (aIndex !== -1 || bIndex !== -1) {
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      return aIndex - bIndex;
+    }
+    return a.localeCompare(b, "zh-CN");
+  });
+}
+
+function categoryMatches(post, category = activePostCategory) {
+  return !category || post.category === category;
+}
+
+function getVisiblePosts() {
+  return posts.filter((post) => {
+    if (!categoryMatches(post)) return false;
+    return !activePostTag || post.tags.includes(activePostTag);
+  });
 }
 
 function safeImageSrc(value) {
@@ -232,6 +327,11 @@ function renderMarkdownTable(block) {
 }
 
 function renderPostBlock(block) {
+  const codeHtml = renderCodeBlock(block);
+  if (codeHtml) {
+    return codeHtml;
+  }
+
   const tableHtml = renderMarkdownTable(block);
   if (tableHtml) {
     return tableHtml;
@@ -259,15 +359,19 @@ function normalizePosts(items) {
   return Array.isArray(items)
     ? items
         .filter((post) => post && post.id && post.title)
-        .map((post) => ({
-          id: String(post.id),
-          title: String(post.title),
-          date: String(post.date || ""),
-          readTime: String(post.readTime || "5 min"),
-          tags: Array.isArray(post.tags) ? post.tags.map(String).filter(Boolean) : [],
-          summary: String(post.summary || ""),
-          body: Array.isArray(post.body) ? post.body.map(String) : []
-        }))
+        .map((post) => {
+          const tags = Array.isArray(post.tags) ? post.tags.map(String).filter(Boolean) : [];
+          return {
+            id: String(post.id),
+            title: String(post.title),
+            date: String(post.date || ""),
+            readTime: String(post.readTime || "5 min"),
+            category: inferPostCategory(post.category, tags),
+            tags,
+            summary: String(post.summary || ""),
+            body: Array.isArray(post.body) ? post.body.map(String) : []
+          };
+        })
     : [];
 }
 
@@ -387,11 +491,33 @@ async function loadResume() {
   return normalizeResume(fallbackResume);
 }
 
-function renderPosts(items = posts) {
+function renderPostCategories() {
+  if (!selectors.categoryTabs) return;
+
+  const categories = getPostCategories();
+  if (!categories.includes(activePostCategory)) {
+    activePostCategory = categories[0] || "";
+  }
+
+  selectors.categoryTabs.innerHTML = categories
+    .map((category) => {
+      const count = posts.filter((post) => post.category === category).length;
+      return `
+        <button class="${category === activePostCategory ? "is-active" : ""}" type="button" data-category="${escapeHtml(category)}" aria-pressed="${category === activePostCategory ? "true" : "false"}">
+          <span>${escapeHtml(category)}</span>
+          <strong>${count}</strong>
+        </button>
+      `;
+    })
+    .join("");
+}
+
+function renderPosts(items = getVisiblePosts()) {
   if (!selectors.postList) return;
 
   if (!items.length) {
-    selectors.postList.innerHTML = '<p class="empty-state">还没有文章。登录后台后可以创建第一篇。</p>';
+    const filterText = [activePostCategory, activePostTag ? `标签：${activePostTag}` : ""].filter(Boolean).join(" · ");
+    selectors.postList.innerHTML = `<p class="empty-state">${filterText ? `「${escapeHtml(filterText)}」暂无文章。` : "还没有文章。登录后台后可以创建第一篇。"}</p>`;
     return;
   }
 
@@ -405,7 +531,10 @@ function renderPosts(items = posts) {
             <p>${escapeHtml(post.summary)}</p>
             <span class="tags">${post.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</span>
           </span>
-          <span class="read-time">${escapeHtml(post.readTime)}</span>
+          <span class="article-side">
+            <span class="article-category">${escapeHtml(post.category)}</span>
+            <span class="read-time">${escapeHtml(post.readTime)}</span>
+          </span>
         </button>
       `
     )
@@ -501,11 +630,10 @@ function contactToHtml(item) {
 function renderResume(data = resume) {
   if (!selectors.resumeRoot || !data) return;
 
-  const pdfLink = data.pdfUrl ? `<a href="${escapeHtml(data.pdfUrl)}" download>下载 PDF 简历</a>` : "";
   selectors.resumeRoot.innerHTML = `
     <div class="resume-header">
       <div>
-        <p class="eyebrow">Resume</p>
+        <p class="eyebrow">About</p>
         <h1 id="resume-title">${escapeHtml(data.name)}</h1>
         ${data.headline ? `<p class="resume-headline">${escapeHtml(data.headline)}</p>` : ""}
         ${data.lead ? `<p class="resume-lead">${escapeHtml(data.lead)}</p>` : ""}
@@ -515,7 +643,6 @@ function renderResume(data = resume) {
       </div>
       <address class="resume-contact" aria-label="联系方式">
         ${data.contact.map(contactToHtml).join("")}
-        ${pdfLink}
       </address>
     </div>
 
@@ -599,10 +726,18 @@ function renderResume(data = resume) {
 function renderTags() {
   if (!selectors.tagCloud) return;
 
-  const tags = Array.from(new Set(posts.flatMap((post) => post.tags))).sort((a, b) => a.localeCompare(b, "zh-CN"));
-  selectors.tagCloud.innerHTML = tags
-    .map((tag) => `<button type="button" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</button>`)
-    .join("");
+  const scopedPosts = posts.filter((post) => categoryMatches(post));
+  const tags = Array.from(new Set(scopedPosts.flatMap((post) => post.tags))).sort((a, b) => a.localeCompare(b, "zh-CN"));
+  selectors.tagCloud.innerHTML = [
+    `<button class="${activePostTag ? "" : "is-active"}" type="button" data-tag="">全部标签</button>`,
+    ...tags.map((tag) => `<button class="${tag === activePostTag ? "is-active" : ""}" type="button" data-tag="${escapeHtml(tag)}">${escapeHtml(tag)}</button>`)
+  ].join("");
+}
+
+function renderNotesView() {
+  renderPostCategories();
+  renderTags();
+  renderPosts();
 }
 
 function renderStats() {
@@ -621,7 +756,7 @@ function renderSearchResults(query = "") {
   const postResults = posts
     .filter((post) => {
       if (!normalized) return true;
-      const source = [post.title, post.summary, ...post.tags, ...post.body].join(" ").toLowerCase();
+      const source = [post.category, post.title, post.summary, ...post.tags, ...post.body].join(" ").toLowerCase();
       return source.includes(normalized);
     })
     .map((post) => ({ kind: "文章", item: post }));
@@ -641,7 +776,7 @@ function renderSearchResults(query = "") {
             <button class="search-result" type="button" ${kind === "文章" ? `data-post-id="${escapeHtml(item.id)}"` : `data-project-id="${escapeHtml(item.id)}"`}>
               <span class="search-kind">${escapeHtml(kind)}</span>
               <strong>${escapeHtml(item.title)}</strong>
-              <span>${escapeHtml([item.date, kind === "项目复盘" ? item.type : "", item.tags.join(" / "), item.summary].filter(Boolean).join(" · "))}</span>
+              <span>${escapeHtml([item.date, kind === "项目复盘" ? item.type : item.category, item.tags.join(" / "), item.summary].filter(Boolean).join(" · "))}</span>
             </button>
           `
         )
@@ -661,12 +796,535 @@ function closeSearch() {
   selectors.body.classList.remove("modal-open");
 }
 
+function initMusicPlayer() {
+  const actions = document.querySelector(".header-actions");
+  const searchTrigger = actions?.querySelector("[data-open-search]");
+  if (!actions || !searchTrigger || actions.querySelector("[data-music-player]")) return;
+
+  searchTrigger.insertAdjacentHTML(
+    "beforebegin",
+    `
+      <div class="music-player" data-music-player>
+        <button class="music-toggle" type="button" data-music-toggle aria-expanded="false" aria-label="打开音乐盒">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M9 18V5l10-2v13M9 9l10-2M9 18a3 3 0 1 1-3-3 3 3 0 0 1 3 3Zm10-2a3 3 0 1 1-3-3 3 3 0 0 1 3 3Z" />
+          </svg>
+          <span data-music-now>音乐</span>
+        </button>
+        <section class="music-panel" data-music-panel hidden>
+          <form class="music-search" data-music-search-form>
+            <input type="search" data-music-query placeholder="筛选曲目" autocomplete="off" />
+            <button type="submit">清</button>
+          </form>
+          <div class="music-controls">
+            <button class="music-play" type="button" data-music-prev aria-label="上一首">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m11 18-7-6 7-6v12Zm9 0-7-6 7-6v12Z" /></svg>
+            </button>
+            <button class="music-play" type="button" data-music-play aria-label="播放">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7Z" /></svg>
+            </button>
+            <div class="music-track">
+              <strong data-music-title>未选择</strong>
+              <span data-music-artist>正在加载音乐库</span>
+            </div>
+            <button class="music-play" type="button" data-music-next aria-label="下一首">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 6 7 6-7 6V6Zm9 0 7 6-7 6V6Z" /></svg>
+            </button>
+          </div>
+          <div class="music-progress">
+            <div class="music-progress-track" data-music-progress role="slider" tabindex="0" aria-label="播放进度" aria-valuemin="0" aria-valuemax="1000" aria-valuenow="0">
+              <span data-music-progress-fill></span>
+            </div>
+            <span data-music-time>0:00 / 0:00</span>
+          </div>
+          <button class="music-mode" type="button" data-music-mode>列表循环</button>
+          <p class="music-status" data-music-status>默认自动播放。</p>
+          <div class="music-results" data-music-results></div>
+          <audio data-music-audio preload="auto"></audio>
+        </section>
+      </div>
+    `
+  );
+
+  const root = actions.querySelector("[data-music-player]");
+  const toggle = root.querySelector("[data-music-toggle]");
+  const panel = root.querySelector("[data-music-panel]");
+  const form = root.querySelector("[data-music-search-form]");
+  const queryInput = root.querySelector("[data-music-query]");
+  const prevButton = root.querySelector("[data-music-prev]");
+  const playButton = root.querySelector("[data-music-play]");
+  const nextButton = root.querySelector("[data-music-next]");
+  const modeButton = root.querySelector("[data-music-mode]");
+  const progress = root.querySelector("[data-music-progress]");
+  const progressFill = root.querySelector("[data-music-progress-fill]");
+  const timeLabel = root.querySelector("[data-music-time]");
+  const status = root.querySelector("[data-music-status]");
+  const resultsRoot = root.querySelector("[data-music-results]");
+  const audio = root.querySelector("[data-music-audio]");
+  const title = root.querySelector("[data-music-title]");
+  const artist = root.querySelector("[data-music-artist]");
+  const now = root.querySelector("[data-music-now]");
+  let tracks = [];
+  let currentIndex = 0;
+  let isSeeking = false;
+  let pendingTime = 0;
+  let lastStateSave = 0;
+  let desiredPlaying = true;
+  let userPaused = false;
+  let unlockPlaybackBound = false;
+
+  const playIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7Z" /></svg>';
+  const pauseIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14" /></svg>';
+  const stateKey = "ianBlogMusicState";
+  const modes = ["list", "single", "random"];
+  const modeLabels = {
+    list: "列表循环",
+    single: "单曲循环",
+    random: "随机播放"
+  };
+  const defaultVolume = 0.7;
+  audio.volume = defaultVolume;
+  audio.autoplay = true;
+  audio.setAttribute("autoplay", "");
+  const bundledDefaultTrack = {
+    id: "andrew-prahlow-travelers",
+    title: "Travelers",
+    artist: "Andrew Prahlow",
+    url: "./assets/music/andrew-prahlow-travelers.mp3"
+  };
+  let playerState = readPlayerState();
+  userPaused = playerState.userPaused === true;
+  desiredPlaying = !userPaused;
+
+  function setPanelOpen(open) {
+    panel.hidden = !open;
+    toggle.setAttribute("aria-expanded", String(open));
+    if (open) window.setTimeout(() => queryInput.focus(), 0);
+  }
+
+  function updatePlayState() {
+    playButton.innerHTML = audio.paused ? playIcon : pauseIcon;
+    playButton.setAttribute("aria-label", audio.paused ? "播放" : "暂停");
+    toggle.classList.toggle("is-playing", !audio.paused);
+  }
+
+  function readPlayerState() {
+    try {
+      return JSON.parse(localStorage.getItem(stateKey) || "{}");
+    } catch {
+      return {};
+    }
+  }
+
+  function savePlayerState({ force = false, playing = null, currentTime = null } = {}) {
+    const nowMs = Date.now();
+    if (!force && nowMs - lastStateSave < 800) return;
+    lastStateSave = nowMs;
+    const track = tracks[currentIndex];
+    const savedTime =
+      typeof currentTime === "number"
+        ? currentTime
+        : pendingTime && (!Number.isFinite(audio.currentTime) || audio.currentTime < 0.25)
+          ? pendingTime
+          : Number.isFinite(audio.currentTime)
+            ? audio.currentTime
+            : 0;
+    localStorage.setItem(
+      stateKey,
+      JSON.stringify({
+        trackId: track?.id || "",
+        currentTime: savedTime,
+        mode: playerState.mode || "list",
+        playing: typeof playing === "boolean" ? playing : desiredPlaying,
+        userPaused,
+        volume: defaultVolume,
+        updatedAt: nowMs
+      })
+    );
+  }
+
+  function normalizeTrack(track, index = 0) {
+    return {
+      id: String(track.id || `track-${index}`),
+      title: String(track.title || "未命名歌曲"),
+      artist: String(track.artist || ""),
+      url: String(track.url || ""),
+      filename: String(track.filename || "")
+    };
+  }
+
+  async function loadMusicTracks() {
+    const sources = ["/api/music", "./data/music.json"];
+    for (const source of sources) {
+      try {
+        const response = await fetch(source, { cache: "no-store" });
+        if (!response.ok) continue;
+        const data = await response.json();
+        const loaded = (data.tracks || []).map(normalizeTrack).filter((track) => track.url);
+        if (loaded.length) return loaded;
+      } catch {
+        // Try the next source.
+      }
+    }
+    return [normalizeTrack(bundledDefaultTrack)];
+  }
+
+  function formatTime(seconds) {
+    const safeSeconds = Number.isFinite(seconds) ? Math.max(0, seconds) : 0;
+    const minutes = Math.floor(safeSeconds / 60);
+    const rest = Math.floor(safeSeconds % 60);
+    return `${minutes}:${String(rest).padStart(2, "0")}`;
+  }
+
+  function getProgressValue() {
+    return Number(progress.dataset.value || progress.getAttribute("aria-valuenow") || 0);
+  }
+
+  function setProgressValue(value) {
+    const normalized = Math.min(1000, Math.max(0, Math.round(Number(value) || 0)));
+    progress.dataset.value = String(normalized);
+    progress.setAttribute("aria-valuenow", String(normalized));
+    progressFill.style.width = `${normalized / 10}%`;
+  }
+
+  function syncProgress() {
+    const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
+    const currentTime = Number.isFinite(audio.currentTime) ? audio.currentTime : 0;
+    if (!isSeeking) {
+      setProgressValue(duration ? (currentTime / duration) * 1000 : 0);
+    }
+    timeLabel.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+  }
+
+  function seekToProgressValue() {
+    const duration = Number.isFinite(audio.duration) ? audio.duration : 0;
+    if (!duration) {
+      setProgressValue(0);
+      return;
+    }
+    const ratio = Math.min(1, Math.max(0, getProgressValue() / 1000));
+    audio.currentTime = ratio * duration;
+    timeLabel.textContent = `${formatTime(audio.currentTime)} / ${formatTime(duration)}`;
+    savePlayerState({ force: true, playing: desiredPlaying });
+  }
+
+  function seekFromClientX(clientX) {
+    const rect = progress.getBoundingClientRect();
+    if (!rect.width) return;
+    const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    setProgressValue(ratio * 1000);
+    seekToProgressValue();
+  }
+
+  function seekFromPointer(event) {
+    seekFromClientX(event.clientX);
+  }
+
+  function seekFromTouch(event) {
+    const touch = event.touches?.[0] || event.changedTouches?.[0];
+    if (touch) seekFromClientX(touch.clientX);
+  }
+
+  function applyMode() {
+    const mode = modes.includes(playerState.mode) ? playerState.mode : "list";
+    playerState.mode = mode;
+    audio.loop = mode === "single";
+    modeButton.textContent = modeLabels[mode];
+    modeButton.setAttribute("aria-label", `播放模式：${modeLabels[mode]}`);
+  }
+
+  function renderPlaylist(filter = queryInput.value) {
+    const keyword = String(filter || "").trim().toLowerCase();
+    const visibleTracks = tracks.filter((track) => {
+      if (!keyword) return true;
+      return `${track.title} ${track.artist}`.toLowerCase().includes(keyword);
+    });
+
+    resultsRoot.innerHTML = visibleTracks.length
+      ? visibleTracks
+          .map((track) => {
+            const active = track.id === tracks[currentIndex]?.id;
+            return `
+              <button class="music-result ${active ? "is-active" : ""}" type="button" data-track-id="${escapeHtml(track.id)}">
+                <span class="music-art" aria-hidden="true">♪</span>
+                <span>
+                  <strong>${escapeHtml(track.title)}</strong>
+                  <small>${escapeHtml(track.artist || "未知歌手")}</small>
+                </span>
+              </button>
+            `;
+          })
+          .join("")
+      : '<p class="music-status">没有匹配曲目。</p>';
+  }
+
+  function removePlaybackUnlock() {
+    if (!unlockPlaybackBound) return;
+    unlockPlaybackBound = false;
+    document.removeEventListener("click", resumeAfterInteraction, true);
+    document.removeEventListener("keydown", resumeAfterInteraction, true);
+    document.removeEventListener("pointerdown", resumeAfterInteraction, true);
+    document.removeEventListener("touchstart", resumeAfterInteraction, true);
+    window.removeEventListener("scroll", resumeAfterInteraction, true);
+  }
+
+  function addPlaybackUnlock() {
+    if (unlockPlaybackBound || userPaused || !desiredPlaying) return;
+    unlockPlaybackBound = true;
+    document.addEventListener("click", resumeAfterInteraction, true);
+    document.addEventListener("keydown", resumeAfterInteraction, true);
+    document.addEventListener("pointerdown", resumeAfterInteraction, true);
+    document.addEventListener("touchstart", resumeAfterInteraction, true);
+    window.addEventListener("scroll", resumeAfterInteraction, true);
+  }
+
+  function resumeAfterInteraction() {
+    if (userPaused || !desiredPlaying || !audio.src || !audio.paused) {
+      removePlaybackUnlock();
+      return;
+    }
+    audio.play().then(() => {
+      status.textContent = "正在播放。";
+      removePlaybackUnlock();
+      updatePlayState();
+      savePlayerState({ force: true, playing: true });
+    }).catch(() => {
+      addPlaybackUnlock();
+    });
+  }
+
+  function playAudio() {
+    desiredPlaying = true;
+    audio.play().then(() => {
+      status.textContent = "正在播放。";
+      removePlaybackUnlock();
+      updatePlayState();
+      savePlayerState({ force: true, playing: true });
+    }).catch(() => {
+      status.textContent = "任意点击页面后继续播放。";
+      addPlaybackUnlock();
+      updatePlayState();
+      savePlayerState({ force: true, playing: true });
+    });
+  }
+
+  function applyPendingTime() {
+    if (!pendingTime || !Number.isFinite(audio.duration)) return;
+    audio.currentTime = Math.min(Math.max(0, pendingTime), Math.max(0, audio.duration - 0.25));
+    pendingTime = 0;
+    syncProgress();
+    savePlayerState({ force: true, playing: desiredPlaying });
+  }
+
+  function setTrack(track, { autoplay = true, currentTime = 0 } = {}) {
+    const index = tracks.findIndex((item) => item.id === track.id);
+    if (index >= 0) currentIndex = index;
+    title.textContent = track.title;
+    artist.textContent = track.artist || "未知歌手";
+    now.textContent = track.title;
+    pendingTime = currentTime || 0;
+    if (audio.getAttribute("src") !== track.url) {
+      audio.src = track.url;
+      audio.load();
+    } else {
+      applyPendingTime();
+    }
+    applyMode();
+    renderPlaylist();
+    updatePlayState();
+    userPaused = !autoplay;
+    desiredPlaying = autoplay;
+    if (autoplay) playAudio();
+    savePlayerState({ force: true, playing: autoplay, currentTime: currentTime || 0 });
+  }
+
+  function selectTrackByIndex(index, options = {}) {
+    if (!tracks.length) return;
+    const normalizedIndex = (index + tracks.length) % tracks.length;
+    setTrack(tracks[normalizedIndex], { autoplay: true, currentTime: 0, ...options });
+  }
+
+  function nextIndex() {
+    if (playerState.mode === "random" && tracks.length > 1) {
+      let index = currentIndex;
+      while (index === currentIndex) {
+        index = Math.floor(Math.random() * tracks.length);
+      }
+      return index;
+    }
+    return currentIndex + 1;
+  }
+
+  async function bootMusicPlayer() {
+    tracks = await loadMusicTracks();
+    audio.volume = defaultVolume;
+    const savedTrackIndex = tracks.findIndex((track) => track.id === playerState.trackId);
+    currentIndex = savedTrackIndex >= 0 ? savedTrackIndex : 0;
+    applyMode();
+    renderPlaylist();
+    userPaused = playerState.userPaused === true;
+    const shouldAutoplay = !userPaused;
+    desiredPlaying = shouldAutoplay;
+    setTrack(tracks[currentIndex], {
+      autoplay: shouldAutoplay,
+      currentTime: savedTrackIndex >= 0 ? Number(playerState.currentTime || 0) : 0
+    });
+    if (!shouldAutoplay) {
+      status.textContent = "已恢复上次曲目。";
+    }
+  }
+
+  toggle.addEventListener("click", () => setPanelOpen(panel.hidden));
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    queryInput.value = "";
+    renderPlaylist("");
+  });
+  queryInput.addEventListener("input", () => renderPlaylist(queryInput.value));
+  playButton.addEventListener("click", () => {
+    if (!audio.src) {
+      status.textContent = "先选歌或上传。";
+      return;
+    }
+    if (audio.paused) {
+      userPaused = false;
+      desiredPlaying = true;
+      audio.play().catch(() => {
+        status.textContent = "任意点击页面后继续播放。";
+        addPlaybackUnlock();
+      });
+    } else {
+      userPaused = true;
+      desiredPlaying = false;
+      removePlaybackUnlock();
+      audio.pause();
+    }
+  });
+  prevButton.addEventListener("click", () => selectTrackByIndex(currentIndex - 1));
+  nextButton.addEventListener("click", () => selectTrackByIndex(nextIndex()));
+  modeButton.addEventListener("click", () => {
+    const currentModeIndex = modes.indexOf(playerState.mode);
+    playerState.mode = modes[(currentModeIndex + 1) % modes.length];
+    applyMode();
+    savePlayerState({ force: true });
+    status.textContent = `已切换为${modeLabels[playerState.mode]}。`;
+  });
+  progress.addEventListener("pointerdown", (event) => {
+    isSeeking = true;
+    progress.setPointerCapture?.(event.pointerId);
+    seekFromPointer(event);
+  });
+  progress.addEventListener("pointermove", (event) => {
+    if (!isSeeking) return;
+    seekFromPointer(event);
+  });
+  progress.addEventListener("pointerup", (event) => {
+    seekFromPointer(event);
+    progress.releasePointerCapture?.(event.pointerId);
+    isSeeking = false;
+  });
+  progress.addEventListener("pointercancel", () => {
+    isSeeking = false;
+  });
+  progress.addEventListener("click", (event) => {
+    seekFromPointer(event);
+    isSeeking = false;
+  });
+  progress.addEventListener("mousedown", (event) => {
+    isSeeking = true;
+    seekFromPointer(event);
+  });
+  document.addEventListener("mousemove", (event) => {
+    if (isSeeking) seekFromPointer(event);
+  });
+  document.addEventListener("mouseup", (event) => {
+    if (!isSeeking) return;
+    seekFromPointer(event);
+    isSeeking = false;
+  });
+  progress.addEventListener("touchstart", (event) => {
+    isSeeking = true;
+    seekFromTouch(event);
+  });
+  progress.addEventListener("touchmove", (event) => {
+    if (!isSeeking) return;
+    event.preventDefault();
+    seekFromTouch(event);
+  }, { passive: false });
+  progress.addEventListener("touchend", (event) => {
+    seekFromTouch(event);
+    isSeeking = false;
+  });
+  progress.addEventListener("keydown", (event) => {
+    const keySteps = {
+      ArrowLeft: -25,
+      ArrowDown: -25,
+      ArrowRight: 25,
+      ArrowUp: 25,
+      PageDown: -100,
+      PageUp: 100,
+      Home: -1000,
+      End: 1000
+    };
+    if (!(event.key in keySteps)) return;
+    event.preventDefault();
+    isSeeking = true;
+    const nextValue = event.key === "Home" ? 0 : event.key === "End" ? 1000 : getProgressValue() + keySteps[event.key];
+    setProgressValue(nextValue);
+    seekToProgressValue();
+    isSeeking = false;
+  });
+  resultsRoot.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-track-id]");
+    if (!button) return;
+    const track = tracks.find((item) => item.id === button.dataset.trackId);
+    if (track) setTrack(track, { autoplay: true, currentTime: 0 });
+  });
+  audio.addEventListener("loadedmetadata", () => {
+    applyPendingTime();
+    syncProgress();
+  });
+  audio.addEventListener("timeupdate", () => {
+    syncProgress();
+    savePlayerState();
+  });
+  audio.addEventListener("play", () => {
+    desiredPlaying = true;
+    removePlaybackUnlock();
+    updatePlayState();
+    savePlayerState({ force: true, playing: true });
+  });
+  audio.addEventListener("pause", () => {
+    updatePlayState();
+    savePlayerState({ force: true, playing: desiredPlaying });
+  });
+  audio.addEventListener("ended", () => {
+    updatePlayState();
+    if (playerState.mode !== "single") {
+      selectTrackByIndex(nextIndex());
+    }
+  });
+  document.addEventListener("click", (event) => {
+    if (!root.contains(event.target)) setPanelOpen(false);
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") setPanelOpen(false);
+  });
+  window.addEventListener("pagehide", () => savePlayerState({ force: true, playing: desiredPlaying }));
+  window.addEventListener("beforeunload", () => savePlayerState({ force: true, playing: desiredPlaying }));
+  bootMusicPlayer().catch(() => {
+    tracks = [normalizeTrack(bundledDefaultTrack)];
+    setTrack(tracks[0], { autoplay: true });
+    status.textContent = "音乐库加载失败，播放默认曲目。";
+  });
+}
+
 function openPost(postId) {
   const post = posts.find((item) => item.id === postId);
   if (!post) return;
 
   selectors.postTitle.textContent = post.title;
-  selectors.postMeta.textContent = `${post.date} · ${post.tags.join(" / ")} · ${post.readTime}`;
+  selectors.postMeta.textContent = `${post.date} · ${post.category} · ${post.tags.join(" / ")} · ${post.readTime}`;
   selectors.postBody.innerHTML = post.body.map(renderPostBlock).join("");
   selectors.postModal.hidden = false;
   selectors.body.classList.add("modal-open");
@@ -739,12 +1397,21 @@ function bindEvents() {
       openProject(projectButton.dataset.projectId);
     }
 
+    const categoryButton = event.target.closest("[data-category]");
+    if (categoryButton) {
+      activePostCategory = categoryButton.dataset.category;
+      activePostTag = "";
+      renderNotesView();
+      document.querySelector("#latest")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+
     const tagButton = event.target.closest("[data-tag]");
     if (tagButton) {
-      const tag = tagButton.dataset.tag;
-      const filtered = posts.filter((post) => post.tags.includes(tag));
-      renderPosts(filtered);
+      activePostTag = tagButton.dataset.tag || "";
+      renderNotesView();
       document.querySelector("#latest")?.scrollIntoView({ behavior: "smooth" });
+      return;
     }
 
     if (event.target.matches(".modal-backdrop")) {
@@ -769,12 +1436,6 @@ function bindEvents() {
     }
   });
 
-  document.querySelectorAll("[data-topic]").forEach((card) => {
-    card.addEventListener("click", () => {
-      const topic = card.dataset.topic;
-      renderPosts(posts.filter((post) => post.tags.includes(topic)));
-    });
-  });
 }
 
 function bindActiveNav() {
@@ -803,9 +1464,35 @@ function revealLocalAdminLinks() {
   }
 }
 
+function applyInitialPostFilters() {
+  if (!selectors.postList) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const requested = normalizeCategoryName(params.get("category") || params.get("topic"));
+  const categories = getPostCategories();
+  if (!requested) {
+    activePostCategory = categories[0] || "";
+    activePostTag = "";
+    return;
+  }
+
+  const aliased = categoryAliases.get(requested) || requested;
+  const category = categories.find((item) => item === aliased);
+  if (category) {
+    activePostCategory = category;
+    activePostTag = "";
+    return;
+  }
+
+  const taggedPost = posts.find((post) => post.tags.includes(requested));
+  activePostCategory = taggedPost?.category || categories[0] || "";
+  activePostTag = taggedPost ? requested : "";
+}
+
 async function init() {
   setTheme(getInitialTheme());
   revealLocalAdminLinks();
+  initMusicPlayer();
   bindEvents();
   bindActiveNav();
 
@@ -825,11 +1512,10 @@ async function init() {
 
   await Promise.all(tasks);
 
-  const topic = new URLSearchParams(window.location.search).get("topic");
-  renderPosts(topic ? posts.filter((post) => post.tags.includes(topic)) : posts);
+  applyInitialPostFilters();
+  renderNotesView();
   renderProjects();
   renderResume();
-  renderTags();
   renderStats();
   renderSearchResults();
 }

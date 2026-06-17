@@ -8,9 +8,11 @@
       "tags": [
         "C++"
       ],
-      "summary": "C++单例模式总结",
+      "summary": "师从Cherno的C++单例模式总结",
       "body": [
-        "嗯"
+        "C++中的单例是一种组织一堆全局变量和静态函数的方式。",
+        "```cpp\n// 在这里粘贴代码\nclass Singleton\n{\npublic:\n    static Singleton& Get()\n    {\n        return s_Instance;\n    }\n\nprivate:\n    Singleton() {}\n\n    static Singleton s_Instance;\n};\n\nSingleton Singleton::s_Instance;\n```",
+        "饿汉式单例。"
       ]
     },
     {
@@ -18,6 +20,7 @@
       "title": "RAII 为什么能降低异常路径的复杂度",
       "date": "2026-06-12",
       "readTime": "8 min",
+      "category": "C++",
       "tags": [
         "C++",
         "工程习惯"
@@ -34,6 +37,7 @@
       "title": "从坐标系理解 MVP 矩阵",
       "date": "2026-06-04",
       "readTime": "10 min",
+      "category": "计算机图形学",
       "tags": [
         "图形学",
         "OpenGL"
@@ -50,6 +54,7 @@
       "title": "哈希表复杂度的真实前提",
       "date": "2026-05-28",
       "readTime": "6 min",
+      "category": "计算机基础",
       "tags": [
         "数据结构",
         "算法"
