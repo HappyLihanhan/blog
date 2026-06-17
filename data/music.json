@@ -4,7 +4,7 @@
       "id": "andrew-prahlow-travelers",
       "title": "Travelers",
       "artist": "Andrew Prahlow",
-      "url": "/assets/music/andrew-prahlow-travelers.mp3",
+      "url": "./assets/music/andrew-prahlow-travelers.mp3",
       "filename": "andrew-prahlow-travelers.mp3",
       "createdAt": "2026-06-17T10:07:11+00:00"
     },
@@ -12,7 +12,7 @@
       "id": "track",
       "title": "雨上がりの空",
       "artist": "",
-      "url": "/assets/music/20260617-230132-302693-track-e97ce192.mp3",
+      "url": "./assets/music/20260617-230132-302693-track-e97ce192.mp3",
       "filename": "20260617-230132-302693-track-e97ce192.mp3",
       "createdAt": "2026-06-17T15:01:32.305685+00:00"
     },
@@ -20,7 +20,7 @@
       "id": "track-23f2",
       "title": "风になる",
       "artist": "",
-      "url": "/assets/music/20260617-230312-990680-track-23f2-0567c4e4.mp3",
+      "url": "./assets/music/20260617-230312-990680-track-23f2-0567c4e4.mp3",
       "filename": "20260617-230312-990680-track-23f2-0567c4e4.mp3",
       "createdAt": "2026-06-17T15:03:12.995941+00:00"
     },
@@ -28,7 +28,7 @@
       "id": "track-8942",
       "title": "小水鲸",
       "artist": "",
-      "url": "/assets/music/20260617-230329-813169-track-8942-1cb0299f.mp3",
+      "url": "./assets/music/20260617-230329-813169-track-8942-1cb0299f.mp3",
       "filename": "20260617-230329-813169-track-8942-1cb0299f.mp3",
       "createdAt": "2026-06-17T15:03:29.816808+00:00"
     }

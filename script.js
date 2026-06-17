@@ -925,6 +925,18 @@ function initMusicPlayer() {
     return lastKnownTime;
   }
 
+  function resolveMusicUrl(value) {
+    const url = String(value || "").trim();
+    if (!url) return "";
+    if (/^(https?:\/\/|blob:|data:audio\/)/i.test(url)) return url;
+
+    const basePath = new URL("./", window.location.href).pathname;
+    if (url.startsWith("/") && basePath !== "/" && !url.startsWith(basePath)) {
+      return `${basePath.replace(/\/$/, "")}${url}`;
+    }
+    return url;
+  }
+
   function getStableCurrentTime() {
     if (pendingTime > 0) return pendingTime;
     if (Number.isFinite(audio.currentTime) && audio.currentTime > 0.25) {
@@ -961,7 +973,7 @@ function initMusicPlayer() {
       id: String(track.id || `track-${index}`),
       title: String(track.title || "未命名歌曲"),
       artist: String(track.artist || ""),
-      url: String(track.url || ""),
+      url: resolveMusicUrl(track.url),
       filename: String(track.filename || "")
     };
   }
