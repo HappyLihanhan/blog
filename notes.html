@@ -3,20 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="个人技术博客首页，记录 C++、计算机图形学、数据结构和项目复盘。"
-    />
-    <title>首页 | ian's Blog</title>
-    <link rel="stylesheet" href="./styles.css?v=20260617-nightcat-floor" />
+    <meta name="description" content="ian's Blog 的学习笔记列表，记录 C++、图形学、数据结构和项目复盘。" />
+    <title>学习笔记 | ian's Blog</title>
+    <link rel="stylesheet" href="./styles.css?v=20260617-search" />
   </head>
-  <body data-page="home">
+  <body data-page="notes">
     <header class="site-header">
       <a class="brand" href="./index.html" aria-label="回到首页">
         <span class="brand-mark" aria-hidden="true"></span>
         <span class="brand-text">ian's Blog</span>
       </a>
-
       <nav class="desktop-nav" aria-label="主导航">
         <a href="./index.html">首页</a>
         <a href="./notes.html">学习笔记</a>
@@ -24,7 +20,6 @@
         <a href="./projects.html">项目复盘</a>
         <a href="./admin.html" data-local-admin hidden>后台</a>
       </nav>
-
       <div class="header-actions">
         <button class="search-trigger" type="button" data-open-search>
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -59,78 +54,34 @@
     </div>
 
     <main id="home" class="page-shell">
-      <section class="hero-grid" aria-labelledby="hero-title">
-        <div class="hero-copy">
-          <p class="eyebrow">Home</p>
-          <h1 id="hero-title">把算法、图形和工程经验写清楚。</h1>
-          <p class="hero-lead">
-            这里整理 C++ 学习、计算机图形学、数据结构、和项目复盘等内容。每篇笔记都尽量保留问题背景、推导过程和可复现代码。
-          </p>
-          <div class="hero-actions">
-            <a class="primary-link" href="./notes.html">开始阅读</a>
-            <button class="secondary-link" type="button" data-open-search>快速搜索</button>
-          </div>
-          <dl class="stats-strip" aria-label="博客数据概览">
-            <div>
-              <dt data-stat-posts>0</dt>
-              <dd>学习笔记</dd>
-            </div>
-            <div>
-              <dt data-stat-projects>0</dt>
-              <dd>项目复盘</dd>
-            </div>
-          </dl>
-        </div>
-
-        <aside class="visual-panel" aria-label="当前学习状态">
-          <div class="lucky-cat-scene" role="img" aria-label="桌上的动态招财猫和窗外夜景">
-            <div class="retro-window" aria-hidden="true">
-              <span class="night-sky"></span>
-              <span class="moon"></span>
-              <span class="city-lights"></span>
-            </div>
-            <div class="desk-surface" aria-hidden="true"></div>
-            <div class="lucky-cat-sprite" aria-hidden="true"></div>
-          </div>
-          <div class="focus-list">
-            <p class="panel-label">Current Focus</p>
-            <ul>
-              <li>现代C++</li>
-              <li>Unity 3D</li>
-              <li>计算机基础</li>
-              <li>图形学</li>
-            </ul>
-          </div>
-        </aside>
+      <section class="page-heading" aria-labelledby="notes-page-title">
+        <p class="eyebrow">Notes</p>
+        <h1 id="notes-page-title">学习笔记</h1>
+        <p>按主题整理最近文章，保留问题背景、推导过程和可复现代码。</p>
       </section>
 
-      <section id="notes" class="section-block" aria-labelledby="notes-title">
-        <div class="section-heading">
-          <p class="eyebrow">Notes</p>
-          <h2 id="notes-title">学习入口</h2>
+      <section id="latest" class="content-layout" aria-labelledby="latest-title">
+        <div class="article-column">
+          <div class="section-heading compact">
+            <p class="eyebrow">Latest</p>
+            <h2 id="latest-title">最近文章</h2>
+          </div>
+          <div class="article-list" data-post-list></div>
         </div>
-        <div class="topic-grid">
-          <a class="topic-card" href="./notes.html?topic=C%2B%2B">
-            <span class="topic-icon">C++</span>
-            <h3>C++ 基础与工程习惯</h3>
-            <p>对象生命周期、模板、标准库、编译模型和调试技巧。</p>
-          </a>
-          <a class="topic-card" href="./notes.html?topic=%E5%9B%BE%E5%BD%A2%E5%AD%A6">
-            <span class="topic-icon">GL</span>
-            <h3>计算机图形学</h3>
-            <p>矩阵变换、着色器、光照模型、纹理采样与渲染管线。</p>
-          </a>
-          <a class="topic-card" href="./notes.html?topic=%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84">
-            <span class="topic-icon">DS</span>
-            <h3>数据结构与算法</h3>
-            <p>把复杂度、边界条件和题解复盘写成可复用方法。</p>
-          </a>
-          <a class="topic-card" href="./projects.html">
-            <span class="topic-icon">PR</span>
-            <h3>项目复盘</h3>
-            <p>按项目整理设计取舍、实现过程、问题记录和后续改进。</p>
-          </a>
-        </div>
+
+        <aside class="sidebar" aria-label="侧边栏">
+          <div class="sidebar-block">
+            <h2>目录</h2>
+            <a href="./index.html#notes">学习入口</a>
+            <a href="./notes.html">最近文章</a>
+            <a href="./resume.html">个人简历</a>
+            <a href="./projects.html">项目复盘</a>
+          </div>
+          <div class="sidebar-block">
+            <h2>标签</h2>
+            <div class="tag-cloud" data-tag-cloud></div>
+          </div>
+        </aside>
       </section>
     </main>
 
