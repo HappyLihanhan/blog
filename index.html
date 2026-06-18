@@ -8,7 +8,7 @@
       content="个人技术博客首页，记录 C++、计算机图形学、数据结构和项目复盘。"
     />
     <title>首页 | ian's Blog</title>
-    <link rel="stylesheet" href="./styles.css?v=20260617-nightcat-floor" />
+    <link rel="stylesheet" href="./styles.css?v=20260618-nav-cropped" />
   </head>
   <body data-page="home">
     <header class="site-header">
@@ -83,14 +83,15 @@
         </div>
 
         <aside class="visual-panel" aria-label="当前学习状态">
-          <div class="lucky-cat-scene" role="img" aria-label="桌上的动态招财猫和窗外夜景">
-            <div class="retro-window" aria-hidden="true">
-              <span class="night-sky"></span>
-              <span class="moon"></span>
-              <span class="city-lights"></span>
-            </div>
-            <div class="desk-surface" aria-hidden="true"></div>
-            <div class="lucky-cat-sprite" aria-hidden="true"></div>
+          <div class="villager-scene" data-villager-scene role="img" aria-label="在牢房中阅读附魔书的村民，眼睛会看向鼠标">
+            <img class="villager-scene-image" src="./assets/villager-enchanter.png" alt="" draggable="false" />
+            <span class="villager-lantern-glow" aria-hidden="true"></span>
+            <span class="villager-book-glow" aria-hidden="true"></span>
+            <span class="villager-magic" data-magic-particles aria-hidden="true"></span>
+            <span class="villager-eyes" aria-hidden="true">
+              <span class="villager-eye villager-eye-left"><span class="villager-pupil"></span></span>
+              <span class="villager-eye villager-eye-right"><span class="villager-pupil"></span></span>
+            </span>
           </div>
           <div class="focus-list">
             <p class="panel-label">Current Focus</p>
@@ -171,6 +172,6 @@
       </article>
     </div>
 
-    <script src="./script.js?v=20260617-search"></script>
+    <script src="./script.js?v=20260618-villager-nav-2"></script>
   </body>
 </html>

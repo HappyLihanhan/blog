@@ -3,9 +3,9 @@
   --bg: #f8faf8;
   --surface: #ffffff;
   --surface-soft: #f1f6f3;
-  --text: #1d2420;
-  --muted: #66736c;
-  --subtle: #8a9690;
+  --text: #111914;
+  --muted: #35443b;
+  --subtle: #536158;
   --line: #dce5df;
   --primary: #147d64;
   --primary-strong: #0b5f4b;
@@ -14,23 +14,30 @@
   --shadow: 0 20px 55px rgba(30, 46, 39, 0.12);
   --header-height: 64px;
   --content-width: 1180px;
-  --garden-sky: linear-gradient(180deg, #dff8ff 0%, #f5ffe7 56%, #e3f2cf 100%);
-  --garden-cloud: rgba(255, 255, 255, 0.9);
-  --garden-cloud-shadow: rgba(141, 194, 192, 0.3);
-  --garden-orb: rgba(255, 211, 89, 0.88);
-  --garden-orb-soft: rgba(255, 214, 103, 0.18);
-  --garden-hill: rgba(109, 173, 83, 0.24);
-  --garden-ground: rgba(126, 183, 86, 0.3);
-  --garden-grass: rgba(30, 126, 77, 0.28);
-  --garden-stem: rgba(34, 123, 75, 0.58);
-  --garden-leaf: rgba(74, 153, 81, 0.62);
-  --garden-flower-a: rgba(233, 112, 105, 0.66);
-  --garden-flower-b: rgba(239, 177, 71, 0.72);
-  --garden-flower-c: rgba(118, 157, 220, 0.62);
-  --garden-flower-core: rgba(255, 238, 156, 0.78);
-  --garden-spark: rgba(221, 144, 43, 0.5);
-  --garden-glow: rgba(255, 194, 83, 0.14);
-  --garden-pixel-opacity: 0.72;
+  --header-scene: url("./assets/nav-day.png?v=20260618-cropped");
+  --header-scene-position: center;
+  --header-scene-overlay: linear-gradient(90deg, rgba(255, 253, 242, 0.3), rgba(255, 253, 242, 0.12), rgba(255, 253, 242, 0.3));
+  --header-scene-filter: saturate(0.96) brightness(1.01);
+  --header-text: #172018;
+  --header-muted: #35443b;
+  --header-strong: #075d46;
+  --header-control: rgba(255, 253, 244, 0.76);
+  --header-line: rgba(93, 78, 51, 0.3);
+  --garden-scene-image: url("./assets/minecraft-garden-background.webp?v=20260618-day");
+  --garden-scene-position: center;
+  --garden-scene-overlay:
+    linear-gradient(90deg, rgba(248, 250, 248, 0.8) 0%, rgba(248, 250, 248, 0.46) 46%, rgba(248, 250, 248, 0.04) 72%),
+    linear-gradient(180deg, rgba(255, 250, 232, 0.03), rgba(22, 48, 30, 0.1));
+  --garden-scene-filter: brightness(1.02) saturate(1.05) contrast(1.02);
+  --garden-atmosphere-opacity: 0.82;
+  --garden-atmosphere-dim: 0.59;
+  --garden-atmosphere-soft: 0.67;
+  --scene-text: #101713;
+  --scene-muted: #29382f;
+  --scene-label: #075d46;
+  --scene-text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.96),
+    0 2px 8px rgba(255, 255, 255, 0.86);
 }
 
 :root.dark {
@@ -47,23 +54,30 @@
   --accent: #f0b460;
   --code: #253128;
   --shadow: 0 24px 70px rgba(0, 0, 0, 0.36);
-  --garden-sky: linear-gradient(180deg, #071220 0%, #10243d 54%, #16271f 100%);
-  --garden-cloud: rgba(92, 112, 143, 0.3);
-  --garden-cloud-shadow: rgba(13, 22, 42, 0.48);
-  --garden-orb: rgba(239, 231, 166, 0.78);
-  --garden-orb-soft: rgba(190, 211, 255, 0.14);
-  --garden-hill: rgba(40, 88, 72, 0.32);
-  --garden-ground: rgba(29, 75, 52, 0.38);
-  --garden-grass: rgba(75, 146, 105, 0.28);
-  --garden-stem: rgba(96, 166, 116, 0.42);
-  --garden-leaf: rgba(95, 158, 100, 0.42);
-  --garden-flower-a: rgba(194, 102, 138, 0.5);
-  --garden-flower-b: rgba(227, 172, 87, 0.54);
-  --garden-flower-c: rgba(114, 159, 219, 0.52);
-  --garden-flower-core: rgba(240, 225, 143, 0.62);
-  --garden-spark: rgba(177, 255, 168, 0.82);
-  --garden-glow: rgba(145, 255, 189, 0.52);
-  --garden-pixel-opacity: 0.84;
+  --header-scene: url("./assets/nav-night.png?v=20260618-cropped");
+  --header-scene-position: center;
+  --header-scene-overlay: linear-gradient(90deg, rgba(1, 7, 16, 0.38), rgba(2, 11, 24, 0.16), rgba(1, 7, 16, 0.38));
+  --header-scene-filter: saturate(1.04) brightness(0.92);
+  --header-text: #f2f7ff;
+  --header-muted: #c8d8ee;
+  --header-strong: #9cecd4;
+  --header-control: rgba(5, 18, 38, 0.68);
+  --header-line: rgba(151, 196, 237, 0.28);
+  --garden-scene-image: url("./assets/minecraft-garden-night.png?v=20260618-night");
+  --garden-scene-position: center;
+  --garden-scene-overlay:
+    linear-gradient(90deg, rgba(2, 8, 19, 0.22) 0%, rgba(2, 8, 19, 0.08) 46%, transparent 72%),
+    linear-gradient(180deg, rgba(2, 8, 18, 0.04), rgba(1, 6, 13, 0.14));
+  --garden-scene-filter: saturate(1.04) contrast(1.02);
+  --garden-atmosphere-opacity: 0.38;
+  --garden-atmosphere-dim: 0.24;
+  --garden-atmosphere-soft: 0.3;
+  --scene-text: #f4f8f5;
+  --scene-muted: #d4ded7;
+  --scene-label: #9aead0;
+  --scene-text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.94),
+    0 3px 12px rgba(0, 0, 0, 0.82);
 }
 
 * {
@@ -100,111 +114,38 @@ body::after {
   position: fixed;
   z-index: 0;
   content: "";
-  image-rendering: pixelated;
   pointer-events: none;
 }
 
 body::before {
-  inset: 0 -36px;
-  background:
-    linear-gradient(var(--garden-cloud-shadow) 0 0) 8% 124px / 126px 18px no-repeat,
-    linear-gradient(var(--garden-cloud) 0 0) 9% 96px / 96px 18px no-repeat,
-    linear-gradient(var(--garden-cloud) 0 0) calc(9% + 34px) 78px / 78px 18px no-repeat,
-    linear-gradient(var(--garden-cloud) 0 0) calc(9% + 72px) 106px / 70px 18px no-repeat,
-    linear-gradient(var(--garden-cloud-shadow) 0 0) 62% 156px / 144px 18px no-repeat,
-    linear-gradient(var(--garden-cloud) 0 0) 64% 130px / 92px 18px no-repeat,
-    linear-gradient(var(--garden-cloud) 0 0) calc(64% + 44px) 112px / 104px 18px no-repeat,
-    linear-gradient(var(--garden-orb-soft) 0 0) calc(82% - 14px) 76px / 82px 82px no-repeat,
-    linear-gradient(var(--garden-orb) 0 0) 82% 102px / 34px 34px no-repeat,
-    linear-gradient(var(--garden-hill) 0 0) 0 66vh / 100% 9vh no-repeat,
-    repeating-linear-gradient(90deg, transparent 0 54px, var(--garden-grass) 54px 60px, transparent 60px 96px) 0 100% / 192px 23vh repeat-x,
-    linear-gradient(180deg, transparent 0 56%, var(--garden-ground) 56% 100%),
-    var(--garden-sky);
-  opacity: 0.94;
-  animation: pixelGardenDrift 24s steps(6, end) infinite alternate;
+  inset: -4vmax;
+  background-image:
+    var(--garden-scene-overlay),
+    var(--garden-scene-image);
+  background-position: center, var(--garden-scene-position);
+  background-repeat: no-repeat;
+  background-size: cover;
+  filter: var(--garden-scene-filter);
+  transform: scale(1.05);
+  will-change: transform, filter;
+  animation: minecraftGardenDrift 28s ease-in-out infinite alternate;
 }
 
 body::after {
-  bottom: 24px;
-  left: 50%;
-  width: 6px;
-  height: 6px;
-  background: transparent;
-  box-shadow:
-    -49vw -12px 0 var(--garden-grass),
-    -43vw -16px 0 var(--garden-grass),
-    -35vw -10px 0 var(--garden-grass),
-    -28vw -18px 0 var(--garden-grass),
-    -17vw -12px 0 var(--garden-grass),
-    -6vw -16px 0 var(--garden-grass),
-    8vw -12px 0 var(--garden-grass),
-    19vw -18px 0 var(--garden-grass),
-    31vw -12px 0 var(--garden-grass),
-    44vw -16px 0 var(--garden-grass),
-    -48vw -22px 0 var(--garden-stem),
-    -48vw -28px 0 var(--garden-stem),
-    -49vw -34px 0 var(--garden-leaf),
-    calc(-48vw - 6px) -42px 0 var(--garden-flower-a),
-    -48vw -48px 0 var(--garden-flower-a),
-    calc(-48vw + 6px) -42px 0 var(--garden-flower-a),
-    -48vw -42px 0 var(--garden-flower-core),
-    -36vw -20px 0 var(--garden-stem),
-    -36vw -26px 0 var(--garden-stem),
-    -35vw -32px 0 var(--garden-leaf),
-    calc(-36vw - 6px) -40px 0 var(--garden-flower-b),
-    -36vw -46px 0 var(--garden-flower-b),
-    calc(-36vw + 6px) -40px 0 var(--garden-flower-b),
-    -36vw -40px 0 var(--garden-flower-core),
-    -24vw -24px 0 var(--garden-stem),
-    -24vw -30px 0 var(--garden-stem),
-    -25vw -36px 0 var(--garden-leaf),
-    calc(-24vw - 6px) -44px 0 var(--garden-flower-c),
-    -24vw -50px 0 var(--garden-flower-c),
-    calc(-24vw + 6px) -44px 0 var(--garden-flower-c),
-    -24vw -44px 0 var(--garden-flower-core),
-    -11vw -18px 0 var(--garden-stem),
-    -11vw -24px 0 var(--garden-stem),
-    -10vw -30px 0 var(--garden-leaf),
-    calc(-11vw - 6px) -38px 0 var(--garden-flower-a),
-    -11vw -44px 0 var(--garden-flower-a),
-    calc(-11vw + 6px) -38px 0 var(--garden-flower-a),
-    -11vw -38px 0 var(--garden-flower-core),
-    3vw -22px 0 var(--garden-stem),
-    3vw -28px 0 var(--garden-stem),
-    2vw -34px 0 var(--garden-leaf),
-    calc(3vw - 6px) -42px 0 var(--garden-flower-b),
-    3vw -48px 0 var(--garden-flower-b),
-    calc(3vw + 6px) -42px 0 var(--garden-flower-b),
-    3vw -42px 0 var(--garden-flower-core),
-    17vw -20px 0 var(--garden-stem),
-    17vw -26px 0 var(--garden-stem),
-    18vw -32px 0 var(--garden-leaf),
-    calc(17vw - 6px) -40px 0 var(--garden-flower-c),
-    17vw -46px 0 var(--garden-flower-c),
-    calc(17vw + 6px) -40px 0 var(--garden-flower-c),
-    17vw -40px 0 var(--garden-flower-core),
-    32vw -24px 0 var(--garden-stem),
-    32vw -30px 0 var(--garden-stem),
-    31vw -36px 0 var(--garden-leaf),
-    calc(32vw - 6px) -44px 0 var(--garden-flower-a),
-    32vw -50px 0 var(--garden-flower-a),
-    calc(32vw + 6px) -44px 0 var(--garden-flower-a),
-    32vw -44px 0 var(--garden-flower-core),
-    45vw -18px 0 var(--garden-stem),
-    45vw -24px 0 var(--garden-stem),
-    46vw -30px 0 var(--garden-leaf),
-    calc(45vw - 6px) -38px 0 var(--garden-flower-b),
-    45vw -44px 0 var(--garden-flower-b),
-    calc(45vw + 6px) -38px 0 var(--garden-flower-b),
-    45vw -38px 0 var(--garden-flower-core),
-    -41vw -184px 0 var(--garden-spark),
-    -18vw -232px 0 var(--garden-spark),
-    7vw -196px 0 var(--garden-spark),
-    28vw -252px 0 var(--garden-spark),
-    43vw -216px 0 var(--garden-spark);
-  filter: drop-shadow(0 0 5px var(--garden-glow));
-  opacity: var(--garden-pixel-opacity);
-  animation: pixelGardenBloom 4.8s steps(2, end) infinite alternate;
+  inset: -18px;
+  background:
+    radial-gradient(circle at 16% 15%, rgba(255, 250, 215, 0.58) 0, rgba(255, 228, 150, 0.13) 16%, transparent 35%),
+    radial-gradient(circle at 82% 45%, #fff7a6 0 1px, rgba(255, 239, 100, 0.56) 2px 4px, transparent 8px),
+    radial-gradient(circle at 75% 52%, #fff7a6 0 1px, rgba(255, 239, 100, 0.48) 2px 3px, transparent 7px),
+    radial-gradient(circle at 88% 58%, #fff7a6 0 1px, rgba(255, 239, 100, 0.5) 2px 4px, transparent 8px),
+    radial-gradient(circle at 68% 61%, #fff7a6 0 1px, rgba(255, 239, 100, 0.42) 2px 3px, transparent 7px),
+    radial-gradient(circle at 92% 67%, #fff7a6 0 1px, rgba(255, 239, 100, 0.46) 2px 4px, transparent 8px),
+    linear-gradient(103deg, transparent 25%, rgba(255, 247, 202, 0.14) 49%, transparent 68%) 0 84% / 360px 100px repeat-x;
+  mix-blend-mode: screen;
+  opacity: var(--garden-atmosphere-opacity);
+  transform: translate3d(-8px, 3px, 0);
+  will-change: transform, opacity;
+  animation: minecraftGardenAtmosphere 7s ease-in-out infinite alternate;
 }
 
 body.admin-page::before,
@@ -248,14 +189,30 @@ svg {
   position: sticky;
   top: 0;
   z-index: 50;
+  isolation: isolate;
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: var(--header-height);
   padding: 0 32px;
-  border-bottom: 1px solid color-mix(in srgb, var(--line), transparent 18%);
-  background: color-mix(in srgb, var(--bg), transparent 8%);
+  border-bottom: 1px solid var(--header-line);
+  background: var(--bg);
   backdrop-filter: blur(18px);
+  box-shadow: 0 8px 26px rgba(16, 24, 18, 0.12);
+  color: var(--header-text);
+}
+
+.site-header::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image: var(--header-scene-overlay), var(--header-scene);
+  background-position: center, var(--header-scene-position);
+  background-repeat: no-repeat;
+  background-size: 100% 100%, cover;
+  filter: var(--header-scene-filter);
+  content: "";
+  pointer-events: none;
 }
 
 .brand {
@@ -264,6 +221,12 @@ svg {
   gap: 10px;
   min-width: 0;
   font-weight: 700;
+  color: var(--header-text);
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.42);
+}
+
+:root.dark .brand {
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.86);
 }
 
 .brand-mark {
@@ -342,7 +305,7 @@ svg {
   display: flex;
   align-items: center;
   gap: 26px;
-  color: var(--muted);
+  color: var(--header-muted);
   font-size: 14px;
 }
 
@@ -365,6 +328,35 @@ svg {
   color: var(--primary-strong);
 }
 
+.site-header .desktop-nav a:hover,
+.site-header .desktop-nav a.is-active {
+  color: var(--header-strong);
+  text-shadow: 0 1px 5px color-mix(in srgb, var(--header-control), transparent 18%);
+}
+
+.site-header .music-toggle,
+.site-header .search-trigger,
+.site-header .icon-button {
+  border-color: var(--header-line);
+  background: var(--header-control);
+  color: var(--header-muted);
+  backdrop-filter: blur(8px);
+}
+
+.site-header .music-toggle:hover,
+.site-header .music-toggle.is-playing,
+.site-header .search-trigger:hover,
+.site-header .icon-button:hover {
+  border-color: color-mix(in srgb, var(--header-strong), transparent 42%);
+  color: var(--header-strong);
+}
+
+.site-header kbd {
+  border-color: var(--header-line);
+  background: color-mix(in srgb, var(--header-control), transparent 6%);
+  color: var(--header-muted);
+}
+
 .header-actions {
   display: flex;
   align-items: center;
@@ -379,6 +371,7 @@ svg {
 .music-toggle,
 .music-play,
 .music-upload,
+.music-volume-toggle,
 .music-mode {
   min-height: 38px;
   border: 1px solid var(--line);
@@ -397,6 +390,7 @@ svg {
 .music-toggle.is-playing,
 .music-play:hover,
 .music-upload:hover,
+.music-volume-toggle:hover,
 .music-mode:hover {
   border-color: color-mix(in srgb, var(--primary), var(--line) 40%);
   color: var(--primary-strong);
@@ -559,6 +553,46 @@ svg {
   font-size: 12px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+.music-volume {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 42px;
+  gap: 8px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.music-volume-toggle {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  min-height: 34px;
+  padding: 0;
+}
+
+.music-volume-toggle.is-muted {
+  color: var(--subtle);
+}
+
+.music-volume input {
+  width: 100%;
+  height: 24px;
+  margin: 0;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.music-volume input:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary), transparent 72%);
+  outline-offset: 2px;
+}
+
+.music-volume span {
+  color: var(--subtle);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
 .music-mode {
@@ -724,19 +758,30 @@ kbd {
   text-transform: uppercase;
 }
 
+.hero-copy > .eyebrow,
+.page-heading > .eyebrow,
+.section-heading > .eyebrow {
+  color: var(--scene-label);
+  text-shadow: var(--scene-text-shadow);
+}
+
 .hero-copy h1 {
   max-width: 760px;
   margin: 0;
+  color: var(--scene-text);
   font-size: 50px;
   line-height: 1.16;
   letter-spacing: 0;
+  text-shadow: var(--scene-text-shadow);
 }
 
 .hero-lead {
   max-width: 720px;
   margin: 22px 0 0;
-  color: var(--muted);
+  color: var(--scene-muted);
   font-size: 17px;
+  font-weight: 500;
+  text-shadow: var(--scene-text-shadow);
 }
 
 .hero-actions {
@@ -808,240 +853,218 @@ kbd {
   box-shadow: var(--shadow);
 }
 
-.lucky-cat-scene {
-  --desk-height: 28%;
+.villager-scene {
+  --look-x: 0px;
+  --look-y: 0px;
 
   position: relative;
+  isolation: isolate;
   width: 100%;
   aspect-ratio: 1;
   overflow: hidden;
-  background:
-    linear-gradient(90deg, rgba(117, 85, 64, 0.12) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(117, 85, 64, 0.1) 1px, transparent 1px),
-    linear-gradient(180deg, #efe2cf 0%, #d9c1a3 58%, #bd8b59 100%);
-  background-size: 24px 24px, 24px 24px, auto;
+  background: #271d17;
 }
 
-.lucky-cat-scene::before {
+.villager-scene-image {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(90deg, transparent 0 48%, rgba(80, 48, 30, 0.12) 48% 52%, transparent 52% 100%),
-    radial-gradient(circle at 18% 20%, rgba(255, 232, 180, 0.5), transparent 18%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 44%);
-  content: "";
+  z-index: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}
+
+.villager-lantern-glow,
+.villager-book-glow,
+.villager-magic,
+.villager-eyes {
+  position: absolute;
   pointer-events: none;
 }
 
-.retro-window {
-  position: absolute;
-  top: 22px;
-  right: 30px;
-  left: 30px;
-  height: 48%;
-  overflow: hidden;
-  border: 9px solid #63412c;
-  border-radius: 4px;
-  background: #07142a;
-  box-shadow:
-    inset 0 0 0 3px rgba(255, 231, 178, 0.16),
-    0 10px 18px rgba(63, 39, 24, 0.28);
+.villager-lantern-glow {
+  top: 33%;
+  left: 20.5%;
+  z-index: 1;
+  width: 15%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 247, 175, 0.82) 0 10%, rgba(255, 173, 45, 0.5) 22%, rgba(255, 114, 18, 0.2) 46%, transparent 72%);
+  filter: blur(3px);
+  mix-blend-mode: screen;
+  transform: translateZ(0);
+  animation: villagerLanternFlicker 2.35s steps(1, end) infinite;
 }
 
-.retro-window::before,
-.retro-window::after {
+.villager-book-glow {
+  top: 48%;
+  left: 35%;
+  z-index: 1;
+  width: 34%;
+  height: 28%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(233, 103, 255, 0.42), rgba(142, 34, 255, 0.18) 38%, transparent 72%);
+  filter: blur(8px);
+  mix-blend-mode: screen;
+  animation: villagerBookPulse 2.8s ease-in-out infinite;
+}
+
+.villager-magic {
+  top: 20%;
+  left: 39%;
+  z-index: 3;
+  width: 24%;
+  height: 36%;
+  overflow: hidden;
+}
+
+.magic-particle {
   position: absolute;
+  bottom: 0;
+  left: var(--particle-left);
+  width: var(--particle-size);
+  height: var(--particle-size);
+  background: #e96cff;
+  box-shadow:
+    0 0 3px #f4a2ff,
+    0 0 9px rgba(183, 50, 255, 0.92);
+  image-rendering: pixelated;
+  opacity: 0;
+  animation: villagerMagicRise var(--particle-duration) linear var(--particle-delay) infinite;
+}
+
+.magic-particle:nth-child(3n) {
+  box-shadow:
+    calc(var(--particle-size) * -1) 0 #b52cff,
+    var(--particle-size) 0 #b52cff,
+    0 calc(var(--particle-size) * -1) #e78aff,
+    0 var(--particle-size) #8f24ee,
+    0 0 10px rgba(194, 61, 255, 0.94);
+}
+
+.villager-eyes {
   inset: 0;
   z-index: 4;
-  content: "";
-  pointer-events: none;
 }
 
-.retro-window::before {
-  background:
-    linear-gradient(90deg, transparent calc(50% - 4px), #63412c calc(50% - 4px) calc(50% + 4px), transparent calc(50% + 4px)),
-    linear-gradient(0deg, transparent calc(50% - 4px), #63412c calc(50% - 4px) calc(50% + 4px), transparent calc(50% + 4px));
-}
-
-.retro-window::after {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.26), transparent 30%, transparent 70%, rgba(255, 255, 255, 0.12));
-  mix-blend-mode: screen;
-}
-
-.night-sky {
+.villager-eye {
   position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 18% 26%, #ffefb0 0 2px, transparent 3px),
-    radial-gradient(circle at 62% 18%, #d5f0ff 0 1px, transparent 2px),
-    radial-gradient(circle at 78% 42%, #fff1bf 0 2px, transparent 3px),
-    radial-gradient(circle at 36% 68%, #d7efff 0 1px, transparent 2px),
-    linear-gradient(180deg, #07142a 0%, #102a4e 55%, #1d405f 100%);
-  background-size: auto, auto, auto, auto, auto;
-  animation: nightStars 11s linear infinite;
-}
-
-.night-sky::before {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 10% 78%, #f7db72 0 1px, transparent 2px),
-    radial-gradient(circle at 46% 34%, #eef8ff 0 1px, transparent 2px),
-    radial-gradient(circle at 88% 22%, #fff3bb 0 2px, transparent 3px);
-  content: "";
-  opacity: 0.85;
-  animation: nightTwinkle 1.8s steps(2, end) infinite;
-}
-
-.retro-window .moon {
-  position: absolute;
-  top: 18px;
-  right: 26px;
-  z-index: 2;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #f7e8af;
-  box-shadow: 0 0 18px rgba(247, 232, 175, 0.55);
-  animation: moonDrift 12s ease-in-out infinite alternate;
-}
-
-.city-lights {
-  position: absolute;
-  right: -14%;
-  bottom: 0;
-  left: -12%;
-  z-index: 3;
-  height: 36%;
-  background:
-    repeating-linear-gradient(90deg, transparent 0 12px, rgba(255, 209, 92, 0.95) 12px 15px, transparent 15px 26px),
-    linear-gradient(180deg, #14243c 0%, #09111f 100%);
-  clip-path: polygon(0 100%, 0 42%, 8% 42%, 8% 22%, 15% 22%, 15% 56%, 24% 56%, 24% 30%, 33% 30%, 33% 48%, 43% 48%, 43% 16%, 51% 16%, 51% 54%, 60% 54%, 60% 34%, 68% 34%, 68% 60%, 78% 60%, 78% 24%, 88% 24%, 88% 46%, 100% 46%, 100% 100%);
-  opacity: 0.92;
-  animation: skylineShift 9s linear infinite alternate;
-}
-
-.desk-surface {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 2;
-  height: var(--desk-height);
-  border-top: 5px solid #6b4127;
-  background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.12), transparent 26%, rgba(74, 39, 20, 0.16) 72%),
-    repeating-linear-gradient(0deg, rgba(92, 52, 29, 0.24) 0 2px, transparent 2px 18px),
-    linear-gradient(180deg, #b9793f 0%, #8d522f 100%);
-  box-shadow: 0 -12px 22px rgba(44, 28, 17, 0.2);
-}
-
-.desk-surface::before {
-  position: absolute;
-  top: -10px;
-  right: 18%;
-  left: 18%;
-  height: 18px;
-  border-radius: 50%;
-  background: rgba(40, 22, 12, 0.16);
-  filter: blur(5px);
-  content: "";
-}
-
-.lucky-cat-sprite {
-  position: absolute;
-  bottom: var(--desk-height);
-  left: 50%;
-  z-index: 5;
-  width: min(54%, 190px);
-  aspect-ratio: 380 / 458;
-  background: url("./assets/lucky-cat-wave.png?v=20260617-floor") 60% 0 / 600% 100% no-repeat;
+  top: 40.82%;
+  width: 3.48%;
+  height: 2.42%;
+  overflow: hidden;
+  background: linear-gradient(90deg, #b9a58a, #d2c0a3 52%, #b5a086);
   image-rendering: pixelated;
-  filter: drop-shadow(0 8px 4px rgba(38, 23, 14, 0.26));
-  transform: translateX(-50%);
-  animation: luckyCatFrame 1.05s steps(1, end) infinite;
 }
 
-@keyframes luckyCatFrame {
-  0%,
-  18% {
-    background-position: 60% 0;
-  }
-  19%,
-  34% {
-    background-position: 40% 0;
-  }
-  35%,
-  52% {
-    background-position: 60% 0;
-  }
-  53%,
-  68% {
-    background-position: 80% 0;
-  }
-  69%,
-  84% {
-    background-position: 60% 0;
-  }
-  85%,
-  100% {
-    background-position: 40% 0;
-  }
+.villager-eye-left {
+  left: 45.38%;
 }
 
-@keyframes nightStars {
+.villager-eye-right {
+  left: 51.48%;
+}
+
+.villager-pupil {
+  position: absolute;
+  top: 5%;
+  left: 21%;
+  width: 58%;
+  height: 90%;
+  background: linear-gradient(90deg, #080705, #17140f 52%, #050403);
+  box-shadow:
+    inset 0 -2px rgba(0, 0, 0, 0.52),
+    inset 1px 0 rgba(74, 65, 52, 0.28);
+  transform: translate3d(var(--look-x), var(--look-y), 0);
+  transition: transform 75ms linear;
+  will-change: transform;
+}
+
+@keyframes villagerMagicRise {
   0% {
-    background-position: 0 0, 0 0, 0 0, 0 0, 0 0;
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.45) rotate(0);
+  }
+  16% {
+    opacity: 0.96;
+  }
+  72% {
+    opacity: 0.8;
   }
   100% {
-    background-position: 14px 4px, -10px 8px, 8px -6px, -12px -4px, 0 0;
+    opacity: 0;
+    transform: translate3d(var(--particle-drift), calc(var(--particle-rise) * -1), 0) scale(0.22) rotate(90deg);
   }
 }
 
-@keyframes nightTwinkle {
+@keyframes villagerLanternFlicker {
   0%,
   100% {
-    opacity: 0.48;
+    opacity: 0.66;
+    transform: scale(0.96);
+  }
+  12% {
+    opacity: 0.88;
+    transform: scale(1.04);
+  }
+  19% {
+    opacity: 0.72;
+    transform: scale(0.99);
+  }
+  42% {
+    opacity: 0.96;
+    transform: scale(1.07);
+  }
+  47% {
+    opacity: 0.7;
+    transform: scale(0.97);
+  }
+  74% {
+    opacity: 0.86;
+    transform: scale(1.03);
+  }
+}
+
+@keyframes villagerBookPulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.94);
   }
   50% {
-    opacity: 0.95;
+    opacity: 0.92;
+    transform: scale(1.06);
   }
 }
 
-@keyframes moonDrift {
+@keyframes minecraftGardenDrift {
   0% {
-    transform: translate(0, 0);
+    transform: translate3d(-0.7%, -0.35%, 0) scale(1.05);
+    filter: var(--garden-scene-filter);
+  }
+  55% {
+    transform: translate3d(0.45%, 0.2%, 0) scale(1.075);
+    filter: var(--garden-scene-filter) brightness(1.035);
   }
   100% {
-    transform: translate(-10px, 5px);
+    transform: translate3d(0.8%, -0.1%, 0) scale(1.06);
+    filter: var(--garden-scene-filter);
   }
 }
 
-@keyframes skylineShift {
+@keyframes minecraftGardenAtmosphere {
   0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(7%);
-  }
-}
-
-@keyframes pixelGardenDrift {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  100% {
-    transform: translate3d(-18px, 0, 0);
-  }
-}
-
-@keyframes pixelGardenBloom {
-  0%,
-  100% {
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(-8px, 3px, 0);
+    opacity: var(--garden-atmosphere-dim);
   }
   50% {
-    transform: translate3d(0, -4px, 0);
+    opacity: var(--garden-atmosphere-opacity);
+  }
+  100% {
+    transform: translate3d(12px, -5px, 0);
+    opacity: var(--garden-atmosphere-soft);
   }
 }
 
@@ -1098,14 +1121,17 @@ kbd {
 
 .section-heading h2 {
   margin: 0;
+  color: var(--scene-text);
   font-size: 30px;
   line-height: 1.25;
+  text-shadow: var(--scene-text-shadow);
 }
 
 .section-heading p:not(.eyebrow) {
   max-width: 680px;
   margin: 0;
-  color: var(--muted);
+  color: var(--scene-muted);
+  text-shadow: var(--scene-text-shadow);
 }
 
 .section-heading.compact {
@@ -1155,14 +1181,18 @@ kbd {
 
 .page-heading h1 {
   margin: 0;
+  color: var(--scene-text);
   font-size: 40px;
   line-height: 1.18;
+  text-shadow: var(--scene-text-shadow);
 }
 
 .page-heading p:not(.eyebrow) {
   max-width: 720px;
   margin: 0;
-  color: var(--muted);
+  color: var(--scene-muted);
+  font-weight: 500;
+  text-shadow: var(--scene-text-shadow);
 }
 
 .topic-grid,
@@ -1781,8 +1811,10 @@ kbd {
   margin: 0 auto;
   padding: 22px 0 32px;
   border-top: 1px solid var(--line);
-  color: var(--muted);
+  color: var(--scene-muted);
   font-size: 14px;
+  font-weight: 600;
+  text-shadow: var(--scene-text-shadow);
 }
 
 .site-footer p {
@@ -2040,8 +2072,23 @@ body.modal-open {
 
 @media (prefers-reduced-motion: reduce) {
   body::before,
-  body::after {
+  body::after,
+  .villager-lantern-glow,
+  .villager-book-glow,
+  .magic-particle {
     animation: none;
+  }
+
+  body::before {
+    transform: scale(1.05);
+  }
+
+  body::after {
+    transform: none;
+  }
+
+  .magic-particle {
+    display: none;
   }
 }
 
@@ -2160,10 +2207,25 @@ body.modal-open {
 @media (max-width: 640px) {
   :root {
     --header-height: 58px;
+    --garden-scene-position: 62% center;
+    --garden-scene-overlay:
+      linear-gradient(180deg, rgba(248, 250, 248, 0.7), rgba(248, 250, 248, 0.54)),
+      linear-gradient(180deg, rgba(255, 250, 232, 0.03), rgba(22, 48, 30, 0.1));
+  }
+
+  :root.dark {
+    --garden-scene-position: 58% center;
+    --garden-scene-overlay:
+      linear-gradient(180deg, rgba(2, 8, 19, 0.14), rgba(1, 6, 14, 0.28)),
+      linear-gradient(180deg, rgba(3, 9, 20, 0.04), rgba(1, 5, 12, 0.12));
   }
 
   .site-header {
     padding: 0 14px;
+  }
+
+  body::before {
+    background-position: center, var(--garden-scene-position);
   }
 
   .header-actions {

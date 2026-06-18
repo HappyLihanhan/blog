@@ -837,6 +837,11 @@ function initMusicPlayer() {
             </div>
             <span data-music-time>0:00 / 0:00</span>
           </div>
+          <div class="music-volume">
+            <button class="music-volume-toggle" type="button" data-music-mute aria-label="静音"></button>
+            <input type="range" data-music-volume min="0" max="100" step="1" value="70" aria-label="音量" />
+            <span data-music-volume-value>70%</span>
+          </div>
           <button class="music-mode" type="button" data-music-mode>列表循环</button>
           <p class="music-status" data-music-status>默认自动播放。</p>
           <div class="music-results" data-music-results></div>
@@ -858,6 +863,9 @@ function initMusicPlayer() {
   const progress = root.querySelector("[data-music-progress]");
   const progressFill = root.querySelector("[data-music-progress-fill]");
   const timeLabel = root.querySelector("[data-music-time]");
+  const muteButton = root.querySelector("[data-music-mute]");
+  const volumeInput = root.querySelector("[data-music-volume]");
+  const volumeValue = root.querySelector("[data-music-volume-value]");
   const status = root.querySelector("[data-music-status]");
   const resultsRoot = root.querySelector("[data-music-results]");
   const audio = root.querySelector("[data-music-audio]");
@@ -876,6 +884,9 @@ function initMusicPlayer() {
 
   const playIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7Z" /></svg>';
   const pauseIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5v14M15 5v14" /></svg>';
+  const volumeHighIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Zm4 4a4 4 0 0 1 0 6m2.5-8.5a7.5 7.5 0 0 1 0 11" /></svg>';
+  const volumeLowIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Zm4 4a4 4 0 0 1 0 6" /></svg>';
+  const volumeMutedIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Zm5 4 5 6m0-6-5 6" /></svg>';
   const stateKey = "ianBlogMusicState";
   const modes = ["list", "single", "random"];
   const modeLabels = {
@@ -884,16 +895,21 @@ function initMusicPlayer() {
     random: "随机播放"
   };
   const defaultVolume = 0.7;
-  audio.volume = defaultVolume;
+  const defaultTrackId = "daniel-rosenfeld-c418";
+  const defaultTrackRevision = 2;
   audio.autoplay = true;
   audio.setAttribute("autoplay", "");
   const bundledDefaultTrack = {
-    id: "andrew-prahlow-travelers",
-    title: "Travelers",
-    artist: "Andrew Prahlow",
-    url: "./assets/music/andrew-prahlow-travelers.mp3"
+    id: "daniel-rosenfeld-c418",
+    title: "C418",
+    artist: "Daniel Rosenfeld",
+    url: "./assets/music/20260618-150523-314526-daniel-rosenfeld-c418-6548c239.mp3"
   };
   let playerState = readPlayerState();
+  const savedVolume = Number(playerState.volume);
+  let currentVolume = Number.isFinite(savedVolume) ? Math.min(1, Math.max(0, savedVolume)) : defaultVolume;
+  let lastAudibleVolume = currentVolume > 0 ? currentVolume : defaultVolume;
+  audio.volume = currentVolume;
   lastKnownTime = Math.max(0, Number(playerState.currentTime) || 0);
   userPaused = playerState.userPaused === true;
   desiredPlaying = !userPaused;
@@ -908,6 +924,26 @@ function initMusicPlayer() {
     playButton.innerHTML = audio.paused ? playIcon : pauseIcon;
     playButton.setAttribute("aria-label", audio.paused ? "播放" : "暂停");
     toggle.classList.toggle("is-playing", !audio.paused);
+  }
+
+  function updateVolumeUi() {
+    const percent = Math.round(currentVolume * 100);
+    volumeInput.value = String(percent);
+    volumeInput.style.setProperty("--music-volume", `${percent}%`);
+    volumeInput.setAttribute("aria-valuetext", `${percent}%`);
+    volumeValue.textContent = `${percent}%`;
+    muteButton.innerHTML = currentVolume === 0 ? volumeMutedIcon : currentVolume < 0.5 ? volumeLowIcon : volumeHighIcon;
+    muteButton.setAttribute("aria-label", currentVolume === 0 ? "恢复音量" : "静音");
+    muteButton.classList.toggle("is-muted", currentVolume === 0);
+  }
+
+  function setVolume(value, { persist = true } = {}) {
+    const normalized = Math.min(1, Math.max(0, Number(value) || 0));
+    currentVolume = normalized;
+    if (normalized > 0) lastAudibleVolume = normalized;
+    audio.volume = normalized;
+    updateVolumeUi();
+    if (persist) savePlayerState({ force: true });
   }
 
   function readPlayerState() {
@@ -962,7 +998,8 @@ function initMusicPlayer() {
       mode: playerState.mode || "list",
       playing: typeof playing === "boolean" ? playing : desiredPlaying,
       userPaused,
-      volume: defaultVolume,
+      volume: currentVolume,
+      defaultTrackRevision,
       updatedAt: nowMs
     };
     localStorage.setItem(stateKey, JSON.stringify(playerState));
@@ -1190,9 +1227,13 @@ function initMusicPlayer() {
 
   async function bootMusicPlayer() {
     tracks = await loadMusicTracks();
-    audio.volume = defaultVolume;
-    const savedTrackIndex = tracks.findIndex((track) => track.id === playerState.trackId);
-    currentIndex = savedTrackIndex >= 0 ? savedTrackIndex : 0;
+    setVolume(currentVolume, { persist: false });
+    const defaultTrackIndex = tracks.findIndex((track) => track.id === defaultTrackId);
+    const savedTrackIndex =
+      playerState.defaultTrackRevision === defaultTrackRevision
+        ? tracks.findIndex((track) => track.id === playerState.trackId)
+        : -1;
+    currentIndex = savedTrackIndex >= 0 ? savedTrackIndex : Math.max(0, defaultTrackIndex);
     applyMode();
     renderPlaylist();
     userPaused = playerState.userPaused === true;
@@ -1241,6 +1282,15 @@ function initMusicPlayer() {
     applyMode();
     savePlayerState({ force: true });
     status.textContent = `已切换为${modeLabels[playerState.mode]}。`;
+  });
+  muteButton.addEventListener("click", () => {
+    setVolume(currentVolume === 0 ? lastAudibleVolume : 0);
+  });
+  volumeInput.addEventListener("input", () => {
+    setVolume(Number(volumeInput.value) / 100, { persist: false });
+  });
+  volumeInput.addEventListener("change", () => {
+    setVolume(Number(volumeInput.value) / 100);
   });
   progress.addEventListener("pointerdown", (event) => {
     isSeeking = true;
@@ -1338,7 +1388,9 @@ function initMusicPlayer() {
     }
   });
   document.addEventListener("click", (event) => {
-    if (!root.contains(event.target)) setPanelOpen(false);
+    const clickPath = typeof event.composedPath === "function" ? event.composedPath() : [];
+    const clickedInsidePlayer = clickPath.length ? clickPath.includes(root) : root.contains(event.target);
+    if (!clickedInsidePlayer) setPanelOpen(false);
   });
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") setPanelOpen(false);
@@ -1388,6 +1440,80 @@ function getInitialTheme() {
   const saved = localStorage.getItem("theme");
   if (saved) return saved;
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function initVillagerScene() {
+  const scene = document.querySelector("[data-villager-scene]");
+  if (!scene) return;
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const particleRoot = scene.querySelector("[data-magic-particles]");
+
+  if (particleRoot && !reducedMotion) {
+    const fragment = document.createDocumentFragment();
+    for (let index = 0; index < 18; index += 1) {
+      const particle = document.createElement("span");
+      const duration = 2.3 + Math.random() * 2.2;
+      particle.className = "magic-particle";
+      particle.style.setProperty("--particle-left", `${18 + Math.random() * 64}%`);
+      particle.style.setProperty("--particle-size", `${2 + Math.round(Math.random() * 3)}px`);
+      particle.style.setProperty("--particle-drift", `${-22 + Math.random() * 44}px`);
+      particle.style.setProperty("--particle-rise", `${78 + Math.random() * 38}px`);
+      particle.style.setProperty("--particle-duration", `${duration.toFixed(2)}s`);
+      particle.style.setProperty("--particle-delay", `${(-Math.random() * duration).toFixed(2)}s`);
+      fragment.appendChild(particle);
+    }
+    particleRoot.appendChild(fragment);
+  }
+
+  if (reducedMotion) return;
+
+  let pointerPosition = null;
+  let animationFrame = 0;
+
+  function resetLook() {
+    scene.style.setProperty("--look-x", "0px");
+    scene.style.setProperty("--look-y", "0px");
+  }
+
+  function updateLook() {
+    animationFrame = 0;
+    if (!pointerPosition) {
+      resetLook();
+      return;
+    }
+
+    const rect = scene.getBoundingClientRect();
+    const eyeCenterX = rect.left + rect.width * 0.505;
+    const eyeCenterY = rect.top + rect.height * 0.421;
+    const deltaX = pointerPosition.x - eyeCenterX;
+    const deltaY = pointerPosition.y - eyeCenterY;
+    const distance = Math.hypot(deltaX, deltaY);
+    const strength = Math.min(1, distance / Math.max(80, rect.width * 0.52));
+    const directionX = distance ? deltaX / distance : 0;
+    const directionY = distance ? deltaY / distance : 0;
+    const maxX = Math.max(1.4, rect.width * 0.0062);
+    const maxY = Math.max(0.8, rect.width * 0.0032);
+
+    scene.style.setProperty("--look-x", `${(directionX * strength * maxX).toFixed(2)}px`);
+    scene.style.setProperty("--look-y", `${(directionY * strength * maxY).toFixed(2)}px`);
+  }
+
+  document.addEventListener(
+    "pointermove",
+    (event) => {
+      if (event.pointerType === "touch") return;
+      pointerPosition = { x: event.clientX, y: event.clientY };
+      if (!animationFrame) animationFrame = requestAnimationFrame(updateLook);
+    },
+    { passive: true }
+  );
+
+  document.documentElement.addEventListener("mouseleave", () => {
+    pointerPosition = null;
+    resetLook();
+  });
+  window.addEventListener("blur", resetLook);
 }
 
 function bindEvents() {
@@ -1525,6 +1651,7 @@ function applyInitialPostFilters() {
 async function init() {
   setTheme(getInitialTheme());
   revealLocalAdminLinks();
+  initVillagerScene();
   initMusicPlayer();
   bindEvents();
   bindActiveNav();
