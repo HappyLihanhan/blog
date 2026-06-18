@@ -188,7 +188,23 @@ function escapeHtml(value) {
 }
 
 function formatInline(value) {
-  return escapeHtml(value).replace(/`([^`]+)`/g, "<code>$1</code>");
+  const codeTokens = [];
+  let formatted = escapeHtml(value).replace(/`([^`\n]+)`/g, (_, code) => {
+    const index = codeTokens.push(`<code>${code}</code>`) - 1;
+    return `\u0000CODE${index}\u0000`;
+  });
+
+  formatted = formatted
+    .replace(
+      /\[size=(small|medium|large|xlarge)\]([\s\S]*?)\[\/size\]/g,
+      '<span class="post-text-size post-text-size-$1">$2</span>'
+    )
+    .replace(/\[u\]([\s\S]*?)\[\/u\]/g, "<u>$1</u>")
+    .replace(/\*\*\*([^*\n]+?)\*\*\*/g, "<strong><em>$1</em></strong>")
+    .replace(/\*\*([^*\n]+?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\*([^*\n]+?)\*/g, "<em>$1</em>");
+
+  return formatted.replace(/\u0000CODE(\d+)\u0000/g, (_, index) => codeTokens[Number(index)] || "");
 }
 
 function normalizeCodeLanguage(value) {

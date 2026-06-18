@@ -26,12 +26,14 @@
   --garden-scene-image: url("./assets/minecraft-garden-background.webp?v=20260618-day");
   --garden-scene-position: center;
   --garden-scene-overlay:
-    linear-gradient(90deg, rgba(248, 250, 248, 0.8) 0%, rgba(248, 250, 248, 0.46) 46%, rgba(248, 250, 248, 0.04) 72%),
+    linear-gradient(90deg, rgba(248, 250, 248, 0.18) 0%, rgba(248, 250, 248, 0.08) 46%, transparent 72%),
     linear-gradient(180deg, rgba(255, 250, 232, 0.03), rgba(22, 48, 30, 0.1));
   --garden-scene-filter: brightness(1.02) saturate(1.05) contrast(1.02);
-  --garden-atmosphere-opacity: 0.82;
-  --garden-atmosphere-dim: 0.59;
-  --garden-atmosphere-soft: 0.67;
+  --garden-sun-glow-inner: rgba(255, 250, 215, 0.18);
+  --garden-sun-glow-outer: rgba(255, 228, 150, 0.03);
+  --garden-atmosphere-opacity: 0.56;
+  --garden-atmosphere-dim: 0.4;
+  --garden-atmosphere-soft: 0.46;
   --scene-text: #101713;
   --scene-muted: #29382f;
   --scene-label: #075d46;
@@ -69,6 +71,8 @@
     linear-gradient(90deg, rgba(2, 8, 19, 0.22) 0%, rgba(2, 8, 19, 0.08) 46%, transparent 72%),
     linear-gradient(180deg, rgba(2, 8, 18, 0.04), rgba(1, 6, 13, 0.14));
   --garden-scene-filter: saturate(1.04) contrast(1.02);
+  --garden-sun-glow-inner: rgba(255, 250, 215, 0.58);
+  --garden-sun-glow-outer: rgba(255, 228, 150, 0.13);
   --garden-atmosphere-opacity: 0.38;
   --garden-atmosphere-dim: 0.24;
   --garden-atmosphere-soft: 0.3;
@@ -134,7 +138,7 @@ body::before {
 body::after {
   inset: -18px;
   background:
-    radial-gradient(circle at 16% 15%, rgba(255, 250, 215, 0.58) 0, rgba(255, 228, 150, 0.13) 16%, transparent 35%),
+    radial-gradient(circle at 16% 15%, var(--garden-sun-glow-inner) 0, var(--garden-sun-glow-outer) 16%, transparent 35%),
     radial-gradient(circle at 82% 45%, #fff7a6 0 1px, rgba(255, 239, 100, 0.56) 2px 4px, transparent 8px),
     radial-gradient(circle at 75% 52%, #fff7a6 0 1px, rgba(255, 239, 100, 0.48) 2px 3px, transparent 7px),
     radial-gradient(circle at 88% 58%, #fff7a6 0 1px, rgba(255, 239, 100, 0.5) 2px 4px, transparent 8px),
@@ -1972,6 +1976,37 @@ kbd {
   font-size: 0.92em;
 }
 
+.post-body strong {
+  color: var(--text);
+  font-weight: 800;
+}
+
+.post-body u {
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 0.18em;
+}
+
+.post-text-size {
+  line-height: 1.55;
+}
+
+.post-text-size-small {
+  font-size: 14px;
+}
+
+.post-text-size-medium {
+  font-size: 18px;
+}
+
+.post-text-size-large {
+  font-size: 22px;
+}
+
+.post-text-size-xlarge {
+  font-size: 28px;
+  line-height: 1.4;
+}
+
 .post-code-block {
   overflow: hidden;
   margin: 2px 0;
@@ -2209,7 +2244,7 @@ body.modal-open {
     --header-height: 58px;
     --garden-scene-position: 62% center;
     --garden-scene-overlay:
-      linear-gradient(180deg, rgba(248, 250, 248, 0.7), rgba(248, 250, 248, 0.54)),
+      linear-gradient(180deg, rgba(248, 250, 248, 0.32), rgba(248, 250, 248, 0.2)),
       linear-gradient(180deg, rgba(255, 250, 232, 0.03), rgba(22, 48, 30, 0.1));
   }
 

@@ -1,21 +1,72 @@
 {
   "posts": [
     {
-      "id": "c",
-      "title": "C++单例模式总结",
+      "id": "post-1781795499744",
+      "title": "单例与工厂模式/对象池的区别",
+      "date": "2026-06-18",
+      "readTime": "5 min",
+      "tags": [
+        "单例，工厂模式，对象池"
+      ],
+      "summary": "对单例与工厂模式/对象池作概念区分。",
+      "body": [
+        "**单例**",
+        "` 一个对象最多创建一个类。`",
+        "**工厂模式**",
+        "` 对象由谁创建，以及根据条件创造什么对象。`"
+      ],
+      "category": "C++"
+    },
+    {
+      "id": "c--1",
+      "title": "单例模式 -- 依赖注入",
+      "date": "2026-06-18",
+      "readTime": "5 min",
+      "tags": [
+        "单例"
+      ],
+      "summary": "单例的扩展知识",
+      "body": [
+        "**[size=large]如何对单例解耦？[/size]**",
+        "1. 依赖注入",
+        "```cpp\nclass Enemy\n{\npublic:\n    void Attack()\n    {\n        AudioManager::Get().PlaySound(\"Attack\");\n    }\n};\n}\n```\n通过 `Get()` 直接获取音频管理器，虽然很方便但是也将 Enemy 和音频管理器绑死了。",
+        "```cpp\nclass IAudioManage\n{\npublic:\n    virtual ~IAudioManage() = delete;\n    virtual void playSound(const std::string& name) = 0;\n};\n\nclass Enemy\n{\npublic:\n    explicit Enemy(const& audiomanage)\n        : audiomanage_(audiomanage)\n    {\n    }\nprivate:\n    IAudioManage& audiomanage_;\n};\n```\n依赖注入版本，不再依赖某个Manage，而是一个抽象接口，这个构造函数要求Enemy构造时必须传入一个audiomanage。",
+        "和前者相比，使用依赖注入后，依赖关系更明确，降低耦合，且更方便测试。"
+      ],
+      "category": "C++"
+    },
+    {
+      "id": "1",
+      "title": "单例模式 -- 不同单例实现方式",
       "date": "2026-06-16",
       "readTime": "5 min",
       "tags": [
-        "C++"
+        "单例"
       ],
       "summary": "师从Cherno的C++单例模式总结",
       "body": [
         "C++中的单例是一种组织一堆全局变量和静态函数的方式。",
-        "```cpp\nclass Singleton\n{\nclass Singleton\n{\npublic:\n    static Singleton& Get()\n    {\n        static Singleton instance;\n        return instance;\n    }\n\n    Singleton(const Singleton&) = delete;\n    Singleton& operator=(const Singleton&) = delete;\n    Singleton(Singleton&&) = delete;\n    Singleton& operator=(Singleton&&) = delete;\n\nprivate:\n    Singleton() = default;\n    ~Singleton() = default;\n};\n```",
+        "优点：",
+        "保证对象唯一：适合只能有一个的资源，例如主音频设备、全局配置中心等。",
+        "统一访问入口：方便调用。",
+        "延迟初始化：局部静态变量版本只有在第一次使用时才创建。",
+        "避免重复初始化重量级资源。",
+        "缺点：",
+        "任何地方都能调用，依赖关系不清晰。",
+        "增加系统耦合。",
+        "不利于单元测试。",
+        "生命周期顺序问题：可能访问已经析构的对象。（不太懂）",
+        "-------------------------------------------------------------------------------",
+        "```cpp\nclass Singleton\n{\npublic:\n    static Singleton& Get()\n    {\n        static Singleton instance;\n        return instance;\n    }\n\n    Singleton(const Singleton&) = delete;\n    Singleton& operator=(const Singleton&) = delete;\n    Singleton(Singleton&&) = delete;\n    Singleton& operator=(Singleton&&) = delete;\n\nprivate:\n    Singleton() = default;\n    ~Singleton() = default;\n};\n```",
         "这是懒汉式初始化，第一次调用 `cpp Singleton::Get()` 时才创建对象，在 C++11 以后，初始化是线程安全的，但不代表单例对象内部所有操作都线程安全。指针版本中多线程不安全（如果看到指向 nullptr 会执行 new singleton），可能会创建多个对象甚至内存泄漏，并且没有明确释放时机，因此不建议用指针方式。",
         "析构函数可以是 private，防止外部 delete，不过即使析构函数是公有的，这样 delete 一个非 new 对象也依然是错误的。",
-        "------------------------------------------------------------------------",
-        "```cpp\nclass Singleton\n{\npublic:\n    static Singleton& Get()\n    {\n        return instance_;\n    }\n\n    Singleton(const Singleton&) = delete;\n    Singleton& operator=(const Singleton&) = delete;\n\nprivate:\n    Singleton() = default;\n\n    static Singleton instance_;\n};\n\nSingleton Singleton::instance_;\n```\n这是饿汉式单例。不管是否使用，只要程序启动就会初始化，可能遇到全局静态对象初始化顺序问题。"
+        "-------------------------------------------------------------------------------",
+        "```cpp\nclass Singleton\n{\npublic:\n    static Singleton* Get()\n    {\n        if (instance_ == nullptr)\n        {\n            std::lock_guard<std::mutex> lock(mutex_);\n\n            if (instance_ == nullptr)\n            {\n                instance_ = new Singleton();\n            }\n        }\n\n        return instance_;\n    }\n\nprivate:\n    Singleton() = default;\n\n    static Singleton* instance_;\n    static std::mutex mutex_;\n};\n```",
+        "双重检查锁，懒汉式的传统线程安全写法。",
+        "-------------------------------------------------------------------------------",
+        "```cpp\nclass Singleton\n{\npublic:\n    static Singleton& Get()\n    {\n        return instance_;\n    }\n\n    Singleton(const Singleton&) = delete;\n    Singleton& operator=(const Singleton&) = delete;\n\nprivate:\n    Singleton() = default;\n\n    static Singleton instance_;\n};\n\nSingleton Singleton::instance_;\n```",
+        "这是饿汉式单例。不管是否使用，只要程序启动就会初始化，可能遇到全局静态对象初始化顺序问题。",
+        "-------------------------------------------------------------------------------"
       ],
       "category": "C++"
     },
