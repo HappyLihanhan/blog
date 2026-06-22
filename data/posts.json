@@ -1,19 +1,143 @@
 {
   "posts": [
     {
+      "id": "128",
+      "title": "128. 最长连续序列",
+      "date": "2026-06-22",
+      "readTime": "5 min",
+      "tags": [
+        "哈希"
+      ],
+      "summary": "应用哈希集合的两个作用：1.去重。  2.平均可以用 O(1) 判断某个数字是否存在。",
+      "body": [
+        "题目：",
+        "![image](/assets/uploads/20260622-215741-146483-image-597dccf6.png)",
+        "```cpp\nclass Solution {\npublic:\n    int longestConsecutive(vector<int>& nums) {\n        unordered_set<int> st(nums.begin(), nums.end());\n\n        int ans = 0;\n\n        for (int x : st) {\n            // 如果 x - 1 存在，说明 x 不是连续序列的起点\n            if (x != INT_MIN && st.count(x - 1)) {\n                continue;\n            }\n\n            // x 是某个连续序列的起点\n            int current = x;\n            int length = 1;\n\n            // 不断寻找 current + 1\n            while (current != INT_MAX && st.count(current + 1)) {\n                current++;\n                length++;\n            }\n\n            ans = max(ans, length);\n        }\n\n        return ans;\n    }\n};\n```",
+        "为什么要找 x - 1 ？",
+        "因为要确保 x 是对应序列的起点，否则会出现大量重复寻找。",
+        "哈希表数据结构：",
+        "![image](/assets/uploads/20260622-221741-806840-image-13265c4b.png)"
+      ],
+      "category": "Hot100",
+      "pinned": false
+    },
+    {
+      "id": "189",
+      "title": "189. 轮转数组",
+      "date": "2026-06-22",
+      "readTime": "5 min",
+      "tags": [
+        "数组"
+      ],
+      "summary": "数组局部翻转方法",
+      "body": [
+        "题目：给定一个整数数组 nums，将数组中的元素向右轮转 k 个位置，其中 k 是非负数。",
+        "```cpp\nclass Solution {\npublic:\n    void rotate(vector<int>& nums, int k) {\n        k %= nums.size(); // 轮转 k 次等于轮转 k % n 次\n        ranges::reverse(nums);\n        reverse(nums.begin(), nums.begin() + k);\n        reverse(nums.begin() + k, nums.end());\n    }\n};\n```",
+        "![image](/assets/uploads/20260622-173707-804230-image-84906de4.png)",
+        "非常经典的 三次反转法，在不创建额外数组的情况下，把数组整体向右轮转 k 个位置。"
+      ],
+      "category": "Hot100",
+      "pinned": false
+    },
+    {
+      "id": "k",
+      "title": "2. 拷贝构造、拷贝赋值",
+      "date": "2026-06-21",
+      "readTime": "5 min",
+      "tags": [
+        "进阶"
+      ],
+      "summary": "拷贝构造、拷贝赋值",
+      "body": [
+        "**拷贝构造函数**",
+        "用一个已经存在的对象，创建一个全新的对象：",
+        "```cpp\nPlayer b = a;\n```",
+        "内部调用 `Player(const Player& other);` ，重点是 `b` 是第一次被创建。",
+        "为什么使用引用 & ？",
+        "`如果不使用引用，调用拷贝构造函数时，要先把原对象复制给参数 other，但复制 other 又要调用拷贝构造函数，于是变成无限递归。",
+        "**拷贝赋值运算符**",
+        "两个对象都已经存在，把一个对象的内容赋给另一个对象：",
+        "```cpp\nPlayer a;\nPlayer b;\n\nb = a;\n```",
+        "调用 `Player& operator=(const Player& other);` ，重点是 `b` 已经存在，只是更换它保存的内容。",
+        "为什么返回 Player& ？",
+        "拷贝赋值函数通常返回当前对象的引用，使用 Player& 是为了支持链式赋值。",
+        "```cpp\na = b = c;  ->  a = ( b = c );\n```"
+      ],
+      "category": "C++",
+      "pinned": false
+    },
+    {
+      "id": "c",
+      "title": "C++ 进阶学习路线",
+      "date": "2026-06-20",
+      "readTime": "5 min",
+      "tags": [
+        "学习路线"
+      ],
+      "summary": "C++ 进阶学习路线。",
+      "body": [
+        "1. 对象生命周期",
+        "2. 拷贝构造、拷贝赋值、析构",
+        "3. 左值、右值、移动语义",
+        "4. RAII 和所有权",
+        "5. unique_ptr、shared_ptr、weak_ptr",
+        "6. 继承、多态、虚析构",
+        "7. 虚表、多继承与对象布局",
+        "8. Lambda、函数对象、std::function",
+        "9. STL 容器底层与迭代器失效",
+        "10. 泛型算法与迭代器体系",
+        "11. 模板推导、特化、可变参数模板",
+        "12. 类型萃取、SFINAE、Concepts",
+        "13. 转发引用、引用折叠、完美转发",
+        "14. 异常安全与 noexcept",
+        "15. 编译、链接、ODR、动态库",
+        "16. 内存布局、对齐与未定义行为",
+        "17. 多线程、锁、条件变量",
+        "18. 原子操作与 C++ 内存模型",
+        "19. CPU 缓存、对象池、内存池",
+        "20. 工程设计与设计模式"
+      ],
+      "category": "C++",
+      "pinned": true
+    },
+    {
+      "id": "post-1781874256607",
+      "title": "1. 对象生命周期与拷贝控制",
+      "date": "2026-06-19",
+      "readTime": "5 min",
+      "tags": [
+        "进阶"
+      ],
+      "summary": "对象生命周期与拷贝控制",
+      "body": [
+        "生命周期，对象是否活着。",
+        "作用域：对象是否能访问。",
+        "四种生命周期：",
+        "1. 自动存储期，普通局部变量，进入作用域时构造，离开作用域时析构，一般存放在栈上。",
+        "2. 静态存储期：例如全局对象、静态成员、静态局部对象等，只构造一次，一般在程序结束时析构。",
+        "3. 动态存储期：通过new创建的对象，不delete的话会内存泄漏，",
+        "4."
+      ],
+      "category": "C++",
+      "pinned": false
+    },
+    {
       "id": "post-1781795499744",
-      "title": "单例与工厂模式/对象池的区别",
+      "title": "工厂模式",
       "date": "2026-06-18",
       "readTime": "5 min",
       "tags": [
-        "单例，工厂模式，对象池"
+        "工厂模式"
       ],
-      "summary": "对单例与工厂模式/对象池作概念区分。",
+      "summary": "工厂模式：把对象的创建过程封装起来。",
       "body": [
-        "**单例**",
-        "` 一个对象最多创建一个类。`",
         "**工厂模式**",
-        "` 对象由谁创建，以及根据条件创造什么对象。`"
+        "` 隐藏对象创建细节，统一对象创建入口，降低调用者和具体类之间的耦合。`",
+        "**简单工厂示例**",
+        "```cpp\npublic enum WeaponType\n{\n    Pistol,\n    Rifle,\n    Shotgun\n}\n```",
+        "```cpp\n#武器父类\npublic abstract class Weapon\n{\n    public abstract void Fire();\n}\n```",
+        "```cpp\n#具体武器\npublic class Pistol : Weapon\n{\n    public override void Fire()\n    {\n        Debug.Log(\"手枪射击\");\n    }\n}\n\npublic class Rifle : Weapon\n{\n    public override void Fire()\n    {\n        Debug.Log(\"步枪射击\");\n    }\n}\n\npublic class Shotgun : Weapon\n{\n    public override void Fire()\n    {\n        Debug.Log(\"霰弹枪射击\");\n    }\n}\n```",
+        "```cpp\n#工厂\npublic static class WeaponFactory\n{\n   访问权限 其他修饰符 返回值类型 函数名字 参数\n    public static Weapon CreateWeapon(WeaponType type)\n    {\n        switch (type)\n        {\n            case WeaponType.Pistol:\n                return new Pistol();\n\n            case WeaponType.Rifle:\n                return new Rifle();\n\n            case WeaponType.Shotgun:\n                return new Shotgun();\n\n            default:\n                throw new System.ArgumentException(\"未知武器类型\");\n        }\n    }\n}\n```"
       ],
       "category": "C++"
     },
@@ -29,7 +153,7 @@
       "body": [
         "**[size=large]如何对单例解耦？[/size]**",
         "1. 依赖注入",
-        "```cpp\nclass Enemy\n{\npublic:\n    void Attack()\n    {\n        AudioManager::Get().PlaySound(\"Attack\");\n    }\n};\n}\n```",
+        "```cpp\nclass Enemy\n{\npublic:\n    void Attack()\n    {\n        AudioManager::Get().PlaySound(\"Attack\");\n    }\n};\n```",
         "通过 `Get()` 直接获取音频管理器，虽然很方便但是也将 Enemy 和音频管理器绑死了。",
         "```cpp\nclass IAudioManage\n{\npublic:\n    virtual ~IAudioManage() = delete;\n    virtual void playSound(const std::string& name) = 0;\n};\n\nclass Enemy\n{\npublic:\n    explicit Enemy(const& audiomanage)\n        : audiomanage_(audiomanage)\n    {\n    }\nprivate:\n    IAudioManage& audiomanage_;\n};\n```",
         "依赖注入版本，不再依赖某个Manage，而是一个抽象接口，这个构造函数要求Enemy构造时必须传入一个audiomanage。",

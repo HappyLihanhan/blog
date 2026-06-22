@@ -90,6 +90,8 @@
 
 html {
   min-height: 100%;
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
   scroll-behavior: smooth;
 }
 
@@ -1280,6 +1282,16 @@ kbd {
   min-width: 0;
 }
 
+.pinned-post-section {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 26px;
+}
+
+.pinned-post-section[hidden] {
+  display: none;
+}
+
 .article-list {
   display: grid;
   gap: 12px;
@@ -1303,6 +1315,32 @@ kbd {
   padding: 18px;
   color: inherit;
   text-align: left;
+}
+
+.article-card.is-pinned {
+  border-color: color-mix(in srgb, var(--primary), var(--line) 35%);
+}
+
+.article-date-stack {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 7px;
+}
+
+.article-pin {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  border: 1px solid color-mix(in srgb, var(--accent), var(--line) 28%);
+  border-radius: 999px;
+  padding: 0 8px;
+  background: color-mix(in srgb, var(--accent), transparent 86%);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .article-card .date {

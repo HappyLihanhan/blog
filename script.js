@@ -156,11 +156,15 @@ let activeProjectName = "";
 let activePostCategory = "";
 let activePostTag = "";
 let musicObjectUrl = "";
+let scrollBehaviorBeforeReset = null;
+let scrollResetFrame = 0;
 
 const selectors = {
   html: document.documentElement,
   body: document.body,
   postList: document.querySelector("[data-post-list]"),
+  pinnedPostSection: document.querySelector("[data-pinned-post-section]"),
+  pinnedPostList: document.querySelector("[data-pinned-post-list]"),
   projectList: document.querySelector("[data-project-list]"),
   projectDetail: document.querySelector("[data-project-detail]"),
   searchModal: document.querySelector("[data-search-modal]"),
@@ -270,10 +274,22 @@ function categoryMatches(post, category = activePostCategory) {
 }
 
 function getVisiblePosts() {
-  return posts.filter((post) => {
+  return sortPostsByPinned(posts.filter((post) => {
+    if (post.pinned) return false;
     if (!categoryMatches(post)) return false;
     return !activePostTag || post.tags.includes(activePostTag);
-  });
+  }));
+}
+
+function getPinnedPosts() {
+  return posts.filter((post) => post.pinned);
+}
+
+function sortPostsByPinned(items) {
+  return items
+    .map((post, index) => ({ post, index }))
+    .sort((a, b) => Number(Boolean(b.post.pinned)) - Number(Boolean(a.post.pinned)) || a.index - b.index)
+    .map(({ post }) => post);
 }
 
 function safeImageSrc(value) {
@@ -384,6 +400,7 @@ function normalizePosts(items) {
             readTime: String(post.readTime || "5 min"),
             category: inferPostCategory(post.category, tags),
             tags,
+            pinned: post.pinned === true || post.pinned === "true",
             summary: String(post.summary || ""),
             body: Array.isArray(post.body) ? post.body.map(String) : []
           };
@@ -528,20 +545,13 @@ function renderPostCategories() {
     .join("");
 }
 
-function renderPosts(items = getVisiblePosts()) {
-  if (!selectors.postList) return;
-
-  if (!items.length) {
-    const filterText = [activePostCategory, activePostTag ? `标签：${activePostTag}` : ""].filter(Boolean).join(" · ");
-    selectors.postList.innerHTML = `<p class="empty-state">${filterText ? `「${escapeHtml(filterText)}」暂无文章。` : "还没有文章。登录后台后可以创建第一篇。"}</p>`;
-    return;
-  }
-
-  selectors.postList.innerHTML = items
-    .map(
-      (post) => `
-        <button class="article-card" type="button" data-post-id="${escapeHtml(post.id)}">
-          <span class="date">${escapeHtml(post.date)}</span>
+function renderPostCard(post) {
+  return `
+        <button class="article-card ${post.pinned ? "is-pinned" : ""}" type="button" data-post-id="${escapeHtml(post.id)}">
+          <span class="article-date-stack">
+            ${post.pinned ? '<span class="article-pin">置顶</span>' : ""}
+            <span class="date">${escapeHtml(post.date)}</span>
+          </span>
           <span>
             <h3>${escapeHtml(post.title)}</h3>
             <p>${escapeHtml(post.summary)}</p>
@@ -552,9 +562,28 @@ function renderPosts(items = getVisiblePosts()) {
             <span class="read-time">${escapeHtml(post.readTime)}</span>
           </span>
         </button>
-      `
-    )
-    .join("");
+      `;
+}
+
+function renderPinnedPosts(items = getPinnedPosts()) {
+  if (!selectors.pinnedPostList) return;
+
+  if (selectors.pinnedPostSection) {
+    selectors.pinnedPostSection.hidden = !items.length;
+  }
+  selectors.pinnedPostList.innerHTML = items.map(renderPostCard).join("");
+}
+
+function renderPosts(items = getVisiblePosts()) {
+  if (!selectors.postList) return;
+
+  if (!items.length) {
+    const filterText = [activePostCategory, activePostTag ? `标签：${activePostTag}` : ""].filter(Boolean).join(" · ");
+    selectors.postList.innerHTML = `<p class="empty-state">${filterText ? `「${escapeHtml(filterText)}」暂无文章。` : "还没有文章。登录后台后可以创建第一篇。"}</p>`;
+    return;
+  }
+
+  selectors.postList.innerHTML = items.map(renderPostCard).join("");
 }
 
 function renderProjects(items = projects) {
@@ -752,6 +781,7 @@ function renderTags() {
 
 function renderNotesView() {
   renderPostCategories();
+  renderPinnedPosts();
   renderTags();
   renderPosts();
 }
@@ -769,12 +799,12 @@ function renderSearchResults(query = "") {
   if (!selectors.searchResults) return;
 
   const normalized = query.trim().toLowerCase();
-  const postResults = posts
+  const postResults = sortPostsByPinned(posts
     .filter((post) => {
       if (!normalized) return true;
       const source = [post.category, post.title, post.summary, ...post.tags, ...post.body].join(" ").toLowerCase();
       return source.includes(normalized);
-    })
+    }))
     .map((post) => ({ kind: "文章", item: post }));
   const projectResults = projects
     .filter((project) => {
@@ -904,6 +934,7 @@ function initMusicPlayer() {
   const volumeLowIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Zm4 4a4 4 0 0 1 0 6" /></svg>';
   const volumeMutedIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Zm5 4 5 6m0-6-5 6" /></svg>';
   const stateKey = "ianBlogMusicState";
+  const windowStateKey = "__ianBlogMusicState";
   const modes = ["list", "single", "random"];
   const modeLabels = {
     list: "列表循环",
@@ -913,8 +944,6 @@ function initMusicPlayer() {
   const defaultVolume = 0.7;
   const defaultTrackId = "daniel-rosenfeld-c418";
   const defaultTrackRevision = 2;
-  audio.autoplay = true;
-  audio.setAttribute("autoplay", "");
   const bundledDefaultTrack = {
     id: "daniel-rosenfeld-c418",
     title: "C418",
@@ -927,7 +956,7 @@ function initMusicPlayer() {
   let lastAudibleVolume = currentVolume > 0 ? currentVolume : defaultVolume;
   audio.volume = currentVolume;
   lastKnownTime = Math.max(0, Number(playerState.currentTime) || 0);
-  userPaused = playerState.userPaused === true;
+  userPaused = isUserPausedState(playerState);
   desiredPlaying = !userPaused;
 
   function setPanelOpen(open) {
@@ -962,12 +991,66 @@ function initMusicPlayer() {
     if (persist) savePlayerState({ force: true });
   }
 
-  function readPlayerState() {
+  function setNativeAutoplay(enabled) {
+    audio.autoplay = enabled;
+    if (enabled) {
+      audio.setAttribute("autoplay", "");
+    } else {
+      audio.removeAttribute("autoplay");
+    }
+  }
+
+  function isPlainObject(value) {
+    return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+  }
+
+  function readWindowPlayerState() {
     try {
-      return JSON.parse(localStorage.getItem(stateKey) || "{}");
+      const payload = JSON.parse(window.name || "{}");
+      return isPlainObject(payload?.[windowStateKey]) ? payload[windowStateKey] : {};
     } catch {
       return {};
     }
+  }
+
+  function writeWindowPlayerState(state) {
+    try {
+      const payload = JSON.parse(window.name || "{}");
+      const nextPayload = isPlainObject(payload) ? payload : {};
+      nextPayload[windowStateKey] = state;
+      window.name = JSON.stringify(nextPayload);
+    } catch {
+      window.name = JSON.stringify({ [windowStateKey]: state });
+    }
+  }
+
+  function readPlayerState() {
+    const windowState = readWindowPlayerState();
+    let localState = {};
+    try {
+      localState = JSON.parse(localStorage.getItem(stateKey) || "{}");
+    } catch {
+      localState = {};
+    }
+    if (!isPlainObject(localState)) localState = {};
+    const windowUpdatedAt = Number(windowState.updatedAt) || 0;
+    const localUpdatedAt = Number(localState.updatedAt) || 0;
+    const mergedState = windowUpdatedAt > localUpdatedAt
+      ? { ...localState, ...windowState }
+      : { ...windowState, ...localState };
+    if (!hasPlaybackIntent(windowState)) {
+      delete mergedState.userPaused;
+      if (mergedState.playing === false) delete mergedState.playing;
+    }
+    return mergedState;
+  }
+
+  function hasPlaybackIntent(state) {
+    return isPlainObject(state) && ("userPaused" in state || "playing" in state);
+  }
+
+  function isUserPausedState(state) {
+    return state?.userPaused === true || state?.playing === false;
   }
 
   function updateLastKnownTime(value, { allowZero = false } = {}) {
@@ -1018,7 +1101,12 @@ function initMusicPlayer() {
       defaultTrackRevision,
       updatedAt: nowMs
     };
-    localStorage.setItem(stateKey, JSON.stringify(playerState));
+    try {
+      localStorage.setItem(stateKey, JSON.stringify(playerState));
+    } catch {
+      // Keep the cross-page fallback below when storage is unavailable.
+    }
+    writeWindowPlayerState(playerState);
   }
 
   function normalizeTrack(track, index = 0) {
@@ -1165,6 +1253,7 @@ function initMusicPlayer() {
       removePlaybackUnlock();
       return;
     }
+    setNativeAutoplay(true);
     audio.play().then(() => {
       status.textContent = "正在播放。";
       removePlaybackUnlock();
@@ -1177,6 +1266,7 @@ function initMusicPlayer() {
 
   function playAudio() {
     desiredPlaying = true;
+    setNativeAutoplay(true);
     audio.play().then(() => {
       status.textContent = "正在播放。";
       removePlaybackUnlock();
@@ -1209,6 +1299,13 @@ function initMusicPlayer() {
     const startTime = Math.max(0, Number(currentTime) || 0);
     pendingTime = startTime;
     updateLastKnownTime(startTime, { allowZero: true });
+    userPaused = !autoplay;
+    desiredPlaying = autoplay;
+    setNativeAutoplay(autoplay);
+    if (!autoplay) {
+      removePlaybackUnlock();
+      audio.pause();
+    }
     if (audio.getAttribute("src") !== track.url) {
       audio.src = track.url;
       audio.load();
@@ -1218,9 +1315,11 @@ function initMusicPlayer() {
     applyMode();
     renderPlaylist();
     updatePlayState();
-    userPaused = !autoplay;
-    desiredPlaying = autoplay;
-    if (autoplay) playAudio();
+    if (autoplay) {
+      playAudio();
+    } else {
+      updatePlayState();
+    }
     savePlayerState({ force: true, playing: autoplay, currentTime: startTime, allowZeroTime: true });
   }
 
@@ -1252,7 +1351,7 @@ function initMusicPlayer() {
     currentIndex = savedTrackIndex >= 0 ? savedTrackIndex : Math.max(0, defaultTrackIndex);
     applyMode();
     renderPlaylist();
-    userPaused = playerState.userPaused === true;
+    userPaused = isUserPausedState(playerState);
     const shouldAutoplay = !userPaused;
     desiredPlaying = shouldAutoplay;
     setTrack(tracks[currentIndex], {
@@ -1279,6 +1378,8 @@ function initMusicPlayer() {
     if (audio.paused) {
       userPaused = false;
       desiredPlaying = true;
+      setNativeAutoplay(true);
+      savePlayerState({ force: true, playing: true });
       audio.play().catch(() => {
         status.textContent = "任意点击页面后继续播放。";
         addPlaybackUnlock();
@@ -1286,8 +1387,10 @@ function initMusicPlayer() {
     } else {
       userPaused = true;
       desiredPlaying = false;
+      setNativeAutoplay(false);
       removePlaybackUnlock();
       audio.pause();
+      savePlayerState({ force: true, playing: false, currentTime: getStableCurrentTime() });
     }
   });
   prevButton.addEventListener("click", () => selectTrackByIndex(currentIndex - 1));
@@ -1388,12 +1491,18 @@ function initMusicPlayer() {
     savePlayerState();
   });
   audio.addEventListener("play", () => {
+    if (userPaused || !desiredPlaying) {
+      setNativeAutoplay(false);
+      audio.pause();
+      return;
+    }
     desiredPlaying = true;
     removePlaybackUnlock();
     updatePlayState();
     savePlayerState({ force: true, playing: true });
   });
   audio.addEventListener("pause", () => {
+    if (userPaused || !desiredPlaying) setNativeAutoplay(false);
     updatePlayState();
     savePlayerState({ force: true, playing: desiredPlaying });
   });
@@ -1425,7 +1534,7 @@ function openPost(postId) {
   if (!post) return;
 
   selectors.postTitle.textContent = post.title;
-  selectors.postMeta.textContent = `${post.date} · ${post.category} · ${post.tags.join(" / ")} · ${post.readTime}`;
+  selectors.postMeta.textContent = [post.pinned ? "置顶" : "", post.date, post.category, post.tags.join(" / "), post.readTime].filter(Boolean).join(" · ");
   selectors.postBody.innerHTML = post.body.map(renderPostBlock).join("");
   selectors.postModal.hidden = false;
   selectors.body.classList.add("modal-open");
@@ -1456,6 +1565,36 @@ function getInitialTheme() {
   const saved = localStorage.getItem("theme");
   if (saved) return saved;
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function resetPageScroll() {
+  const scroller = document.scrollingElement || document.documentElement;
+
+  if (scrollBehaviorBeforeReset === null) {
+    scrollBehaviorBeforeReset = selectors.html.style.scrollBehavior;
+  }
+  selectors.html.style.scrollBehavior = "auto";
+
+  const reset = () => {
+    scroller.scrollTop = 0;
+    scroller.scrollLeft = 0;
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  };
+
+  reset();
+  if (scrollResetFrame) cancelAnimationFrame(scrollResetFrame);
+  scrollResetFrame = requestAnimationFrame(() => {
+    reset();
+    selectors.html.style.scrollBehavior = scrollBehaviorBeforeReset;
+    scrollBehaviorBeforeReset = null;
+    scrollResetFrame = 0;
+  });
+}
+
+function disableScrollRestoration() {
+  if (window.history && "scrollRestoration" in window.history) {
+    window.history.scrollRestoration = "manual";
+  }
 }
 
 function initVillagerScene() {
@@ -1577,7 +1716,7 @@ function bindEvents() {
       activePostCategory = categoryButton.dataset.category;
       activePostTag = "";
       renderNotesView();
-      document.querySelector("#latest")?.scrollIntoView({ behavior: "smooth" });
+      resetPageScroll();
       return;
     }
 
@@ -1585,7 +1724,7 @@ function bindEvents() {
     if (tagButton) {
       activePostTag = tagButton.dataset.tag || "";
       renderNotesView();
-      document.querySelector("#latest")?.scrollIntoView({ behavior: "smooth" });
+      resetPageScroll();
       return;
     }
 
@@ -1665,6 +1804,7 @@ function applyInitialPostFilters() {
 }
 
 async function init() {
+  disableScrollRestoration();
   setTheme(getInitialTheme());
   revealLocalAdminLinks();
   initVillagerScene();
@@ -1672,7 +1812,7 @@ async function init() {
   bindEvents();
   bindActiveNav();
 
-  const needsPosts = Boolean(selectors.postList || selectors.searchResults || selectors.statPosts || selectors.tagCloud);
+  const needsPosts = Boolean(selectors.postList || selectors.pinnedPostList || selectors.searchResults || selectors.statPosts || selectors.tagCloud);
   const needsProjects = Boolean(selectors.projectList || selectors.searchResults || selectors.statProjects);
   const tasks = [];
 
@@ -1694,6 +1834,7 @@ async function init() {
   renderResume();
   renderStats();
   renderSearchResults();
+  resetPageScroll();
 }
 
 init();
