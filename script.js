@@ -3,7 +3,6 @@ const fallbackPosts = [
     id: "cpp-raii",
     title: "RAII 为什么能降低异常路径的复杂度",
     date: "2026-06-12",
-    readTime: "8 min",
     category: "C++",
     tags: ["C++", "工程习惯"],
     summary: "用资源所有权视角解释构造、析构、异常传播和智能指针的边界。",
@@ -17,7 +16,6 @@ const fallbackPosts = [
     id: "graphics-matrix",
     title: "从坐标系理解 MVP 矩阵",
     date: "2026-06-04",
-    readTime: "10 min",
     category: "计算机图形学",
     tags: ["图形学", "OpenGL"],
     summary: "把模型、观察、投影三个矩阵拆开，减少凭公式记忆带来的混乱。",
@@ -31,7 +29,6 @@ const fallbackPosts = [
     id: "ds-hashmap",
     title: "哈希表复杂度的真实前提",
     date: "2026-05-28",
-    readTime: "6 min",
     category: "计算机基础",
     tags: ["数据结构", "算法"],
     summary: "记录负载因子、冲突处理和扩容策略对实际性能的影响。",
@@ -45,7 +42,6 @@ const fallbackPosts = [
     id: "tooling-cmake",
     title: "CMake 项目从能编译到可维护",
     date: "2026-05-17",
-    readTime: "7 min",
     category: "计算机基础",
     tags: ["工具链", "CMake"],
     summary: "从 target、include 边界和构建选项三个角度整理 CMake 结构。",
@@ -62,7 +58,6 @@ const fallbackProjects = [
     id: "renderer",
     title: "渲染管线渐进式实现复盘",
     date: "2026-06-01",
-    readTime: "6 min",
     type: "小型实时渲染器",
     tags: ["图形学", "OpenGL"],
     summary: "从模型加载到 PBR 材质的渐进式实现记录。",
@@ -76,7 +71,6 @@ const fallbackProjects = [
     id: "blog-admin-workflow",
     title: "内容管理流程复盘",
     date: "2026-06-16",
-    readTime: "5 min",
     type: "后台管理工作流",
     tags: ["博客", "后台"],
     summary: "文章元数据、登录权限、搜索索引和写作规范。",
@@ -90,7 +84,6 @@ const fallbackProjects = [
     id: "notes-cli",
     title: "Markdown 整理流程复盘",
     date: "2026-05-20",
-    readTime: "4 min",
     type: "学习笔记整理器",
     tags: ["工具链", "CLI"],
     summary: "用命令行把零散 Markdown 整理成可发布目录。",
@@ -397,7 +390,6 @@ function normalizePosts(items) {
             id: String(post.id),
             title: String(post.title),
             date: String(post.date || ""),
-            readTime: String(post.readTime || "5 min"),
             category: inferPostCategory(post.category, tags),
             tags,
             pinned: post.pinned === true || post.pinned === "true",
@@ -416,7 +408,6 @@ function normalizeProjects(items) {
           id: String(project.id),
           title: String(project.title),
           date: String(project.date || ""),
-          readTime: String(project.readTime || "5 min"),
           type: String(project.type || project.title || ""),
           tags: Array.isArray(project.tags) ? project.tags.map(String).filter(Boolean) : [],
           summary: String(project.summary || ""),
@@ -559,7 +550,6 @@ function renderPostCard(post) {
           </span>
           <span class="article-side">
             <span class="article-category">${escapeHtml(post.category)}</span>
-            <span class="read-time">${escapeHtml(post.readTime)}</span>
           </span>
         </button>
       `;
@@ -1534,7 +1524,7 @@ function openPost(postId) {
   if (!post) return;
 
   selectors.postTitle.textContent = post.title;
-  selectors.postMeta.textContent = [post.pinned ? "置顶" : "", post.date, post.category, post.tags.join(" / "), post.readTime].filter(Boolean).join(" · ");
+  selectors.postMeta.textContent = [post.pinned ? "置顶" : "", post.date, post.category, post.tags.join(" / ")].filter(Boolean).join(" · ");
   selectors.postBody.innerHTML = post.body.map(renderPostBlock).join("");
   selectors.postModal.hidden = false;
   selectors.body.classList.add("modal-open");

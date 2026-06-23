@@ -1368,13 +1368,6 @@ kbd {
   padding: 2px 8px;
 }
 
-.article-card .read-time {
-  color: var(--primary-strong);
-  font-size: 13px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
 .article-side {
   display: grid;
   justify-items: end;
@@ -2387,10 +2380,6 @@ body.modal-open {
   .article-card {
     grid-template-columns: 1fr;
     gap: 8px;
-  }
-
-  .article-card .read-time {
-    white-space: normal;
   }
 
   .resume-header,
