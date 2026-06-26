@@ -44,7 +44,7 @@
         "支持随机访问，字符连续存储，迭代器失效通常可以按 vector 理解。",
         "**[size=medium]关联容器[/size]**",
         "**1. set 和 map**",
-        "![image](/assets/uploads/20260626-153317-947224-image-982b31cc.png)",
+        "![image](./assets/uploads/20260626-153317-947224-image-982b31cc.png)",
         "底层通常使用平衡二叉搜索树，常见实现是红黑树，但标准并未强制必须使用红黑树。",
         "查找、插入、删除通常为 O(log n)，不支持随机访问，迭代顺序是按键排序后的顺序。",
         "为什么使用红黑树？ 因为红黑树平衡条件更宽松，能在查找和增删中取得一个更好的平衡效率。",
@@ -70,7 +70,7 @@
         "**3. priority_queue**",
         "底层通常为 std::vector<int>，默认使用大顶堆维护，pop 复杂度 O(1)，增删的复杂度 O(log n)，不提供迭代器。",
         "**[size=large]迭代器失效总表[/size]**",
-        "![image](/assets/uploads/20260626-194440-900239-image-0954b4a9.png)",
+        "![image](./assets/uploads/20260626-194440-900239-image-0954b4a9.png)",
         "更新一下个人理解，指针和引用关注的是元素在内存中的位置，而迭代器关注的是元素在容器中的位置，所以可能会出现在容器中相对位置（或者说某种遍历位置）变了所以迭代器失效，但指针和引用还是正常的。"
       ],
       "category": "C++",
@@ -193,7 +193,7 @@
         "```cpp\nclass Character\n{\npublic:\n    int hp = 100;\n\n    void Move()\n    {\n        std::cout << \"角色移动\\n\";\n    }\n};\n\nclass Player : public Character\n{\npublic:\n    void Shoot()\n    {\n        std::cout << \"玩家射击\\n\";\n    }\n};\n```",
         "表达的是一种 is-a 的关系。",
         "三种不同继承方式如下图所示，一般使用 public 较多。",
-        "![image](/assets/uploads/20260625-130623-145458-image-c8c17851.png)",
+        "![image](./assets/uploads/20260625-130623-145458-image-c8c17851.png)",
         "一个派生类对象可以粗略理解为",
         "```cpp\nDerived 对象\n├── Base 子对象\n│   └── baseValue\n└── Derived 自己的部分\n    └── derivedValue\n```",
         "因此，子类对象可以被当作父类对象使用，这叫做向上转型。",
@@ -321,7 +321,7 @@
         "原因是 10 是临时值，而普通左值引用意味着“我要长期修改这个对象”，编译器不允许它直接引用一个即将消失的临时值。",
         "**常量左值引用 const T&** 既可以绑定左值，也可以绑定右值。这是因为通过 const T& 不能修改对象，因此绑定临时值是安全的。原本临时字符串会在表达式结束后销毁。但绑定到 const 左值引用后，它的生命周期会延长到 ref 生命周期结束。",
         "**右值引用 T&&** 右值引用主要用于绑定右值。不能直接绑定左值，但可以通过 std::move 转换。",
-        "![image](/assets/uploads/20260624-001311-884996-image-f150a2d2.png)",
+        "![image](./assets/uploads/20260624-001311-884996-image-f150a2d2.png)",
         "**[size=large]非常重要：有名字的右值引用是左值[/size]**",
         "```cpp\nint&& ref = 10;\n```",
         "初始化时，右侧的 10 是右值，因此可以绑定到 `int&&`。",
@@ -340,7 +340,7 @@
       ],
       "summary": "FCFS、SSTF、SCAN、C-SCAN、LOOK",
       "body": [
-        "![image](/assets/uploads/20260623-141146-948786-image-7ef433a4.png)",
+        "![image](./assets/uploads/20260623-141146-948786-image-7ef433a4.png)",
         "**[size=large]FCFS：先来先服务[/size]**",
         "按照磁盘请求到达系统的先后顺序依次处理，不对请求重新排序。",
         "优点：\n实现非常简单；\n严格按照请求到达顺序执行；\n不会发生请求饥饿；\n对所有请求比较公平。",
@@ -423,7 +423,7 @@
       "summary": "用户态、内核态、特权指令与模式切换",
       "body": [
         "用户态和内核态是 CPU 的两种不同特权级。",
-        "![image](/assets/uploads/20260623-135511-408621-image-d51c8ec9.png)",
+        "![image](./assets/uploads/20260623-135511-408621-image-d51c8ec9.png)",
         "普通应用程序运行在用户态，只能执行非特权指令（例如加减乘除，函数调用等）并访问自己的用户空间；操作系统内核运行在内核态，可以执行特权指令、管理页表、处理中断并控制硬件。",
         "用户程序需要操作文件、网络或设备时，必须通过系统调用进入内核态。除了系统调用，硬件中断和执行异常也会使 CPU 进入内核态。",
         "模式切换只是用户态和内核态之间的权限切换，不一定更换进程；上下文切换则是 CPU 从一个进程或线程切换到另一个进程或线程，通常开销更大。"
@@ -472,12 +472,12 @@
       "summary": "应用哈希集合的两个作用：1.去重。  2.平均可以用 O(1) 判断某个数字是否存在。",
       "body": [
         "题目：",
-        "![image](/assets/uploads/20260622-215741-146483-image-597dccf6.png)",
+        "![image](./assets/uploads/20260622-215741-146483-image-597dccf6.png)",
         "```cpp\nclass Solution {\npublic:\n    int longestConsecutive(vector<int>& nums) {\n        unordered_set<int> st(nums.begin(), nums.end());\n\n        int ans = 0;\n\n        for (int x : st) {\n            // 如果 x - 1 存在，说明 x 不是连续序列的起点\n            if (x != INT_MIN && st.count(x - 1)) {\n                continue;\n            }\n\n            // x 是某个连续序列的起点\n            int current = x;\n            int length = 1;\n\n            // 不断寻找 current + 1\n            while (current != INT_MAX && st.count(current + 1)) {\n                current++;\n                length++;\n            }\n\n            ans = max(ans, length);\n        }\n\n        return ans;\n    }\n};\n```",
         "为什么要找 x - 1 ？",
         "因为要确保 x 是对应序列的起点，否则会出现大量重复寻找。",
         "哈希表数据结构：",
-        "![image](/assets/uploads/20260622-221741-806840-image-13265c4b.png)"
+        "![image](./assets/uploads/20260622-221741-806840-image-13265c4b.png)"
       ],
       "category": "Hot100",
       "pinned": false
@@ -493,7 +493,7 @@
       "body": [
         "题目：给定一个整数数组 nums，将数组中的元素向右轮转 k 个位置，其中 k 是非负数。",
         "```cpp\nclass Solution {\npublic:\n    void rotate(vector<int>& nums, int k) {\n        k %= nums.size(); // 轮转 k 次等于轮转 k % n 次\n        ranges::reverse(nums);\n        reverse(nums.begin(), nums.begin() + k);\n        reverse(nums.begin() + k, nums.end());\n    }\n};\n```",
-        "![image](/assets/uploads/20260622-173707-804230-image-84906de4.png)",
+        "![image](./assets/uploads/20260622-173707-804230-image-84906de4.png)",
         "非常经典的 三次反转法，在不创建额外数组的情况下，把数组整体向右轮转 k 个位置。"
       ],
       "category": "Hot100",

@@ -314,10 +314,25 @@ function sortPostsByPinned(items) {
     .map(({ post }) => post);
 }
 
+function prefixSiteBasePath(url) {
+  if (!url.startsWith("/") || url.startsWith("//")) {
+    return url;
+  }
+
+  const basePath = new URL("./", window.location.href).pathname;
+  if (basePath !== "/" && !url.startsWith(basePath)) {
+    return `${basePath.replace(/\/$/, "")}${url}`;
+  }
+  return url;
+}
+
 function safeImageSrc(value) {
   const src = String(value || "").trim();
-  if (/^(https?:\/\/|\/|\.\/|\.\.\/|data:image\/(?:png|jpe?g|gif|webp);base64,)/i.test(src)) {
+  if (/^(https?:\/\/|\/\/|\.\/|\.\.\/|data:image\/(?:png|jpe?g|gif|webp);base64,)/i.test(src)) {
     return src;
+  }
+  if (src.startsWith("/")) {
+    return prefixSiteBasePath(src);
   }
   return "";
 }
@@ -1118,12 +1133,7 @@ function initMusicPlayer() {
     const url = String(value || "").trim();
     if (!url) return "";
     if (/^(https?:\/\/|blob:|data:audio\/)/i.test(url)) return url;
-
-    const basePath = new URL("./", window.location.href).pathname;
-    if (url.startsWith("/") && basePath !== "/" && !url.startsWith(basePath)) {
-      return `${basePath.replace(/\/$/, "")}${url}`;
-    }
-    return url;
+    return prefixSiteBasePath(url);
   }
 
   function getStableCurrentTime() {
