@@ -1297,6 +1297,57 @@ kbd {
   gap: 12px;
 }
 
+.article-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.article-pagination[hidden] {
+  display: none;
+}
+
+.article-page-button {
+  display: inline-grid;
+  place-items: center;
+  min-width: 38px;
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.article-page-arrow {
+  font-size: 18px;
+}
+
+.article-page-button:hover,
+.article-page-button.is-active {
+  border-color: var(--primary);
+  background: var(--surface-soft);
+  color: var(--primary-strong);
+}
+
+.article-page-button:disabled {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.article-pagination-ellipsis {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 38px;
+  color: var(--subtle);
+  font-weight: 800;
+}
+
 .empty-state {
   margin: 0;
   border: 1px solid var(--line);

@@ -145,9 +145,11 @@ const categoryAliases = new Map([
 let posts = [];
 let projects = [];
 let resume = null;
+const POSTS_PER_PAGE = 10;
 let activeProjectName = "";
 let activePostCategory = "";
 let activePostTag = "";
+let activePostPage = 1;
 let musicObjectUrl = "";
 let scrollBehaviorBeforeReset = null;
 let scrollResetFrame = 0;
@@ -156,6 +158,7 @@ const selectors = {
   html: document.documentElement,
   body: document.body,
   postList: document.querySelector("[data-post-list]"),
+  postPagination: document.querySelector("[data-post-pagination]"),
   pinnedPostSection: document.querySelector("[data-pinned-post-section]"),
   pinnedPostList: document.querySelector("[data-pinned-post-list]"),
   projectList: document.querySelector("[data-project-list]"),
@@ -272,6 +275,32 @@ function getVisiblePosts() {
     if (!categoryMatches(post)) return false;
     return !activePostTag || post.tags.includes(activePostTag);
   }));
+}
+
+function getPostPageCount(total) {
+  return Math.max(1, Math.ceil(total / POSTS_PER_PAGE));
+}
+
+function getPostPageNumbers(page, pageCount) {
+  if (pageCount <= 7) {
+    return Array.from({ length: pageCount }, (_, index) => index + 1);
+  }
+
+  const pages = new Set([1, pageCount, page - 1, page, page + 1]);
+  if (page <= 3) {
+    pages.add(2);
+    pages.add(3);
+    pages.add(4);
+  }
+  if (page >= pageCount - 2) {
+    pages.add(pageCount - 3);
+    pages.add(pageCount - 2);
+    pages.add(pageCount - 1);
+  }
+
+  return Array.from(pages)
+    .filter((item) => item >= 1 && item <= pageCount)
+    .sort((a, b) => a - b);
 }
 
 function getPinnedPosts() {
@@ -564,16 +593,51 @@ function renderPinnedPosts(items = getPinnedPosts()) {
   selectors.pinnedPostList.innerHTML = items.map(renderPostCard).join("");
 }
 
+function renderPostPagination(page, pageCount, total) {
+  if (!selectors.postPagination) return;
+
+  if (!total) {
+    selectors.postPagination.hidden = true;
+    selectors.postPagination.innerHTML = "";
+    return;
+  }
+
+  const pages = getPostPageNumbers(page, pageCount);
+  let lastPage = 0;
+  const pageButtons = pages
+    .map((pageNumber) => {
+      const gap = pageNumber - lastPage > 1 ? '<span class="article-pagination-ellipsis" aria-hidden="true">...</span>' : "";
+      lastPage = pageNumber;
+      const isActive = pageNumber === page;
+      return `${gap}<button class="article-page-button ${isActive ? "is-active" : ""}" type="button" data-post-page="${pageNumber}" aria-label="Page ${pageNumber}" ${isActive ? 'aria-current="page" disabled' : ""}>${pageNumber}</button>`;
+    })
+    .join("");
+
+  selectors.postPagination.hidden = false;
+  selectors.postPagination.innerHTML = `
+    ${pageCount > 1 ? `<button class="article-page-button article-page-arrow" type="button" data-post-page="${page - 1}" aria-label="Previous page" ${page === 1 ? "disabled" : ""}>&lsaquo;</button>` : ""}
+    ${pageButtons}
+    ${pageCount > 1 ? `<button class="article-page-button article-page-arrow" type="button" data-post-page="${page + 1}" aria-label="Next page" ${page === pageCount ? "disabled" : ""}>&rsaquo;</button>` : ""}
+  `;
+}
+
 function renderPosts(items = getVisiblePosts()) {
   if (!selectors.postList) return;
 
   if (!items.length) {
     const filterText = [activePostCategory, activePostTag ? `标签：${activePostTag}` : ""].filter(Boolean).join(" · ");
     selectors.postList.innerHTML = `<p class="empty-state">${filterText ? `「${escapeHtml(filterText)}」暂无文章。` : "还没有文章。登录后台后可以创建第一篇。"}</p>`;
+    renderPostPagination(1, 1, 0);
     return;
   }
 
-  selectors.postList.innerHTML = items.map(renderPostCard).join("");
+  const pageCount = getPostPageCount(items.length);
+  activePostPage = Math.min(Math.max(activePostPage, 1), pageCount);
+  const startIndex = (activePostPage - 1) * POSTS_PER_PAGE;
+  const pagedItems = items.slice(startIndex, startIndex + POSTS_PER_PAGE);
+
+  selectors.postList.innerHTML = pagedItems.map(renderPostCard).join("");
+  renderPostPagination(activePostPage, pageCount, items.length);
 }
 
 function renderProjects(items = projects) {
@@ -1701,10 +1765,22 @@ function bindEvents() {
       openProject(projectButton.dataset.projectId);
     }
 
+    const pageButton = event.target.closest("[data-post-page]");
+    if (pageButton) {
+      const nextPage = Number(pageButton.dataset.postPage);
+      if (Number.isFinite(nextPage) && nextPage !== activePostPage) {
+        activePostPage = nextPage;
+        renderPosts();
+        resetPageScroll();
+      }
+      return;
+    }
+
     const categoryButton = event.target.closest("[data-category]");
     if (categoryButton) {
       activePostCategory = categoryButton.dataset.category;
       activePostTag = "";
+      activePostPage = 1;
       renderNotesView();
       resetPageScroll();
       return;
@@ -1713,6 +1789,7 @@ function bindEvents() {
     const tagButton = event.target.closest("[data-tag]");
     if (tagButton) {
       activePostTag = tagButton.dataset.tag || "";
+      activePostPage = 1;
       renderNotesView();
       resetPageScroll();
       return;
