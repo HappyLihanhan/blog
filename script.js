@@ -154,7 +154,6 @@ let activeProjectName = "";
 let activePostCategory = "";
 let activePostTag = "";
 let activePostPage = 1;
-let musicObjectUrl = "";
 let scrollBehaviorBeforeReset = null;
 let scrollResetFrame = 0;
 
@@ -513,7 +512,7 @@ function normalizeResume(value) {
 }
 
 async function loadPosts() {
-  const sources = ["./data/posts.json", "/api/posts"];
+  const sources = ["/api/posts", "./data/posts.json"];
 
   for (const source of sources) {
     try {
@@ -551,7 +550,7 @@ async function loadProjects() {
 }
 
 async function loadResume() {
-  const sources = ["./data/resume.json", "/api/resume"];
+  const sources = ["/api/resume", "./data/resume.json"];
 
   for (const source of sources) {
     try {
@@ -1860,7 +1859,17 @@ function revealLocalAdminLinks() {
     document.querySelectorAll("[data-local-admin]").forEach((link) => {
       link.hidden = false;
     });
+    return;
   }
+
+  fetch("/api/session", { credentials: "same-origin", cache: "no-store" })
+    .then((response) => {
+      if (!response.ok) return;
+      document.querySelectorAll("[data-local-admin]").forEach((link) => {
+        link.hidden = false;
+      });
+    })
+    .catch(() => null);
 }
 
 function applyInitialPostFilters() {

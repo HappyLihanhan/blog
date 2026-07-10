@@ -1,6 +1,35 @@
 {
   "posts": [
     {
+      "id": "post-1783668431191",
+      "title": "13. 转发引用、引用折叠、完美转发",
+      "date": "2026-07-10",
+      "tags": [
+        "进阶"
+      ],
+      "summary": "转发引用、引用折叠、完美转发",
+      "body": [
+        "**[size=large]转发引用[/size]**",
+        "用于函数模板中，既可以接收左值也可以接收右值。",
+        "```cpp\ntemplate<typename T>\nvoid func(T&& value);\n```",
+        "必须是** T 模版推导**且形式是** T&& **才是转发引用，少一条都不行，有 const 也不行。",
+        "**[size=large]引用折叠[/size]**",
+        "虽然 C++ 不允许存在“引用的引用”，但是在模版中还是可能间接存在的，需要引用折叠规则，简单来说规则就是只要有一个左值最终就是左值，只有两个都是 && 时才是右值。",
+        "| 原始形式 | 折叠结果 |\n| --- | --- |\n| T& & | T& |\n| T& && | T& |\n| T&& & | T& |\n| T&& && | T&& |",
+        "举例说明：",
+        "```cpp\ntemplate<typename T>\nvoid func(T&& value);\n\n//传入左值\nint x = 10;\nfunc(x);\n\n//此时\nT = int&\nT&& = int& && = int&\n\n//传入右值\nfunc(10);\n\n//此时\nT = int\nT&& = int&&\n```",
+        "因此参数最终分别是左值引用、右值引用。",
+        "虽然这里 x 只是一个普通变量，但在转发引用中，仅对左值有一条特殊规则，如果传入**左值**，T 会被推导为**“左值引用类型”**。",
+        "**[size=large]完美转发[/size]**",
+        "定义：函数接收到参数后，将其原本的左值或右值属性原封不动地传给另一个函数。",
+        "完整实例：",
+        "```cpp\n#include <iostream>\n#include <utility>\n\nvoid target(int&)\n{\n    std::cout << \"接收到左值\\n\";\n}\n\nvoid target(int&&)\n{\n    std::cout << \"接收到右值\\n\";\n}\n\ntemplate<typename T>\nvoid wrapper(T&& value)\n{\n    target(std::forward<T>(value));\n}\n\nint main()\n{\n    int x = 10;\n\n    wrapper(x);   // 接收到左值\n    wrapper(10);  // 接收到右值\n}\n```",
+        "完美转发的作用和原理我不太理解，我感觉主要是中间可能有通用包装层会把右值包装成左值，所以需要去推导真实类型，有待后续补充。"
+      ],
+      "category": "C++",
+      "pinned": false
+    },
+    {
       "id": "16",
       "title": "16. 内存布局、对齐与未定义行为",
       "date": "2026-07-10",
@@ -1190,11 +1219,12 @@
         "1. 依赖注入",
         "```cpp\nclass Enemy\n{\npublic:\n    void Attack()\n    {\n        AudioManager::Get().PlaySound(\"Attack\");\n    }\n};\n```",
         "通过 `Get()` 直接获取音频管理器，虽然很方便但是也将 Enemy 和音频管理器绑死了。",
-        "```cpp\nclass IAudioManage\n{\npublic:\n    virtual ~IAudioManage() = delete;\n    virtual void playSound(const std::string& name) = 0;\n};\n\nclass Enemy\n{\npublic:\n    explicit Enemy(const& audiomanage)\n        : audiomanage_(audiomanage)\n    {\n    }\nprivate:\n    IAudioManage& audiomanage_;\n};\n```",
+        "```cpp\nclass IAudioManage\n{\npublic:\n    virtual ~IAudioManage() = delete;\n    virtual void playSound(const std::string& name) = 0;\n};\n\nclass Enemy\n{\npublic:\n    explicit Enemy(const Audiomanage& audiomanage)\n        : audiomanage_(audiomanage)\n    {\n    }\nprivate:\n    IAudioManage& audiomanage_;\n};\n```",
         "依赖注入版本，不再依赖某个Manage，而是一个抽象接口，这个构造函数要求Enemy构造时必须传入一个audiomanage。",
         "和前者相比，使用依赖注入后，依赖关系更明确，降低耦合，且更方便测试。"
       ],
-      "category": "C++"
+      "category": "C++",
+      "pinned": false
     },
     {
       "id": "1",

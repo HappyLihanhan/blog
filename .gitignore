@@ -12,3 +12,16 @@ README.md
 __pycache__/
 *.pyc
 *.tmp
+
+# Sites / Vinext generated files.
+node_modules/
+dist/
+.next/
+.wrangler/
+next-env.d.ts
+tsconfig.tsbuildinfo
+public/*.html
+public/*.js
+public/*.css
+public/assets/
+public/data/
