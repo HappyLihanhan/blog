@@ -146,6 +146,10 @@ let posts = [];
 let projects = [];
 let resume = null;
 const POSTS_PER_PAGE = 10;
+const postTitleCollator = new Intl.Collator("zh-CN-u-co-pinyin", {
+  numeric: true,
+  sensitivity: "base"
+});
 let activeProjectName = "";
 let activePostCategory = "";
 let activePostTag = "";
@@ -270,7 +274,7 @@ function categoryMatches(post, category = activePostCategory) {
 }
 
 function getVisiblePosts() {
-  return sortPostsByPinned(posts.filter((post) => {
+  return sortPostsForDisplay(posts.filter((post) => {
     if (post.pinned) return false;
     if (!categoryMatches(post)) return false;
     return !activePostTag || post.tags.includes(activePostTag);
@@ -304,13 +308,17 @@ function getPostPageNumbers(page, pageCount) {
 }
 
 function getPinnedPosts() {
-  return posts.filter((post) => post.pinned);
+  return sortPostsForDisplay(posts.filter((post) => post.pinned));
 }
 
-function sortPostsByPinned(items) {
+function sortPostsForDisplay(items) {
   return items
     .map((post, index) => ({ post, index }))
-    .sort((a, b) => Number(Boolean(b.post.pinned)) - Number(Boolean(a.post.pinned)) || a.index - b.index)
+    .sort((a, b) =>
+      Number(Boolean(b.post.pinned)) - Number(Boolean(a.post.pinned)) ||
+      postTitleCollator.compare(a.post.title.trim(), b.post.title.trim()) ||
+      a.index - b.index
+    )
     .map(({ post }) => post);
 }
 
@@ -868,7 +876,7 @@ function renderSearchResults(query = "") {
   if (!selectors.searchResults) return;
 
   const normalized = query.trim().toLowerCase();
-  const postResults = sortPostsByPinned(posts
+  const postResults = sortPostsForDisplay(posts
     .filter((post) => {
       if (!normalized) return true;
       const source = [post.category, post.title, post.summary, ...post.tags, ...post.body].join(" ").toLowerCase();
