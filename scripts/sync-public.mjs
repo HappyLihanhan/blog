@@ -1,4 +1,4 @@
-import { cp, mkdir } from "node:fs/promises";
+import { cp, mkdir, rm } from "node:fs/promises";
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
@@ -20,10 +20,14 @@ const files = [
 ];
 
 await mkdir(publicRoot, { recursive: true });
+await rm(resolve(publicRoot, "assets", "music"), { recursive: true, force: true });
 await Promise.all(
   files.map((file) => cp(resolve(root, file), resolve(publicRoot, file))),
 );
 await Promise.all([
-  cp(resolve(root, "assets"), resolve(publicRoot, "assets"), { recursive: true }),
+  cp(resolve(root, "assets"), resolve(publicRoot, "assets"), {
+    recursive: true,
+    filter: (source) => !source.toLowerCase().endsWith(".mp3"),
+  }),
   cp(resolve(root, "data"), resolve(publicRoot, "data"), { recursive: true }),
 ]);
