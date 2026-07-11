@@ -1,6 +1,23 @@
 {
   "posts": [
     {
+      "id": "129",
+      "title": "129. 求根节点到叶节点数字之和",
+      "date": "2026-07-11",
+      "tags": [
+        "二叉树"
+      ],
+      "summary": "使用lambda和递归求根节点到叶节点数字之和",
+      "body": [
+        "```cpp\n/**\n * Definition for a binary tree node.\n * struct TreeNode {\n *     int val;\n *     TreeNode *left;\n *     TreeNode *right;\n *     TreeNode() : val(0), left(nullptr), right(nullptr) {}\n *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}\n *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}\n * };\n */\nclass Solution {\npublic:\n    int sumNumbers(TreeNode* root) {\n        int ans = 0;\n\n        auto dfs = [&](this auto& dfs, TreeNode* root, int count)->void {\n            count *= 10;\n            count += root->val;\n            if(root->left != nullptr){\n                dfs(root->left, count);\n            }\n            if(root->right != nullptr){\n                dfs(root->right, count);\n            }\n            if(root->left == nullptr && root->right == nullptr){\n                ans += count;\n                return;\n            }\n        };\n\n        dfs(root, 0);\n        return ans;\n    }\n};\n```",
+        "踩过的坑：",
+        "1. 如果 Lambda 内部要调用自身的话，应该传入隐式参数 `this auto& dfs`，要注意写法。",
+        "2. 使用 ans 记录答案不需要 dfs 返回值，因此应该显式设置为 void 不然会报错。"
+      ],
+      "category": "Hot100",
+      "pinned": false
+    },
+    {
       "id": "71",
       "title": "71. 简化路径",
       "date": "2026-07-11",
