@@ -1,6 +1,24 @@
 {
   "posts": [
     {
+      "id": "71",
+      "title": "71. 简化路径",
+      "date": "2026-07-11",
+      "tags": [
+        "字符串"
+      ],
+      "summary": "涉及到字符串切分",
+      "body": [
+        "使用 split 实现，也可以使用 getline(ss, s, '/')，意思是对 ss（字符串流）使用 / 进行切分，保存到 s（string）中。",
+        "```cpp\nclass Solution {\npublic:\n    string simplifyPath(string path) {\n        vector<string> stack;\n        for(auto&& str : path | views::split('/')){\n            string s(str.begin(), str.end());\n            if(s == \".\" || s.empty()) continue;\n            else if(s != \"..\") stack.push_back(s);\n            else{\n                if(!stack.empty()){\n                    stack.pop_back();\n                }\n            }\n        }\n        string ans;\n        for(string& s : stack){\n            ans += '/';\n            ans += s;\n        }\n        \n        return ans.empty() ? \"/\" : ans;\n    }\n};\n```",
+        "需要注意的是，split 的迭代器解引用后返回的是一个子区间临时对象，或者说纯右值，因此只能**右值引用**接收,并且由于返回的是一个子区间对象，因此还需要用一个 string 变量来接收，不能直接使用。",
+        "**getline 写法**",
+        "```cpp\nclass Solution {\npublic:\n    string simplifyPath(string path) {\n        vector<string> stk;\n        istringstream ss(path);\n        string s;\n        while (getline(ss, s, '/')) {\n            if (s.empty() || s == \".\") {\n                continue;\n            }\n            if (s != \"..\") {\n                stk.push_back(s);\n            } else if (!stk.empty()) {\n                stk.pop_back();\n            }\n        }\n\n        string ans;\n        for (string& s : stk) {\n            ans += '/';\n            ans += s;\n        }\n        return stk.empty() ? \"/\" : ans;\n    }\n};\n```"
+      ],
+      "category": "Hot100",
+      "pinned": false
+    },
+    {
       "id": "15-odr",
       "title": "15. 编译、链接、ODR、动态库",
       "date": "2026-07-10",
@@ -17,7 +35,28 @@
         "**3. 汇编**",
         "对汇编语言转换成机器语言，生成**目标文件**。",
         "**4. 链接**",
-        "两个工作：符号解析和重定位。**符号解析**要找到函数和全局变量的定义在哪个目标文件中。**重定位**负责找到这些东西的最终地址，并修正代码和数据的地址引用。最后把多个目标文件和动态库组合成**最终可执行文件**。"
+        "两个工作：符号解析和重定位。**符号解析**要找到函数和全局变量的定义在哪个目标文件中。**重定位**负责找到这些东西的最终地址，并修正代码和数据的地址引用。最后把多个目标文件和动态库组合成**最终可执行文件**。",
+        "**[size=large]链接[/size]**",
+        "定义不多赘述，讲讲可能会链接错误的地方",
+        "1. 声明了但不提供定义",
+        "2. 同一函数或变量在多个目标文件中重复定义",
+        "**[size=medium]静态链接和动态链接[/size]**",
+        "**静态链接：**静态库在链接阶段被复制进可执行文件。",
+        "**特点**",
+        "1. 可执行文件体积较大",
+        "2. 运行时不依赖静态库文件",
+        "3. 多个程序会各自存一份库代码",
+        "**动态链接：**动态库不复制进可执行文件，而是执行时动态查找。",
+        "**特点**",
+        "1. 可执行文件体积较小",
+        "2. 运行时必须能找到动态库",
+        "3. 多个程序可以共享一份库代码",
+        "4. 更新库函数不用重新链接，相对方便",
+        "**[size=large]静态/动态链接和链接阶段总结[/size]**",
+        "静态链接和动态链接可以共存。",
+        "**静态链接**会在链接阶段，从静态库中提取程序需要的目标文件，将其代码和数据合并进可执行文件，并完成符号解析和重定位。",
+        "**动态链接**则在链接阶段记录动态库依赖，并完成当前能够确定的符号处理；程序启动时，动态链接器把共享库映射到进程的虚拟地址空间，并完成必要的动态重定位。共享库的物理页面通常按需加载，当程序首次访问尚未进入物理内存的页面时发生缺页异常，操作系统再把对应页面调入物理内存。",
+        "例子中是隐式链接（启动时自动加载，确实可能无法启动），显式链接是运行时主动加载动态库。"
       ],
       "category": "C++",
       "pinned": false
