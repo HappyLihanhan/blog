@@ -216,7 +216,15 @@ export async function listPortfolio(): Promise<PortfolioItem[]> {
   const row = await getD1().prepare("SELECT payload FROM site_documents WHERE key = 'portfolio'").first<{ payload: string }>();
   let items: unknown = portfolioSeed.items;
   if (row) {
-    try { items = JSON.parse(row.payload); } catch { items = []; }
+    try {
+      const stored = JSON.parse(row.payload) as unknown;
+      if (Array.isArray(stored)) {
+        // The first portfolio release could leave an uninitialised empty array in D1.
+        items = stored.length ? stored : portfolioSeed.items;
+      } else if (stored && typeof stored === "object" && Array.isArray((stored as { items?: unknown }).items)) {
+        items = (stored as { items: unknown[] }).items;
+      }
+    } catch { items = portfolioSeed.items; }
   }
   return Array.isArray(items) ? items.map((item) => normalizePortfolioItem(item as Partial<PortfolioItem>)) : [];
 }
@@ -225,7 +233,7 @@ async function savePortfolio(items: PortfolioItem[], actor: string, action: stri
   const db = getD1();
   await db.batch([
     db.prepare("INSERT INTO content_revisions (entity_type, entity_id, payload, action, actor_email, created_at) VALUES ('portfolio', ?, ?, ?, ?, ?)").bind(entityId, JSON.stringify(await listPortfolio()), action, actor, now()),
-    db.prepare("INSERT INTO site_documents (key, payload, updated_at) VALUES ('portfolio', ?, ?) ON CONFLICT(key) DO UPDATE SET payload = excluded.payload, updated_at = excluded.updated_at").bind(JSON.stringify(items), now()),
+    db.prepare("INSERT INTO site_documents (key, payload, updated_at) VALUES ('portfolio', ?, ?) ON CONFLICT(key) DO UPDATE SET payload = excluded.payload, updated_at = excluded.updated_at").bind(JSON.stringify({ version: 1, initialized: true, items }), now()),
   ]);
 }
 
