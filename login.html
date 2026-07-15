@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>管理员登录 | ian's Blog</title>
+    <link rel="stylesheet" href="./styles.css?v=20260715-portfolio" />
+    <link rel="stylesheet" href="./admin.css" />
+  </head>
+  <body class="admin-page login-page">
+    <header class="admin-header">
+      <a class="brand" href="./index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-text">ian's Blog</span>
+      </a>
+      <a class="admin-link" href="./index.html">返回首页</a>
+    </header>
+
+    <main class="admin-shell auth-shell">
+      <section class="login-panel">
+        <div>
+          <p class="eyebrow">Admin</p>
+          <h1>管理员登录</h1>
+          <p>登录成功后会进入独立的后台管理界面。</p>
+        </div>
+        <form class="login-form" data-login-form>
+          <label>
+            <span>账号</span>
+            <input name="username" autocomplete="username" required value="ian" />
+          </label>
+          <label>
+            <span>密码</span>
+            <input name="password" type="password" autocomplete="current-password" required autofocus />
+          </label>
+          <button class="admin-primary" type="submit">登录后台</button>
+          <p class="admin-message" data-login-message role="status"></p>
+        </form>
+      </section>
+    </main>
+
+    <script src="./login.js"></script>
+  </body>
+</html>

@@ -31,3 +31,8 @@ test("GitHub static portfolio data is copied unchanged into the Sites build", as
   ]);
   assert.deepEqual(JSON.parse(sitesData), JSON.parse(githubData));
 });
+
+test("the shared admin client keeps local and Sites sign-out flows separate", async () => {
+  const adminScript = await readFile(new URL("../admin.js", import.meta.url), "utf8");
+  assert.match(adminScript, /isLocalAdmin[\s\S]*\/api\/logout[\s\S]*signout-with-chatgpt/);
+});

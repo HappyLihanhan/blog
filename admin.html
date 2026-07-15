@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>后台管理 | ian's Blog</title>
+      <link rel="stylesheet" href="./styles.css?v=20260715-portfolio" />
+      <link rel="stylesheet" href="./admin.css?v=20260715-portfolio" />
+  </head>
+  <body class="admin-page">
+    <header class="admin-header">
+      <a class="brand" href="./index.html">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-text">ian's Blog</span>
+      </a>
+      <div class="admin-header-actions">
+        <a class="admin-link" href="./index.html">查看网站</a>
+        <button class="admin-link" type="button" data-logout>退出</button>
+      </div>
+    </header>
+
+    <main class="admin-shell">
+      <section class="dashboard">
+        <div class="dashboard-heading">
+          <div>
+            <h1 data-dashboard-title>内容管理</h1>
+          </div>
+          <div class="dashboard-actions">
+            <div class="content-tabs" role="tablist" aria-label="内容类型">
+              <button class="content-tab is-active" type="button" data-content-type="posts">文章</button>
+              <button class="content-tab" type="button" data-content-type="projects">项目复盘</button>
+              <button class="content-tab" type="button" data-content-type="portfolio">作品集</button>
+              <button class="content-tab" type="button" data-content-type="resume">关于博主</button>
+              <button class="content-tab" type="button" data-content-type="music">音乐</button>
+            </div>
+            <button class="admin-primary" type="button" data-new-entry>新建文章</button>
+          </div>
+        </div>
+
+        <div class="admin-layout">
+          <aside class="post-manager">
+            <div class="manager-title">
+              <h2 data-manager-title>文章列表</h2>
+              <span data-entry-count>0 篇</span>
+            </div>
+            <div class="manager-list" data-admin-entry-list></div>
+          </aside>
+
+          <form class="editor-panel" data-editor-form>
+            <input name="originalId" type="hidden" />
+            <input name="contentType" type="hidden" value="posts" />
+            <div class="editor-head">
+              <div>
+                <h2 data-editor-title>新建文章</h2>
+              </div>
+              <button class="admin-secondary" type="button" data-clear-form>清空</button>
+            </div>
+
+            <div class="field-grid">
+              <label>
+                <span data-title-label>标题</span>
+                <input name="title" required placeholder="例如：从坐标系理解 MVP 矩阵" />
+              </label>
+              <label>
+                <span data-id-label>文章 ID</span>
+                <input name="id" required pattern="[A-Za-z0-9_-]+" placeholder="graphics-matrix" />
+              </label>
+              <label>
+                <span data-date-label>发布日期</span>
+                <input name="date" type="date" required />
+              </label>
+              <label data-category-field>
+                <span data-category-label>栏目</span>
+                <select name="category" required data-category-select></select>
+              </label>
+              <label data-new-category-field hidden>
+                <span>新增栏目</span>
+                <input name="newCategory" data-new-category-input placeholder="例如：计算机网络" />
+              </label>
+              <label class="checkbox-field" data-pinned-field>
+                <input name="pinned" type="checkbox" />
+                <span>置顶文章</span>
+              </label>
+              <label data-project-type-field hidden>
+                <span data-project-type-label>项目名称</span>
+                <input name="type" placeholder="例如：小型实时渲染器" />
+              </label>
+            </div>
+
+            <label>
+              <span data-tags-label>标签</span>
+              <input name="tags" placeholder="C++, 图形学, OpenGL" />
+            </label>
+
+            <label>
+              <span data-summary-label>摘要</span>
+              <textarea name="summary" rows="3" required placeholder="文章的核心观点或问题"></textarea>
+            </label>
+
+            <div class="body-field">
+              <div class="body-toolbar">
+                <span data-body-label>正文</span>
+                <div class="body-tools">
+                  <select class="admin-secondary body-size-select" data-font-size aria-label="设置字号" title="设置字号">
+                    <option value="" selected>字号</option>
+                    <option value="small">小号</option>
+                    <option value="medium">中号</option>
+                    <option value="large">大号</option>
+                    <option value="xlarge">特大号</option>
+                  </select>
+                  <button class="admin-secondary body-format-button" type="button" data-format-bold aria-label="加粗" title="加粗（Ctrl+B）">
+                    <strong>B</strong>
+                  </button>
+                  <button class="admin-secondary body-format-button" type="button" data-format-italic aria-label="斜体" title="斜体（Ctrl+I）">
+                    <em>I</em>
+                  </button>
+                  <button class="admin-secondary body-format-button" type="button" data-format-underline aria-label="下划线" title="下划线（Ctrl+U）">
+                    <u>U</u>
+                  </button>
+                  <button class="admin-secondary body-format-button body-code-button" type="button" data-format-inline-code aria-label="行内代码" title="行内代码">
+                    &lt;/&gt;
+                  </button>
+                  <label class="admin-secondary upload-control">
+                    上传图片
+                    <input type="file" accept="image/*" data-image-upload />
+                  </label>
+                  <button class="admin-secondary" type="button" data-insert-code-block>插入代码块</button>
+                  <button class="admin-secondary" type="button" data-insert-image-url>插入图片链接</button>
+                </div>
+              </div>
+              <textarea
+                name="body"
+                rows="32"
+                required
+                placeholder="写作背景：这篇文章解决什么问题&#10;&#10;```cpp&#10;int main() {&#10;  return 0;&#10;}&#10;```&#10;&#10;![图片说明](/assets/uploads/example.png)&#10;&#10;| 概念 | 说明 |&#10;| --- | --- |&#10;| 内容 | 内容 |&#10;&#10;结论：可以复用的经验或下一步问题"
+              ></textarea>
+              <p class="field-help" data-upload-message role="status"></p>
+            </div>
+
+            <div class="editor-actions">
+              <button class="admin-primary" type="submit" data-save-entry>保存文章</button>
+              <button class="admin-danger" type="button" data-delete-entry hidden>删除当前文章</button>
+              <p class="admin-message" data-editor-message role="status"></p>
+            </div>
+          </form>
+        </div>
+
+        <section class="portfolio-admin" data-portfolio-admin hidden>
+          <aside class="post-manager">
+            <div class="manager-title"><h2>作品列表</h2><span data-portfolio-count>0 项</span></div>
+            <div class="manager-list" data-portfolio-admin-list></div>
+          </aside>
+          <form class="editor-panel portfolio-admin-form" data-portfolio-form>
+            <input name="originalId" type="hidden" />
+            <div class="editor-head"><h2 data-portfolio-editor-title>新建作品</h2><button class="admin-secondary" type="button" data-clear-portfolio>清空</button></div>
+            <div class="field-grid">
+              <label><span>作品标题</span><input name="title" required placeholder="例如：Unity3D 塔防策略游戏" /></label>
+              <label><span>作品 ID</span><input name="id" required placeholder="unity-tower-defense" /></label>
+              <label><span>分类</span><input name="category" required placeholder="游戏开发" /></label>
+              <label><span>右上角标签</span><input name="badge" placeholder="Unity 3D" /></label>
+            </div>
+            <label><span>作品摘要</span><textarea name="summary" rows="4" placeholder="介绍作品玩法、职责或核心亮点"></textarea></label>
+            <label><span>技术标签（逗号分隔）</span><input name="tags" placeholder="Unity3D, C#, NavMesh" /></label>
+            <div class="portfolio-media-fields">
+              <fieldset>
+                <legend>封面素材</legend>
+                <div class="field-grid">
+                  <label><span>类型</span><select name="coverType"><option value="image">图片</option><option value="video">视频</option></select></label>
+                  <label><span>封面地址</span><input name="coverSrc" required placeholder="上传文件或填写 URL" /></label>
+                </div>
+                <label class="admin-secondary portfolio-upload-control">上传封面图片/视频<input type="file" accept="image/*,video/mp4,video/webm,video/quicktime" data-portfolio-cover-upload /></label>
+              </fieldset>
+              <fieldset>
+                <legend>演示视频（可选）</legend>
+                <div class="field-grid">
+                  <label><span>播放方式</span><select name="demoType"><option value="video">直接视频</option><option value="iframe">B站等嵌入视频</option></select></label>
+                  <label><span>视频地址</span><input name="demoSrc" placeholder="上传视频或填写播放器地址" /></label>
+                </div>
+                <label class="admin-secondary portfolio-upload-control">上传演示视频<input type="file" accept="video/mp4,video/webm,video/quicktime" data-portfolio-demo-upload /></label>
+              </fieldset>
+            </div>
+            <p class="field-help" data-portfolio-upload-message role="status"></p>
+            <div class="editor-actions">
+              <button class="admin-primary" type="submit">保存作品</button>
+              <button class="admin-danger" type="button" data-delete-portfolio hidden>删除当前作品</button>
+              <p class="admin-message" data-portfolio-message role="status"></p>
+            </div>
+          </form>
+        </section>
+
+        <form class="editor-panel resume-json-panel" data-resume-form hidden>
+          <div class="editor-head">
+            <div>
+              <h2>编辑关于博主</h2>
+            </div>
+          </div>
+          <label>
+            <span>关于博主 JSON</span>
+            <textarea name="resumeJson" rows="28" spellcheck="false"></textarea>
+          </label>
+          <div class="editor-actions">
+            <button class="admin-primary" type="submit">保存关于博主</button>
+            <p class="admin-message" data-resume-message role="status"></p>
+          </div>
+        </form>
+
+        <section class="editor-panel music-admin-panel" data-music-admin hidden>
+          <div class="editor-head">
+            <div>
+              <h2>音乐库</h2>
+            </div>
+          </div>
+
+          <form class="music-admin-form" data-music-form>
+            <div class="field-grid">
+              <label>
+                <span>歌名</span>
+                <input name="title" required placeholder="Travelers" />
+              </label>
+              <label>
+                <span>歌手</span>
+                <input name="artist" placeholder="Andrew Prahlow" />
+              </label>
+            </div>
+            <label>
+              <span>音频文件</span>
+              <input name="audio" type="file" accept="audio/*" required />
+            </label>
+            <div class="editor-actions">
+              <button class="admin-primary" type="submit">上传歌曲</button>
+              <p class="admin-message" data-music-message role="status"></p>
+            </div>
+          </form>
+
+          <div class="music-admin-list" data-music-admin-list></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="./admin.js?v=20260715-portfolio-fix"></script>
+  </body>
+</html>
