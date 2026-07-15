@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="关于博主李圣杰的学习背景、技术方向和项目经历。" />
-    <title>关于博主 | ian's Blog</title>
+    <meta name="description" content="ian 的个人作品集，展示游戏开发、网站与交互作品。" />
+    <title>作品集 | ian's Blog</title>
     <link rel="stylesheet" href="./styles.css?v=20260715-portfolio" />
   </head>
-  <body data-page="resume">
+  <body data-page="portfolio">
     <header class="site-header">
       <a class="brand" href="./index.html" aria-label="回到首页">
         <span class="brand-mark" aria-hidden="true"></span>
@@ -55,9 +55,16 @@
       <a href="./admin.html" data-local-admin hidden>后台</a>
     </div>
 
-    <main id="home" class="page-shell">
-      <section id="resume" class="section-block resume-section" aria-labelledby="resume-title" data-resume-root>
-        <p class="empty-state">正在加载博主信息...</p>
+    <main class="page-shell portfolio-page">
+      <section class="section-block page-heading portfolio-heading" aria-labelledby="portfolio-title">
+        <p class="eyebrow">Portfolio</p>
+        <h1 id="portfolio-title">作品集</h1>
+        <p>记录做过的游戏、网站与交互作品，图片用于快速浏览，视频可以在当前页面直接观看。</p>
+      </section>
+
+      <section class="portfolio-showcase" aria-label="作品列表">
+        <div class="portfolio-filters" data-portfolio-filters aria-label="作品分类"></div>
+        <div class="portfolio-grid" data-portfolio-grid aria-live="polite"></div>
       </section>
     </main>
 
@@ -91,6 +98,19 @@
         <h2 id="post-title" data-post-title></h2>
         <div class="post-body" data-post-body></div>
       </article>
+    </div>
+
+    <div class="modal-backdrop portfolio-modal-backdrop" data-portfolio-modal hidden>
+      <section class="portfolio-modal" role="dialog" aria-modal="true" aria-labelledby="portfolio-video-title">
+        <div class="portfolio-modal-head">
+          <div>
+            <p class="eyebrow">Demo Video</p>
+            <h2 id="portfolio-video-title" data-portfolio-video-title>演示视频</h2>
+          </div>
+          <button class="portfolio-modal-close" type="button" data-close-portfolio-video aria-label="关闭演示视频">关闭</button>
+        </div>
+        <div class="portfolio-video-frame" data-portfolio-video-frame></div>
+      </section>
     </div>
 
     <script src="./script.js?v=20260715-portfolio"></script>

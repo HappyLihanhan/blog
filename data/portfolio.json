@@ -1,0 +1,44 @@
+{
+  "items": [
+    {
+      "id": "unity-tower-defense",
+      "title": "Unity3D 塔防策略游戏",
+      "category": "游戏开发",
+      "badge": "Unity 3D",
+      "summary": "独立完成的固定路线塔防游戏，包含自由建塔、敌人波次、防御塔升级出售、技能系统与通关结算。",
+      "tags": [
+        "Unity3D",
+        "C#",
+        "NavMesh",
+        "UGUI"
+      ],
+      "cover": {
+        "type": "image",
+        "src": "https://i0.hdslb.com/bfs/archive/ee0506397453ca10f5bc737588c5c13c391b66e9.jpg",
+        "alt": "Unity3D 塔防策略游戏演示封面"
+      },
+      "demo": {
+        "type": "iframe",
+        "src": "https://player.bilibili.com/player.html?bvid=BV13Qw6zoEXg&autoplay=1&high_quality=1&danmaku=0",
+        "title": "Unity3D 塔防策略游戏演示视频"
+      }
+    },
+    {
+      "id": "ian-personal-blog",
+      "title": "ian's Blog",
+      "category": "网站作品",
+      "badge": "Web",
+      "summary": "围绕 C++、计算机图形学、数据结构与项目复盘搭建的个人技术博客，支持主题切换、全文搜索和内容后台。",
+      "tags": [
+        "Next.js",
+        "Cloudflare",
+        "响应式设计"
+      ],
+      "cover": {
+        "type": "image",
+        "src": "./assets/uploads/20260618-171258-202566-image-c520c35b.png",
+        "alt": "ian's Blog 首页截图"
+      }
+    }
+  ]
+}

@@ -144,6 +144,7 @@ const categoryAliases = new Map([
 
 let posts = [];
 let projects = [];
+let portfolioItems = [];
 let resume = null;
 const POSTS_PER_PAGE = 10;
 const postTitleCollator = new Intl.Collator("zh-CN-u-co-pinyin", {
@@ -151,11 +152,13 @@ const postTitleCollator = new Intl.Collator("zh-CN-u-co-pinyin", {
   sensitivity: "base"
 });
 let activeProjectName = "";
+let activePortfolioCategory = "全部";
 let activePostCategory = "";
 let activePostTag = "";
 let activePostPage = 1;
 let scrollBehaviorBeforeReset = null;
 let scrollResetFrame = 0;
+let lastPortfolioVideoTrigger = null;
 
 const selectors = {
   html: document.documentElement,
@@ -166,6 +169,11 @@ const selectors = {
   pinnedPostList: document.querySelector("[data-pinned-post-list]"),
   projectList: document.querySelector("[data-project-list]"),
   projectDetail: document.querySelector("[data-project-detail]"),
+  portfolioFilters: document.querySelector("[data-portfolio-filters]"),
+  portfolioGrid: document.querySelector("[data-portfolio-grid]"),
+  portfolioModal: document.querySelector("[data-portfolio-modal]"),
+  portfolioVideoTitle: document.querySelector("[data-portfolio-video-title]"),
+  portfolioVideoFrame: document.querySelector("[data-portfolio-video-frame]"),
   searchModal: document.querySelector("[data-search-modal]"),
   searchInput: document.querySelector("#site-search"),
   searchResults: document.querySelector("[data-search-results]"),
@@ -470,6 +478,39 @@ function normalizeProjects(items) {
     : [];
 }
 
+function normalizePortfolioMedia(value, fallbackType = "image") {
+  const raw = value && typeof value === "object" ? value : {};
+  const type = raw.type === "video" || raw.type === "iframe" ? raw.type : fallbackType;
+  return {
+    type,
+    src: String(raw.src || ""),
+    poster: String(raw.poster || ""),
+    alt: String(raw.alt || ""),
+    title: String(raw.title || "")
+  };
+}
+
+function normalizePortfolio(items) {
+  return Array.isArray(items)
+    ? items
+        .filter((item) => item && item.id && item.title)
+        .map((item) => {
+          const cover = normalizePortfolioMedia(item.cover, "image");
+          const demo = item.demo?.src ? normalizePortfolioMedia(item.demo, "video") : null;
+          return {
+            id: String(item.id),
+            title: String(item.title),
+            category: String(item.category || "其他作品"),
+            badge: String(item.badge || item.category || "作品"),
+            summary: String(item.summary || ""),
+            tags: normalizeStringList(item.tags),
+            cover,
+            demo
+          };
+        })
+    : [];
+}
+
 function normalizeStringList(value) {
   return Array.isArray(value) ? value.map(String).filter(Boolean) : [];
 }
@@ -547,6 +588,16 @@ async function loadProjects() {
   }
 
   return normalizeProjects(fallbackProjects);
+}
+
+async function loadPortfolio() {
+  for (const source of ["/api/portfolio", "./data/portfolio.json"]) {
+    try {
+      const response = await fetch(source, { cache: "no-store" });
+      if (response.ok) { const data = await response.json(); return normalizePortfolio(data.items || data); }
+    } catch { /* Try the static fallback. */ }
+  }
+  return [];
 }
 
 async function loadResume() {
@@ -704,6 +755,87 @@ function renderProjects(items = projects) {
       `
     )
     .join("");
+}
+
+function safeMediaUrl(value) {
+  const source = String(value || "").trim();
+  if (!source) return "";
+  try {
+    const parsed = new URL(source, window.location.href);
+    return ["http:", "https:"].includes(parsed.protocol) ? source : "";
+  } catch {
+    return "";
+  }
+}
+
+function renderPortfolioCover(item) {
+  const src = safeMediaUrl(item.cover.src);
+  const poster = safeMediaUrl(item.cover.poster);
+  if (!src) {
+    return '<div class="portfolio-media-placeholder" aria-hidden="true"><span>ian\'s Blog</span></div>';
+  }
+  if (item.cover.type === "video") {
+    return `<video src="${escapeHtml(src)}" ${poster ? `poster="${escapeHtml(poster)}"` : ""} muted loop autoplay playsinline preload="metadata" aria-label="${escapeHtml(item.cover.alt || `${item.title}预览`)}"></video>`;
+  }
+  return `<img src="${escapeHtml(src)}" alt="${escapeHtml(item.cover.alt || `${item.title}封面`)}" loading="lazy" />`;
+}
+
+function getPortfolioCategories() {
+  return ["全部", ...Array.from(new Set(portfolioItems.map((item) => item.category)))];
+}
+
+function renderPortfolioFilters() {
+  if (!selectors.portfolioFilters) return;
+  const categories = getPortfolioCategories();
+  if (!categories.includes(activePortfolioCategory)) activePortfolioCategory = "全部";
+  selectors.portfolioFilters.innerHTML = categories
+    .map(
+      (category) => `
+        <button class="${category === activePortfolioCategory ? "is-active" : ""}" type="button" data-portfolio-category="${escapeHtml(category)}" aria-pressed="${category === activePortfolioCategory ? "true" : "false"}">
+          ${escapeHtml(category)}
+        </button>
+      `
+    )
+    .join("");
+}
+
+function renderPortfolio() {
+  if (!selectors.portfolioGrid) return;
+  renderPortfolioFilters();
+  const visibleItems =
+    activePortfolioCategory === "全部"
+      ? portfolioItems
+      : portfolioItems.filter((item) => item.category === activePortfolioCategory);
+
+  selectors.portfolioGrid.innerHTML = visibleItems.length
+    ? visibleItems
+        .map(
+          (item) => `
+            <article class="portfolio-card">
+              <div class="portfolio-card-media">
+                ${renderPortfolioCover(item)}
+                <span class="portfolio-badge">${escapeHtml(item.badge)}</span>
+              </div>
+              <div class="portfolio-card-body">
+                <div>
+                  <p class="portfolio-category">${escapeHtml(item.category)}</p>
+                  <h2>${escapeHtml(item.title)}</h2>
+                  <p class="portfolio-summary">${escapeHtml(item.summary)}</p>
+                </div>
+                <div class="portfolio-tags" aria-label="技术标签">
+                  ${item.tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}
+                </div>
+                ${
+                  item.demo
+                    ? `<button class="portfolio-demo-button" type="button" data-portfolio-video="${escapeHtml(item.id)}"><span aria-hidden="true">▶</span>演示视频</button>`
+                    : ""
+                }
+              </div>
+            </article>
+          `
+        )
+        .join("")
+    : '<p class="empty-state portfolio-empty">这个分类还没有作品。</p>';
 }
 
 function groupProjectsByName(items) {
@@ -915,7 +1047,12 @@ function openSearch() {
 
 function closeSearch() {
   selectors.searchModal.hidden = true;
-  selectors.body.classList.remove("modal-open");
+  syncModalOpenState();
+}
+
+function syncModalOpenState() {
+  const hasOpenModal = Array.from(document.querySelectorAll(".modal-backdrop")).some((modal) => !modal.hidden);
+  selectors.body.classList.toggle("modal-open", hasOpenModal);
 }
 
 function initMusicPlayer() {
@@ -1624,7 +1761,34 @@ function openProject(projectId) {
 
 function closePost() {
   selectors.postModal.hidden = true;
-  selectors.body.classList.remove("modal-open");
+  syncModalOpenState();
+}
+
+function openPortfolioVideo(itemId, trigger) {
+  if (!selectors.portfolioModal || !selectors.portfolioVideoFrame || !selectors.portfolioVideoTitle) return;
+  const item = portfolioItems.find((entry) => entry.id === itemId);
+  if (!item?.demo) return;
+  const src = safeMediaUrl(item.demo.src);
+  if (!src) return;
+
+  lastPortfolioVideoTrigger = trigger || null;
+  selectors.portfolioVideoTitle.textContent = item.demo.title || `${item.title}演示视频`;
+  selectors.portfolioVideoFrame.innerHTML =
+    item.demo.type === "iframe"
+      ? `<iframe src="${escapeHtml(src)}" title="${escapeHtml(item.demo.title || `${item.title}演示视频`)}" allow="autoplay; fullscreen; picture-in-picture" referrerpolicy="no-referrer-when-downgrade" allowfullscreen></iframe>`
+      : `<video src="${escapeHtml(src)}" ${item.demo.poster ? `poster="${escapeHtml(safeMediaUrl(item.demo.poster))}"` : ""} controls autoplay playsinline></video>`;
+  selectors.portfolioModal.hidden = false;
+  selectors.body.classList.add("modal-open");
+  window.requestAnimationFrame(() => document.querySelector("[data-close-portfolio-video]")?.focus());
+}
+
+function closePortfolioVideo({ restoreFocus = true } = {}) {
+  if (!selectors.portfolioModal || selectors.portfolioModal.hidden) return;
+  selectors.portfolioModal.hidden = true;
+  if (selectors.portfolioVideoFrame) selectors.portfolioVideoFrame.innerHTML = "";
+  syncModalOpenState();
+  if (restoreFocus && lastPortfolioVideoTrigger?.isConnected) lastPortfolioVideoTrigger.focus();
+  lastPortfolioVideoTrigger = null;
 }
 
 function setTheme(theme) {
@@ -1749,6 +1913,7 @@ function bindEvents() {
 
   document.querySelector("[data-close-search]").addEventListener("click", closeSearch);
   document.querySelector("[data-close-post]").addEventListener("click", closePost);
+  document.querySelector("[data-close-portfolio-video]")?.addEventListener("click", () => closePortfolioVideo());
 
   document.querySelector("[data-theme-toggle]").addEventListener("click", () => {
     setTheme(selectors.html.classList.contains("dark") ? "light" : "dark");
@@ -1763,6 +1928,19 @@ function bindEvents() {
   });
 
   document.addEventListener("click", (event) => {
+    const portfolioCategoryButton = event.target.closest("[data-portfolio-category]");
+    if (portfolioCategoryButton) {
+      activePortfolioCategory = portfolioCategoryButton.dataset.portfolioCategory || "全部";
+      renderPortfolio();
+      return;
+    }
+
+    const portfolioVideoButton = event.target.closest("[data-portfolio-video]");
+    if (portfolioVideoButton) {
+      openPortfolioVideo(portfolioVideoButton.dataset.portfolioVideo, portfolioVideoButton);
+      return;
+    }
+
     const postButton = event.target.closest("[data-post-id]");
     if (postButton) {
       closeSearch();
@@ -1815,6 +1993,7 @@ function bindEvents() {
     if (event.target.matches(".modal-backdrop")) {
       closeSearch();
       closePost();
+      closePortfolioVideo({ restoreFocus: false });
     }
 
     if (event.target.closest(".mobile-menu a")) {
@@ -1831,6 +2010,7 @@ function bindEvents() {
     if (event.key === "Escape") {
       closeSearch();
       closePost();
+      closePortfolioVideo();
     }
   });
 
@@ -1908,6 +2088,7 @@ async function init() {
 
   const needsPosts = Boolean(selectors.postList || selectors.pinnedPostList || selectors.searchResults || selectors.statPosts || selectors.tagCloud);
   const needsProjects = Boolean(selectors.projectList || selectors.searchResults || selectors.statProjects);
+  const needsPortfolio = Boolean(selectors.portfolioGrid);
   const tasks = [];
 
   if (needsPosts) {
@@ -1915,6 +2096,9 @@ async function init() {
   }
   if (needsProjects) {
     tasks.push(loadProjects().then((items) => (projects = items)));
+  }
+  if (needsPortfolio) {
+    tasks.push(loadPortfolio().then((items) => (portfolioItems = items)));
   }
   if (selectors.resumeRoot) {
     tasks.push(loadResume().then((data) => (resume = data)));
@@ -1925,6 +2109,7 @@ async function init() {
   applyInitialPostFilters();
   renderNotesView();
   renderProjects();
+  renderPortfolio();
   renderResume();
   renderStats();
   renderSearchResults();

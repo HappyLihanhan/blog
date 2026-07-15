@@ -1,5 +1,6 @@
 import { getD1, getMediaBucket } from "@/db";
 import { HttpError } from "@/lib/http";
+import portfolioSeed from "@/data/portfolio.json";
 
 export type BlogPost = {
   id: string;
@@ -20,6 +21,18 @@ export type BlogProject = {
   tags: string[];
   summary: string;
   body: string[];
+};
+
+export type PortfolioMedia = { type: "image" | "video" | "iframe"; src: string; poster?: string; alt?: string; title?: string };
+export type PortfolioItem = {
+  id: string;
+  title: string;
+  category: string;
+  badge: string;
+  summary: string;
+  tags: string[];
+  cover: PortfolioMedia;
+  demo?: PortfolioMedia;
 };
 
 export type MusicTrack = {
@@ -90,6 +103,32 @@ export function normalizeProject(value: Partial<BlogProject>): BlogProject {
     tags: stringList(value.tags),
     summary: stringValue(value.summary),
     body: stringList(value.body),
+  };
+}
+
+function normalizePortfolioMedia(value: unknown, fallbackType: PortfolioMedia["type"]): PortfolioMedia {
+  const raw = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+  const requestedType = stringValue(raw.type);
+  const type = requestedType === "image" || requestedType === "video" || requestedType === "iframe" ? requestedType : fallbackType;
+  return { type, src: stringValue(raw.src), poster: stringValue(raw.poster), alt: stringValue(raw.alt), title: stringValue(raw.title) };
+}
+
+export function normalizePortfolioItem(value: Partial<PortfolioItem>): PortfolioItem {
+  const id = stringValue(value.id);
+  const title = stringValue(value.title);
+  if (!id || !title) throw new HttpError(400, "作品 ID 和标题不能为空");
+  const cover = normalizePortfolioMedia(value.cover, "image");
+  if (!cover.src) throw new HttpError(400, "请上传或填写作品封面");
+  const demo = value.demo && normalizePortfolioMedia(value.demo, "video");
+  return {
+    id,
+    title,
+    category: stringValue(value.category) || "其他作品",
+    badge: stringValue(value.badge) || stringValue(value.category) || "作品",
+    summary: stringValue(value.summary),
+    tags: stringList(value.tags),
+    cover,
+    ...(demo?.src ? { demo } : {}),
   };
 }
 
@@ -173,6 +212,44 @@ export async function deleteProject(id: string, actor: string): Promise<void> {
   ]);
 }
 
+export async function listPortfolio(): Promise<PortfolioItem[]> {
+  const row = await getD1().prepare("SELECT payload FROM site_documents WHERE key = 'portfolio'").first<{ payload: string }>();
+  let items: unknown = portfolioSeed.items;
+  if (row) {
+    try { items = JSON.parse(row.payload); } catch { items = []; }
+  }
+  return Array.isArray(items) ? items.map((item) => normalizePortfolioItem(item as Partial<PortfolioItem>)) : [];
+}
+
+async function savePortfolio(items: PortfolioItem[], actor: string, action: string, entityId: string): Promise<void> {
+  const db = getD1();
+  await db.batch([
+    db.prepare("INSERT INTO content_revisions (entity_type, entity_id, payload, action, actor_email, created_at) VALUES ('portfolio', ?, ?, ?, ?, ?)").bind(entityId, JSON.stringify(await listPortfolio()), action, actor, now()),
+    db.prepare("INSERT INTO site_documents (key, payload, updated_at) VALUES ('portfolio', ?, ?) ON CONFLICT(key) DO UPDATE SET payload = excluded.payload, updated_at = excluded.updated_at").bind(JSON.stringify(items), now()),
+  ]);
+}
+
+export async function createPortfolioItem(item: PortfolioItem, actor: string): Promise<void> {
+  const items = await listPortfolio();
+  if (items.some((entry) => entry.id === item.id)) throw new HttpError(409, "作品 ID 已存在");
+  await savePortfolio([item, ...items], actor, "create", item.id);
+}
+
+export async function updatePortfolioItem(originalId: string, item: PortfolioItem, actor: string): Promise<void> {
+  const items = await listPortfolio();
+  const index = items.findIndex((entry) => entry.id === originalId);
+  if (index < 0) throw new HttpError(404, "作品不存在");
+  if (item.id !== originalId && items.some((entry) => entry.id === item.id)) throw new HttpError(409, "作品 ID 已存在");
+  items[index] = item;
+  await savePortfolio(items, actor, "update", originalId);
+}
+
+export async function deletePortfolioItem(id: string, actor: string): Promise<void> {
+  const items = await listPortfolio();
+  if (!items.some((entry) => entry.id === id)) throw new HttpError(404, "作品不存在");
+  await savePortfolio(items.filter((entry) => entry.id !== id), actor, "delete", id);
+}
+
 export async function getResume(): Promise<Record<string, unknown>> {
   const row = await getD1().prepare("SELECT payload FROM site_documents WHERE key = 'resume'").first<{ payload: string }>();
   if (!row) return {};
@@ -218,6 +295,20 @@ export async function uploadImage(file: File, actor: string): Promise<string> {
     .bind(crypto.randomUUID(), key, file.name, file.type, file.size, now(), actor)
     .run();
   return `/media/${key}`;
+}
+
+export async function uploadPortfolioMedia(file: File, actor: string): Promise<{ url: string; type: "image" | "video" }> {
+  const imageTypes = new Set(["image/png", "image/jpeg", "image/gif", "image/webp"]);
+  const videoTypes = new Set(["video/mp4", "video/webm", "video/quicktime"]);
+  const type = imageTypes.has(file.type) ? "image" : videoTypes.has(file.type) ? "video" : null;
+  if (!type) throw new HttpError(400, "只支持 PNG、JPG、GIF、WEBP、MP4、WEBM 和 MOV 文件");
+  const limit = type === "image" ? 10 * 1024 * 1024 : 100 * 1024 * 1024;
+  if (file.size > limit) throw new HttpError(400, type === "image" ? "图片不能超过 10MB" : "视频不能超过 100MB");
+  const key = `portfolio/${Date.now()}-${crypto.randomUUID()}-${safeFilename(file.name)}`;
+  await getMediaBucket().put(key, await file.arrayBuffer(), { httpMetadata: { contentType: file.type } });
+  await getD1().prepare("INSERT INTO media (id, object_key, filename, content_type, size, created_at, uploaded_by) VALUES (?, ?, ?, ?, ?, ?, ?)")
+    .bind(crypto.randomUUID(), key, file.name, file.type, file.size, now(), actor).run();
+  return { url: `/media/${key}`, type };
 }
 
 export async function uploadTrack(file: File, titleValue: string, artistValue: string, actor: string): Promise<MusicTrack> {
