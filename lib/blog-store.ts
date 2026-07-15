@@ -59,6 +59,26 @@ function now(): string {
   return new Date().toISOString();
 }
 
+let portfolioStorageReady: Promise<void> | null = null;
+
+function ensurePortfolioStorage(): Promise<void> {
+  if (!portfolioStorageReady) {
+    const db = getD1();
+    portfolioStorageReady = db.batch([
+      db.prepare("CREATE TABLE IF NOT EXISTS site_documents (key text PRIMARY KEY NOT NULL, payload text NOT NULL, updated_at text NOT NULL)"),
+      db.prepare("CREATE TABLE IF NOT EXISTS content_revisions (id integer PRIMARY KEY AUTOINCREMENT NOT NULL, entity_type text NOT NULL, entity_id text NOT NULL, payload text NOT NULL, action text NOT NULL, actor_email text NOT NULL, created_at text NOT NULL)"),
+      db.prepare("CREATE INDEX IF NOT EXISTS content_revisions_entity_idx ON content_revisions (entity_type, entity_id)"),
+      db.prepare("CREATE TABLE IF NOT EXISTS media (id text PRIMARY KEY NOT NULL, object_key text NOT NULL, filename text NOT NULL, content_type text NOT NULL, size integer NOT NULL, created_at text NOT NULL, uploaded_by text NOT NULL)"),
+      db.prepare("CREATE UNIQUE INDEX IF NOT EXISTS media_object_key_unique ON media (object_key)"),
+      db.prepare("CREATE INDEX IF NOT EXISTS media_created_at_idx ON media (created_at)"),
+    ]).then(() => undefined).catch((error) => {
+      portfolioStorageReady = null;
+      throw error;
+    });
+  }
+  return portfolioStorageReady;
+}
+
 function stringValue(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
@@ -213,6 +233,7 @@ export async function deleteProject(id: string, actor: string): Promise<void> {
 }
 
 export async function listPortfolio(): Promise<PortfolioItem[]> {
+  await ensurePortfolioStorage();
   const row = await getD1().prepare("SELECT payload FROM site_documents WHERE key = 'portfolio'").first<{ payload: string }>();
   let items: unknown = portfolioSeed.items;
   if (row) {
@@ -230,6 +251,7 @@ export async function listPortfolio(): Promise<PortfolioItem[]> {
 }
 
 async function savePortfolio(items: PortfolioItem[], actor: string, action: string, entityId: string): Promise<void> {
+  await ensurePortfolioStorage();
   const db = getD1();
   await db.batch([
     db.prepare("INSERT INTO content_revisions (entity_type, entity_id, payload, action, actor_email, created_at) VALUES ('portfolio', ?, ?, ?, ?, ?)").bind(entityId, JSON.stringify(await listPortfolio()), action, actor, now()),
@@ -306,6 +328,7 @@ export async function uploadImage(file: File, actor: string): Promise<string> {
 }
 
 export async function uploadPortfolioMedia(file: File, actor: string): Promise<{ url: string; type: "image" | "video" }> {
+  await ensurePortfolioStorage();
   const imageTypes = new Set(["image/png", "image/jpeg", "image/gif", "image/webp"]);
   const videoTypes = new Set(["video/mp4", "video/webm", "video/quicktime"]);
   const type = imageTypes.has(file.type) ? "image" : videoTypes.has(file.type) ? "video" : null;

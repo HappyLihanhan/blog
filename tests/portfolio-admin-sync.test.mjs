@@ -4,8 +4,8 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 import { Miniflare } from "miniflare";
 
-test("legacy empty portfolio document still exposes the seeded works in admin", async () => {
-  const mf = new Miniflare({
+function createMiniflare() {
+  return new Miniflare({
     modules: true,
     modulesRules: [{ type: "ESModule", include: ["**/*.js"] }],
     scriptPath: fileURLToPath(new URL("../dist/server/index.js", import.meta.url)),
@@ -15,6 +15,23 @@ test("legacy empty portfolio document still exposes the seeded works in admin", 
     r2Buckets: ["MEDIA"],
     serviceBindings: { ASSETS: () => new Response("Not found", { status: 404 }) },
   });
+}
+
+test("portfolio admin initializes its storage in a fresh local database", async () => {
+  const mf = createMiniflare();
+  try {
+    const response = await mf.dispatchFetch("http://localhost/api/admin/portfolio", {
+      headers: { "oai-authenticated-user-email": "owner@example.com" },
+    });
+    assert.equal(response.status, 200);
+    assert.equal((await response.json()).items.length, 2);
+  } finally {
+    await mf.dispose();
+  }
+});
+
+test("legacy empty portfolio document still exposes the seeded works in admin", async () => {
+  const mf = createMiniflare();
   try {
     const db = await mf.getD1Database("DB");
     const migration = await readFile(new URL("../drizzle/0000_dear_dakota_north.sql", import.meta.url), "utf8");
