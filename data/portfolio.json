@@ -14,8 +14,8 @@
       ],
       "cover": {
         "type": "image",
-        "src": "https://i0.hdslb.com/bfs/archive/ee0506397453ca10f5bc737588c5c13c391b66e9.jpg",
-        "alt": "Unity3D 塔防策略游戏演示封面"
+        "src": "./assets/uploads/20260717-000228-454162-673dee74-538c-4f34-8ccc-8da62d914afa-89c817a9.png",
+        "alt": "Unity3D 塔防策略游戏封面"
       },
       "demo": {
         "type": "iframe",
