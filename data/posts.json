@@ -1,6 +1,86 @@
 {
   "posts": [
     {
+      "id": "Cjing1",
+      "title": "1. 值类型、引用类型、装箱拆箱",
+      "date": "2026-07-16",
+      "tags": [
+        "第一梯队"
+      ],
+      "summary": "值类型、引用类型、装箱拆箱",
+      "body": [
+        "**值类型：**变量直接保存数据本身。例如 int、double、float、struct、enum 等，赋值时会复制一份完整的数据。（其实我感觉结构体和枚举是值类型挺反直觉的）",
+        "**引用类型：**变量中保存的是对对象的引用。例如 class、string、array、interface、delegate 等，赋值时，只复制引用，不复制对象，因此修改的也是同一个对象。",
+        "值类型和引用类型不能简单的说值类型在栈，引用类型在堆。首先**引用类型**创建的对象基本上是在**托管堆**里。",
+        "而**值类型**取决于他属于谁，有三种情况：值类型作为**局部变量**时，就是在栈或寄存器中；如果是类的字段，那就会直接存放在类对象内部；最后一种，如果被装箱了那就在托管堆里。",
+        "**[size=large]装箱[/size]**",
+        "装箱是把值类型转换成 **object** 或某个**接口**类型。装箱后，原变量和装箱对象是互相独立的。",
+        "装箱流程：",
+        "```cpp\nint num = 10;\nobject obj = num; // 装箱\n\n1. 在托管堆申请一个对象\n\n2. 把值类型 num 复制到新申请的对象内部\n\n3. obj 保存这个对象的引用\n```",
+        "**[size=large]拆箱[/size]**",
+        "拆箱是从装箱对象中取出原来的值类型数据。",
+        "拆箱流程：",
+        "```cpp\nobject obj = 10;\nint num = (int)obj; // 拆箱\n\n1. 检查 obj 内部保存的类型是否正确\n\n2. 将 obj 内部的值复制到值类型变量 num 中\n```",
+        "拆箱必须使用原本的值类型，例如 `long b = (long)obj;` 会抛异常，即使 int 可以隐式转换成 long，但也不能直接把 int 拆箱成 long，正确做法是 `long b = (long)(int)obj;`。",
+        "**[size=large]装箱拆箱可能涉及的问题[/size]**",
+        "1. 堆内存分配 -> 因为创建对象是在托管堆上分配的",
+        "2. 垃圾回收压力 -> 频繁创建删除堆对象，会有 GC 压力",
+        "3. 类型错误导致异常 -> 前面提到的用 long 接收 int 拆箱",
+        "**[size=large]如何避免[/size]**",
+        "使用泛型集合：",
+        "```cpp\nList<int> list = new List<int>();\n\nlist.Add(10);\nint num = list[0];\n```",
+        "因为泛型集合 List<int> 已经规定好参数类型了，因此内部是可以直接存储 int 值类型的。"
+      ],
+      "category": "C#",
+      "pinned": false
+    },
+    {
+      "id": "const",
+      "title": "为什么梅耶单例的局部 static 变量初始化是线程安全的",
+      "date": "2026-07-16",
+      "tags": [
+        "C++"
+      ],
+      "summary": "为什么梅耶单例的局部 static 变量初始化是线程安全的",
+      "body": [
+        "C++11 以后的标准会在初始化的代码周边插入一次性初始化保护机制，通常使用的是一个隐藏的“初始化守卫变量”。",
+        "代码大致如下：",
+        "```cpp\nSingleton& getInstance() {\n    static Guard guard;\n    static Singleton instance;\n\n    if (!guard.initialized()) {\n        if (guard.acquire()) {\n            try {\n                new (&instance) Singleton();\n                guard.release();   // 标记初始化完成\n            } catch (...) {\n                guard.abort();     // 初始化失败，允许以后重试\n                throw;\n            }\n        }\n    }\n\n    return instance;\n}\n```",
+        "假设有两个线程同时调用 getinstance，流程可以理解为：",
+        "```cpp\n线程 A                    线程 B\n  │                         │\n检查 instance 未初始化       检查 instance 未初始化\n  │                         │\n获得初始化权                 等待初始化完成\n  │                         │\n执行 Singleton 构造函数      阻塞/等待\n  │                         │\n标记初始化完成               被唤醒\n  │                         │\n返回 instance               返回同一个 instance\n```",
+        "三个细节：",
+        "1. 只有第一次调用才会初始化。",
+        "2. 构造抛异常，下次调用还会尝试初始化。",
+        "3. 构造期间不能递归进入同一个局部静态变量的初始化（单例自己都还没构造完，构造函数中就要来获取它自己）。"
+      ],
+      "category": "面试问题收集",
+      "pinned": false
+    },
+    {
+      "id": "lambda1",
+      "title": "lambda表达式的本质是什么 为什么不加mutable就无法修改按值捕获的变量呢",
+      "date": "2026-07-16",
+      "tags": [
+        "C++"
+      ],
+      "summary": "关于 lambda 表达式的一些底层，以及 const 修饰的 this 指针。",
+      "body": [
+        "Lambda 表达式本质上是匿名的函数对象，函数体为 operator()，按值捕获的变量即为函数对象的私有成员。",
+        "```cpp\n//示例\nint x = 10;\n\nauto f = [x]() {\n    x++;   // 报错\n};\n\n\n//伪代码\nclass __Lambda {\nprivate:\n    int x;           // 按值捕获\n\npublic:\n    __Lambda(int _x)\n        : x(_x)\n    {}\n\n    void operator()() const\n    {\n        cout << x << endl;\n    }\n};\n```",
+        "**[size=medium]为什么按值捕获不能修改？[/size]**",
+        "因为 operator() 默认是 const，此时 this 指针有 const 修饰，是 `const __Lambda* const this`，因此 this->x 的类型为 const int，众所周知 const 变量是无法修改的。",
+        "而按引用捕获的时候，修改的是引用指向的外部对象而不是 Lambda 对象内部的成员，这样是可以的。",
+        "**[size=medium]mutable 是什么？[/size]**",
+        "还是那个例子，如果我们写上 mutable，请往下看：",
+        "```cpp\n//示例\nint x = 10;\n\nauto f = [x]() mutable{\n    x++;\n};\n```",
+        "编译器生成的是：",
+        "```cpp\n//伪代码\nclass __Lambda {\n    int x;\n\npublic:\n    __Lambda(int _x)\n        : x(_x)\n    {}\n\n    void operator()()\n    {\n        cout << x << endl;\n    }\n};\n```",
+        "此时没有 const，于是 this 指针就是 `__Lambda* const this，就可以改了，mutable 的作用其实就是去掉 operator() 后面的 const，为什么默认是 const 呢？这是因为值引用使用的是复制过来的副本，如果内部更改了的话容易给人一种修改的是外部变量的幻觉，但其实不是。"
+      ],
+      "category": "面试问题收集",
+      "pinned": false
+    },
+    {
       "id": "drawcall-cpu",
       "title": "什么情况下 DrawCall 不再是 CPU 的瓶颈 这种情况如何优化",
       "date": "2026-07-16",
