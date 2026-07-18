@@ -1,6 +1,197 @@
 {
   "posts": [
     {
+      "id": "tcpydp",
+      "title": "3. TCP 和 UDP",
+      "date": "2026-07-18",
+      "tags": [
+        "计算机网络"
+      ],
+      "summary": "TCP 和 UDP",
+      "body": [
+        "TCP 和 UDP 都属于传输层协议，都通过端口号区分不同进程。",
+        "**[size=large]TCP[/size]**",
+        "面向字节流，有连接的可靠传输，开销较大。",
+        "**可靠传输**通过以下机制：序列号、校验和、确认应答、拥塞控制（慢启动、拥塞避免、快重传、快恢复）、流量控制（接收窗口）、超时重传、快速重传等。",
+        "由于 TCP 不保留应用层消息边界，所以存在粘包问题，可以通过**固定长度**、**特殊分隔符**、**头部记录消息长度**来拆包。",
+        "**[size=large]UDP[/size]**",
+        "面向数据报，无连接不可靠开销小，需要应用层自己保证数据正确（例如QUIC）。",
+        "UDP 会保留消息边界，不存在粘包，此外支持单播、广播、组播。",
+        "**[size=large]TCP 和 UDP 对比[/size]**",
+        "| 对比项 | TCP | UDP |\n| --- | --- | --- |\n| 是否连接 | 面向连接 | 无连接 |\n| 可靠性 | 可靠 | 不保证可靠 |\n| 数据形式 | 字节流 | 数据报 |\n| 消息边界 | 不保留 | 保留 |\n| 数据顺序 | 保证有序 | 不保证有序 |\n| 丢包处理 | 自动重传 | 默认不重传 |\n| 流量控制 | 有 | 无 |\n| 拥塞控制 | 有 | 无 |\n| 首部大小 | 通常至少 20 字节 | 8 字节 |\n| 通信方式 | 通常一对一 | 单播、广播、组播 |\n| 速度与延迟 | 开销较大 | 开销小、延迟低 |",
+        "**[size=large]QUIC[/size]**",
+        "在 UDP 基础上实现的一套可靠传输的机制，默认结合了 TLS1.3，只要一个 RTT，不像传统 HTTPS，TCP 握手之后才能轮到 TLS。",
+        "**[size=medium]实现方法[/size]**",
+        "QUIC 支持多个相互独立的数据流，其中一个流丢失不影响其他流，每个流各自维护序号、偏移值和长度。",
+        "所谓“流”个人理解是数据报中可能存在部分重叠的一段数据，通过这种独立流可以防止 TCP 中存在的队列头阻塞（前面的丢失了，后面的全部阻塞）。",
+        "[size=medium]**为啥要用 UDP+QUIC 而不是直接用 TCP 呢？**[/size]",
+        "1. 因为 TCP 属于操作系统内核，如果要修改 TCP 就要进入内核",
+        "2. UDP 提供一个轻量入口，QUIC 独立实现序列号、ACK 确认、拥塞/流量控制、超时重传。"
+      ],
+      "category": "计算机基础",
+      "pinned": false
+    },
+    {
+      "id": "fourcast",
+      "title": "四种类型转换",
+      "date": "2026-07-18",
+      "tags": [
+        "基础"
+      ],
+      "summary": "总结四种类型转换的相关知识",
+      "body": [
+        "**[size=large]1. static_cast：普通类型转换[/size]**",
+        "用来处理一些**数值之间转换**，**父类与子类的上行转换**，**左值转右值引用**，**void* 和具体指针转换**等编译期就能判断是否合法的转换，因为他不会做运行时检查。",
+        "C 风格的转换：",
+        "```cpp\ndouble d = 3.14;\nint x = (int)d;\n```",
+        "可能会同时尝试不同转型方式，权限过大，因此需要 static_cast，明确程序员的目的，通常这么写：int x = static_cast<int>(d);。",
+        "**[size=large]2. dynamic_cast：多态类型的安全转换[/size]**",
+        "底层：利用 RTTI 运行时信息，沿着继承关系检查对象的真实类型，检验是否是 Derived 或者其派生类，如果是的话会找到 Derived 在完整对象中的位置（如果是派生类），并返回调整过的 Derived*。如果不是则会返回 nullptr。",
+        "dynamic_cast 主要用于继承体系中，特别是父类指针转子类指针，也就是向下转换，它会在运行时检查对象的真实类型。",
+        "举例说明：",
+        "```cpp\nBase* p = new Derived;\n\nDerived* q = dynamic_cast<Derived*>(p);\n```",
+        "**[size=large]3. const_cast：修改 const 或 volatile 属性[/size]**",
+        "个人理解是用来剥离参数的 const 或 volatile 属性，但是不能用来修改真正只读的对象。",
+        "```cpp\nint x = 10;\n\nconst int* p = &x;\nint* q = const_cast<int*>(p);\n\n*q = 20;\n```",
+        "**[size=large]4. reinterpret_cast：重新解释内存[/size]**",
+        "最危险的一种，它通常不改变内存里的比特，只是告诉编译器：“把这一段内容换一种类型看待。”主要用于指针、地址、底层比特重新解释。",
+        "他不关心类型之间是否有正常的语义关系，因此虽然编译器可能允许这些行为，但不代表他们是安全的。"
+      ],
+      "category": "C++",
+      "pinned": false
+    },
+    {
+      "id": "sharedptr",
+      "title": "手撕 Shared_ptr",
+      "date": "2026-07-18",
+      "tags": [
+        "手撕代码"
+      ],
+      "summary": "Shared_ptr 本体和控制块的代码",
+      "body": [
+        "控制块：",
+        "```cpp\ntemplate<class T>\nstruct Control_Block{\nprivate:\n    T* ptr_;\n\npublic:\n    std::atomic<std::size_t> strong_count{1};\n    \n    std::atomic<std::size_t> weak_count{0};\n\n    explict Control_Block(T* ptr) : ptr_(ptr) {}\n};\n```",
+        "指针：",
+        "```cpp\ntemplate<class T>\nclass Shared_Ptr{\nprivate:\n    T* ptr_;\n\npublic:\n    explict Shared_Ptr(\n```",
+        "哎写不动了，下次再写吧。"
+      ],
+      "category": "面试问题收集",
+      "pinned": false
+    },
+    {
+      "id": "s",
+      "title": "手撕 unique_ptr",
+      "date": "2026-07-18",
+      "tags": [
+        "手撕代码"
+      ],
+      "summary": "随便写写的，并不完整",
+      "body": [
+        "```cpp\ntemplate<class T>\nClass MyUniquePtr{\nprivate:\n    MyUniquePtr ptr_;\npublic:\n    explict MyUniquePtr(T* ptr = nullptr) : ptr_(ptr) noexcept {}\n    \n    ~MyUniquePtr(){\n        delete ptr_;\n    }\n    \n    //禁止复制\n    MyUniquePtr(const MyUniquePtr&) = delete;\n    MyUniquePtr& operator=(const MyUniquePtr&) = delete;\n\n    //移动构造\n    MyUniquePtr(MyUniquePtr&& other) noexcept : ptr_(other.release()){}\n    //移动赋值\n    MyUniquePtr& operator=(MyUniquePtr&& other) noexcept {\n        if(this != &other){\n            reset(other.release());\n        }\n        return *this;\n    }\n    \n    //用来观察，不转移所有权，返回的是裸指针 ptr_，例如 T* raw = p.get();。\n    T* get() const noexcept {\n        return ptr_;\n    }\n\n    //用来获取原对象的引用，可读写，返回的是 ptr_ 指向的对象，例如 int& x = *ptr_;。\n    T& operator*() const noexcept {\n        return *ptr_;\n    }\n\n    //让智能指针像普通指针一样使用\n    T* operator->() const noexcept {\n        return ptr_;\n    }\n\n    //释放原指针\n    T* release() noexcept {\n        T* old = ptr_;\n        ptr_ = nullptr;\n        return old;\n    }\n\n    //更新指针\n    void reset(T* ptr = nullptr) noexcept {\n        if(ptr_ == ptr){\n            return;\n        }\n        T* old = ptr_;\n        ptr_ = ptr;\n        delete old;\n    }\n};\n\n//可变参数模版构造指针\ntemplate<T, class... Args>\nMyUniquePtr<T> make_unique<Args&&... args>{\n    return MyUniquePtr<T>(\n        new T(std::forward<Args>(args)...)\n    );\n}\n```"
+      ],
+      "category": "面试问题收集",
+      "pinned": false
+    },
+    {
+      "id": "post-1784301568182",
+      "title": "3. 委托与事件",
+      "date": "2026-07-17",
+      "tags": [
+        "第一梯队"
+      ],
+      "summary": "委托、事件",
+      "body": [
+        "**[size=large]委托[/size]**",
+        "一种保存**方法**的类型，例如：",
+        "```cpp\ndelegate int Calculate(int a, int b);\n\nint Add(int a, int b) => a + b;\n\nCalculate cal = Add;\nint result = cal(1, 2);\n```",
+        "普通变量：保存数据",
+        "委托变量：保存方法",
+        "需要注意的是，委托只能绑定返回值类型和参数列表一致的方法（上方代码段中的 Add）。",
+        "**[size=large]多播委托[/size]**",
+        "一个委托内绑定多个方法，调用时按照绑定顺序执行，多播委托有返回值时，只能得到最后一个方法的返回值。",
+        "```cpp\nAction action = MethodA;\naction += MethodB;\n\naction();          // 依次执行 MethodA、MethodB\naction -= MethodA; // 取消绑定\n```",
+        "看起来有点像事件，因为用了 Action 内置委托，虽然说事件其实也就是加了一层访问权限保护的多播委托。",
+        "如果不用内置委托的话这么写：",
+        "```cpp\n// 1. 自定义委托类型\npublic delegate void MyDelegate();\n\nstatic void MethodA()\n{\n    Console.WriteLine(\"MethodA\");\n}\n\nstatic void MethodB()\n{\n    Console.WriteLine(\"MethodB\");\n}\n\nstatic void Main()\n{\n    // 2. 创建委托对象，绑定 MethodA\n    MyDelegate action = MethodA;\n\n    // 3. 再绑定 MethodB，成为多播委托\n    action += MethodB;\n\n    // 4. 按绑定顺序依次调用\n    action();\n\n    // 5. 解除 MethodA\n    action -= MethodA;\n\n    action(); // 只执行 MethodB\n}\n```",
+        "**[size=large]事件[/size]**",
+        "在委托基础上添加了一层访问权限保护，用来实现发布-订阅模式。",
+        "```cpp\n假装有代码\n```",
+        "流程：",
+        "```cpp\n发布者触发事件\n       ↓\n事件通知所有订阅者\n       ↓\n订阅者执行对应方法\n```",
+        "**[size=xlarge]委托和事件的区别[/size]**",
+        "委托变量在外部可以通常可以：绑定方法、移除方法、直接赋值、直接调用，怎么说捏，订阅方直接接触被订阅方，权限也比较高。",
+        "而事件在类外部只能订阅和取消订阅，由声明他的类内部触发。"
+      ],
+      "category": "C#",
+      "pinned": false
+    },
+    {
+      "id": "post-1784295589672",
+      "title": "2. 集合、泛型",
+      "date": "2026-07-17",
+      "tags": [
+        "第一梯队"
+      ],
+      "summary": "简单总结一下集合-泛型的相关知识",
+      "body": [
+        "集合-可以动态扩容的容器，比普通数组更灵活。",
+        "**[size=large]常见泛型集合[/size]**",
+        "1. List<int> 动态数组，可以通过下标访问，特性和数组一样。",
+        "2. Dictionary<T, T> 这个似乎就是 C++ 的 map，同样键不可重复，值可重复。",
+        "3. HashSet<T> C++ 里的 set，底层也是基于哈希表，不可重复，适合用来去重，O(1)级别查找。",
+        "4. Queue 不多讲",
+        "5. Stack 这个也懒得讲",
+        "6. LinkedList<T> 双向链表",
+        "**[size=large]何谓泛型？[/size]**",
+        "意思是把类型当参数传递，光看定义感觉跟 CPP 的模版好像是一类东西。",
+        "优点：",
+        "1. 编译器就能查出类型错误（确实，模版也是编译期要实例化的）",
+        "2. 不需要强制类型转换（非泛型可能需要类型强转）",
+        "3. **避免装箱拆箱**",
+        "**[size=large]泛型约束[/size]**",
+        "可以限制参数需要满足的条件"
+      ],
+      "category": "C#",
+      "pinned": false
+    },
+    {
+      "id": "236",
+      "title": "236. 二叉树的最近公共祖先",
+      "date": "2026-07-17",
+      "tags": [
+        "二叉树"
+      ],
+      "summary": "二叉树的最近公共祖先",
+      "body": [
+        "![image](./assets/uploads/20260717-205837-597501-image-a85e9d19.png)",
+        "这题一开始给我一种要用并查集的幻觉，但后来看题解才发现只要递归向上传递已经匹配的节点即可。",
+        "分为两种情况：",
+        "1. 当前节点是 p 或 q 中的一个，那么直接返回当前节点，因为不管它下面是一个还是两个匹配节点都不会影响结果，如果另一侧还有一个节点，那答案自然会被覆盖掉。",
+        "2. 当前节点不是我们需要的，那就查左右子树，只有单侧有->返回子节点，双侧都有->返回当前节点。",
+        "```cpp\n/**\n * Definition for a binary tree node.\n * struct TreeNode {\n *     int val;\n *     TreeNode *left;\n *     TreeNode *right;\n *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}\n * };\n */\nclass Solution {\npublic:\n    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {\n        if(root == nullptr) return nullptr;\n        \n        TreeNode* l = lowestCommonAncestor(root->left, p, q);\n        TreeNode* r = lowestCommonAncestor(root->right, p, q);\n\n        if(root->val == p->val || root->val == q->val) return root;\n        if(l && r) return root;\n        else if(l) return l;\n        else if(r) return r;\n        else return nullptr;\n    }\n};\n```",
+        "虽然 AC 了，但是性能比较低，还有待提高。"
+      ],
+      "category": "Hot100",
+      "pinned": false
+    },
+    {
+      "id": "61",
+      "title": "61. 旋转链表",
+      "date": "2026-07-17",
+      "tags": [
+        "链表"
+      ],
+      "summary": "旋转链表",
+      "body": [
+        "![image](./assets/uploads/20260717-165458-942025-image-defb07fa.png)",
+        "本来我用的是双指针，试图拆分成两段重新拼接，但后来没处理好边界条件，遂不了了之。",
+        "03xf 提供的思路：首尾连接，中间断开，妙哉。",
+        "```cpp\n/**\n * Definition for singly-linked list.\n * struct ListNode {\n *     int val;\n *     ListNode *next;\n *     ListNode() : val(0), next(nullptr) {}\n *     ListNode(int x) : val(x), next(nullptr) {}\n *     ListNode(int x, ListNode *next) : val(x), next(next) {}\n * };\n */\nclass Solution {\npublic:\n    ListNode* rotateRight(ListNode* head, int k) {\n        if(head == nullptr) return nullptr;\n        ListNode* cur = head;\n        int t = 0;\n        while(cur != nullptr){\n            t++;\n            cur = cur->next;\n        }\n        k %= t;\n        \n        cur = head;\n        ListNode* nxt = head;\n        while(k--){\n            nxt = nxt->next;\n        }\n        while(nxt->next != nullptr){\n            nxt = nxt->next;\n            cur = cur->next;\n        }\n        nxt->next = head;\n        head = cur->next;\n        cur->next = nullptr;\n        return head;\n    }\n};\n```"
+      ],
+      "category": "Hot100",
+      "pinned": false
+    },
+    {
       "id": "Cjing1",
       "title": "1. 值类型、引用类型、装箱拆箱",
       "date": "2026-07-16",
