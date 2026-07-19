@@ -1,6 +1,27 @@
 {
   "posts": [
     {
+      "id": "nimingkongjian",
+      "title": "匿名命名空间和 Static",
+      "date": "2026-07-19",
+      "tags": [
+        "进阶"
+      ],
+      "summary": "匿名命名空间和 Static",
+      "body": [
+        "匿名命名空间：让其中的名字只在当前源文件可见，从而获得“内部链接”，可以理解为编译器为这个空间起了一个当前源文件独有的名字。",
+        "```cpp\n// A.cpp\nnamespace （例如编译器起了个名字叫A_cpp_unique_namespace）{\n    int count = 0;\n\n    void func() {\n    }\n}\n\n// B.cpp\nnamespace {\n    int count = 0;\n\n    void func() {\n    }\n}\n```",
+        "**[size=medium]为什么能解决命名冲突[/size]**",
+        "如果有两个相同匿名空间（都有 func），它们对应各自源文件的匿名空间，编译并链接时，对编译器来说这是两份不同的实体，并不会发生重复定义冲突。",
+        "**[size=medium]和 Static 的区别[/size]**",
+        "匿名空间和 static 的思想都是限制该名字只属于当前源文件，只不过 static 只能对变量和函数使用，匿名空间还可以对类、类型别名、模板使用，而且一个空间可以放很多东西。",
+        "**[size=medium]个人理解[/size]**",
+        "匿名命名空间内部组织一批变量、函数或类，作用是将可见范围限定在当前源文件，可以理解为编译器会为该空间生成一个仅当前源文件可以使用的名字，这个和 static 思想挺像的，都是限定可见范围，区别是内部可以包含的内容不同。"
+      ],
+      "category": "C++",
+      "pinned": false
+    },
+    {
       "id": "tcpydp",
       "title": "3. TCP 和 UDP",
       "date": "2026-07-18",

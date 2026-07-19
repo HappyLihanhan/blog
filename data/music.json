@@ -4,7 +4,7 @@
       "id": "daniel-rosenfeld-c418",
       "title": "C418",
       "artist": "Daniel Rosenfeld",
-      "url": "https://happyliahanhan.github.io/blog/assets/music/20260618-150523-314526-daniel-rosenfeld-c418-6548c239.mp3",
+      "url": "./assets/music/20260618-150523-314526-daniel-rosenfeld-c418-6548c239.mp3",
       "filename": "20260618-150523-314526-daniel-rosenfeld-c418-6548c239.mp3",
       "createdAt": "2026-06-18T07:05:23.318515+00:00"
     },
@@ -12,7 +12,7 @@
       "id": "andrew-prahlow-travelers",
       "title": "Travelers",
       "artist": "Andrew Prahlow",
-      "url": "https://happyliahanhan.github.io/blog/assets/music/andrew-prahlow-travelers.mp3",
+      "url": "./assets/music/andrew-prahlow-travelers.mp3",
       "filename": "andrew-prahlow-travelers.mp3",
       "createdAt": "2026-06-17T10:07:11+00:00"
     },
@@ -20,7 +20,7 @@
       "id": "andrew-prahlow-outer-wilds",
       "title": "Outer Wilds",
       "artist": "Andrew Prahlow",
-      "url": "https://happyliahanhan.github.io/blog/assets/music/20260624-161506-532407-andrew-prahlow-outer-wilds-82b6ae56.mp3",
+      "url": "./assets/music/20260624-161506-532407-andrew-prahlow-outer-wilds-82b6ae56.mp3",
       "filename": "20260624-161506-532407-andrew-prahlow-outer-wilds-82b6ae56.mp3",
       "createdAt": "2026-06-24T08:15:06.534828+00:00"
     }
