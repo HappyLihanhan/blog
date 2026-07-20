@@ -25,6 +25,7 @@
   --header-line: rgba(93, 78, 51, 0.3);
   --garden-scene-image: url("./assets/minecraft-garden-background.webp?v=20260618-day");
   --garden-scene-position: center;
+  --garden-scene-size: cover;
   --garden-scene-overlay:
     linear-gradient(90deg, rgba(248, 250, 248, 0.18) 0%, rgba(248, 250, 248, 0.08) 46%, transparent 72%),
     linear-gradient(180deg, rgba(255, 250, 232, 0.03), rgba(22, 48, 30, 0.1));
@@ -67,6 +68,7 @@
   --header-line: rgba(151, 196, 237, 0.28);
   --garden-scene-image: url("./assets/minecraft-garden-night.png?v=20260618-night");
   --garden-scene-position: center;
+  --garden-scene-size: 92% auto;
   --garden-scene-overlay:
     linear-gradient(90deg, rgba(2, 8, 19, 0.22) 0%, rgba(2, 8, 19, 0.08) 46%, transparent 72%),
     linear-gradient(180deg, rgba(2, 8, 18, 0.04), rgba(1, 6, 13, 0.14));
@@ -130,7 +132,7 @@ body::before {
     var(--garden-scene-image);
   background-position: center, var(--garden-scene-position);
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: cover, cover, var(--garden-scene-size);
   filter: var(--garden-scene-filter);
   transform: scale(1.05);
   will-change: transform, filter;
