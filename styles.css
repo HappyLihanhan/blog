@@ -97,7 +97,7 @@ html {
 
 body {
   position: relative;
-  overflow-x: hidden;
+  overflow-x: clip;
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
