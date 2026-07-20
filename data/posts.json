@@ -1,6 +1,87 @@
 {
   "posts": [
     {
+      "id": "post-1784470176303",
+      "title": "类对象的内存布局",
+      "date": "2026-07-19",
+      "tags": [
+        "C++"
+      ],
+      "summary": "类对象的内存布局",
+      "body": [
+        "**[size=large]无继承关系[/size]**",
+        "对象主要保存非静态数据成员，如果是**多态类**，还需要保存虚表指针，此外还包含内存对齐产生的字节填充。",
+        "**[size=large]多继承（覆盖了单继承了，直接跳过）[/size]**",
+        "根据继承顺序，依次排列，典型布局是：",
+        "```cpp\nC 对象\n┌──────────────┐\n│ A 基类子对象 │\n├──────────────┤\n│ B 基类子对象 │\n├──────────────┤\n│ C 自身成员   │\n└──────────────┘\n不包括内部细节，例如尾部字节填充，如果子对象支持动态绑定虚函数，那还需要保存虚表指针。\n\nC 对象\n┌──────────────┐\n│ A::vptr      │\n│ A::a         │\n├──────────────┤\n│ B::vptr      │\n│ B::b         │\n├──────────────┤\n│ C::c         │\n└──────────────┘\n```",
+        "**[size=large]菱形继承目前懒得写，反正答得大差不差。[/size]**"
+      ],
+      "category": "面试问题收集",
+      "pinned": false
+    },
+    {
+      "id": "rtti-dynamic_cast",
+      "title": "RTTI 是什么？dynamic_cast 底层怎么判断类型？",
+      "date": "2026-07-19",
+      "tags": [
+        "C++"
+      ],
+      "summary": "RTTI 是什么？dynamic_cast 底层怎么判断类型？",
+      "body": [
+        "RTTI 是运行时类型信息，dynamic_cast 底层步骤如下：",
+        "```cpp\nBase* p = new Derived;\nDerived* d = dynamic_cast<Derived*>(p);\n\n1. 通过虚表指针找到虚函数表，虚函数表中的 RTTI 元数据包含了完整对象的真实类型和起始地址、p 指向的是哪个子对象、偏移值多少。\n\n2. 得到完整对象类型后，运行库会在 RTTI 中的继承关系中继续搜索目标类型。\n\n3. 如果检查发现当前指向的 Base 位于某个包含合法且唯一的目标子对象 Derived 的完整对象中，那么转换成功，但如果不含 Derived 子对象，那么转换失败。\n```",
+        "横向转换更能体现工作逻辑：",
+        "```cpp\nclass Base {\npublic:\n    virtual ~Base() = default;\n};\n\nclass Left : public Base {};\nclass Right : public Base {};\n\nclass Derived : public Left, public Right {};\n```",
+        "```cpp\nDerived obj;\n\nLeft* left = &obj;\nRight* right = dynamic_cast<Right*>(left);\n```",
+        "```cpp\n1. left 指向 Derived 中的 Left 子对象\n2. 通过 Left 子对象的 vptr 发现完整对象类型是 Derived\n3. 找到 Derived 完整对象的起始地址\n4. 在 Derived 的继承关系中寻找 Right 子对象\n5. 找到唯一且公开的 Right 子对象\n6. 将指针调整到 Right 子对象的位置\n```"
+      ],
+      "category": "面试问题收集",
+      "pinned": false
+    },
+    {
+      "id": "object-slicing",
+      "title": "object slicing（对象切片）是什么？",
+      "date": "2026-07-19",
+      "tags": [
+        "C++"
+      ],
+      "summary": "object slicing（对象切片）是什么？",
+      "body": [
+        "**对象切片**发生在：派生类对象**按值复制**给基类对象时发生。",
+        "```cpp\nDerived d;\nBase b = d;\n```",
+        "流程补充说明：",
+        "1. 新建一个新的 Base 对象 b。",
+        "2. 将 d 中的 Base 子对象复制一份新的给 b，派生类独有的部分被丢弃。",
+        "3. b 现在完全是 Base 类型。"
+      ],
+      "category": "面试问题收集",
+      "pinned": false
+    },
+    {
+      "id": "post-1784452621383",
+      "title": "纯虚函数、抽象类、接口类有什么区别？",
+      "date": "2026-07-19",
+      "tags": [
+        "C++"
+      ],
+      "summary": "纯虚函数、抽象类、接口类有什么区别？",
+      "body": [
+        "**纯虚函数**在基类中只声明但不实现（其实也可以实现，派生类可以显式调用），要求派生类必须实现（否则不能成为具体类），和C#中的接口比较相似，通常用来规定类的功能。",
+        "补充一点，**纯虚析构函数**必须要有定义，因为不管怎么样最终都会运行基类析构函数。",
+        "----------------------------------------------------",
+        "包含未实现的纯虚函数的类就是**抽象类**，不可被实例化，但可以声明指针和引用。",
+        "----------------------------------------------------",
+        "C++ 没有像 C# 那样的 interface 关键字，所谓接口类是认为约定的一种特殊抽象类，例如：",
+        "```cpp\nclass IRenderer {\npublic:\n    virtual void draw() = 0;\n    virtual void clear() = 0;\n\n    virtual ~IRenderer() = default;\n};\n```",
+        "通常有以下特点：",
+        "1. 内部成员函数几乎都是公有纯虚函数",
+        "2. 没有业务成员变量",
+        "3. 只负责描述一组能力或协议"
+      ],
+      "category": "面试问题收集",
+      "pinned": false
+    },
+    {
       "id": "nimingkongjian",
       "title": "匿名命名空间和 Static",
       "date": "2026-07-19",
@@ -75,7 +156,7 @@
         "个人理解是用来剥离参数的 const 或 volatile 属性，但是不能用来修改真正只读的对象。",
         "```cpp\nint x = 10;\n\nconst int* p = &x;\nint* q = const_cast<int*>(p);\n\n*q = 20;\n```",
         "**[size=large]4. reinterpret_cast：重新解释内存[/size]**",
-        "最危险的一种，它通常不改变内存里的比特，只是告诉编译器：“把这一段内容换一种类型看待。”主要用于指针、地址、底层比特重新解释。",
+        "最危险的一种，它通常不改变内存里的比特，只是告诉编译器：“把这一段内容换一种类型看待。”主要用于指针、地址、底层比特重新解释。**换句话说，就是用另一种类型解释同一个变量、地址。**",
         "他不关心类型之间是否有正常的语义关系，因此虽然编译器可能允许这些行为，但不代表他们是安全的。"
       ],
       "category": "C++",

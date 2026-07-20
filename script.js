@@ -1977,7 +1977,6 @@ function bindEvents() {
       activePostTag = "";
       activePostPage = 1;
       renderNotesView();
-      resetPageScroll();
       return;
     }
 
@@ -1986,7 +1985,6 @@ function bindEvents() {
       activePostTag = tagButton.dataset.tag || "";
       activePostPage = 1;
       renderNotesView();
-      resetPageScroll();
       return;
     }
 
