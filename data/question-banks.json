@@ -1,0 +1,3236 @@
+{
+  "version": 1,
+  "sources": [
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "filename": "游戏客户端面试题库_题目与参考答案_完整版.xlsx",
+      "importedAt": "2026-07-21T09:52:55.886406+00:00",
+      "questionCount": 537,
+      "answerCount": 537
+    }
+  ],
+  "questions": [
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0001",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "什么是多态？静态多态和动态多态有什么区别？",
+      "answer": "多态是同一接口在不同对象上表现出不同行为。静态多态在编译期确定，如函数重载和模板，速度快但扩展需重新编译；动态多态依赖虚函数，在运行期根据对象实际类型分派，扩展灵活但有一次间接调用和对象模型开销。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0002",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "虚函数是怎么实现的？",
+      "answer": "含虚函数的类通常由编译器生成虚函数表，每个多态子对象中保存虚表指针。通过基类指针或引用调用虚函数时，先读取对象的虚表指针，再按编译期确定的槽位取出函数地址并间接调用。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0003",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "虚函数表和虚函数指针分别存在哪里？",
+      "answer": "虚表指针是对象的一部分，通常位于对象内存开头或对应基类子对象开头；虚函数表是类级共享的只读数据，通常放在程序的只读数据段。具体布局由编译器 ABI 决定。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0004",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "虚函数表什么时候创建？",
+      "answer": "虚函数表通常在编译和链接阶段生成，并随程序映像加载，不是在每次创建对象时动态创建。构造对象时主要是把对象中的虚表指针设置为当前构造阶段对应类的虚表地址。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0005",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "对象如何通过虚指针找到对应虚函数？",
+      "answer": "编译器为每个虚函数分配固定槽位。调用时读取对象中的 vptr，得到 vtable，再取该槽位中的函数地址；派生类重写虚函数时会把对应槽位替换为派生类实现，因此能按实际对象类型调用。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0006",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "多个虚函数如何确定调用虚表中的哪一项？",
+      "answer": "虚函数的槽位编号在编译期由类的虚函数声明顺序和 ABI 确定，调用点知道要访问哪个槽位。运行时只需要通过对象的虚表指针找到虚表，再按固定偏移读取函数地址。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0007",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "构造函数为什么不能是虚函数？",
+      "answer": "调用构造函数前对象尚未完整存在，虚表指针和动态类型也需要由构造过程建立，因此无法先通过虚机制找到正确构造函数。创建何种对象必须在调用构造函数前就已确定，常用虚拟构造函数模式，即工厂方法或 clone 代替。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0008",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "析构函数为什么经常需要声明为虚函数？",
+      "answer": "如果通过基类指针 delete 派生类对象，而基类析构函数不是虚函数，行为未定义，通常只调用基类析构，派生类资源可能泄漏。作为多态基类时应提供虚析构；若不允许基类指针删除，则可把析构设为 protected 非虚。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0009",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "构造函数和析构函数中调用虚函数会发生什么？",
+      "answer": "构造和析构期间不会分派到更派生类版本。构造基类时派生部分尚未建立，析构基类时派生部分已销毁，所以虚调用只会到当前构造或析构阶段对应类的实现，纯虚调用还可能导致运行时错误。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0010",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "普通类和含虚函数类的对象大小有什么不同？",
+      "answer": "普通类对象通常只包含非静态数据成员及填充；含虚函数的类对象通常额外包含一个虚表指针，64 位环境常增加 8 字节，并受对齐影响。多继承时可能有多个虚表指针，最终大小还取决于成员布局和 ABI。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0011",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "多继承时，一个对象中可能有几个虚指针？",
+      "answer": "可能有多个。若派生类继承多个含虚函数的基类，通常每个多态基类子对象各有一个 vptr；主基类的 vptr 有时可与派生类共用，具体数量和布局由编译器 ABI 决定。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0012",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "菱形继承有什么问题？虚继承如何解决？",
+      "answer": "菱形继承会让最终派生类中出现两份共同基类子对象，造成数据重复和成员访问歧义。虚继承让中间类共享同一份虚基类子对象，并由最终派生类负责构造，但会增加指针调整和布局复杂度。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0013",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "override、overload、隐藏分别是什么？",
+      "answer": "overload 是同一作用域中同名函数参数列表不同，编译期选择；override 是派生类用相同签名重写基类虚函数，运行期分派；隐藏是派生类声明同名成员后遮蔽基类同名成员，即使参数不同也可能隐藏，可用 using 引入基类重载集。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0014",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "纯虚函数、抽象类、接口类有什么区别？",
+      "answer": "纯虚函数用 =0 声明接口约束；包含至少一个纯虚函数的类是抽象类，不能直接实例化；接口类是设计约定，通常只有纯虚函数、虚析构和少量常量，不保存业务状态。C++ 没有专门的 interface 关键字。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0015",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "object slicing（对象切片）是什么？",
+      "answer": "对象切片是把派生类对象按值赋给或传给基类对象时，只复制基类子对象，派生类新增成员和动态类型信息被丢弃。要保留多态应使用基类指针或引用，而不是按值传递。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0016",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "RTTI 是什么？dynamic_cast 底层怎么判断类型？",
+      "answer": "RTTI 是运行时类型信息，通常包含 type_info 和继承关系描述。dynamic_cast 对多态对象从 vptr 关联的 RTTI 找到最派生对象，再检查目标类型在继承图中是否存在、是否可访问且转换唯一，成功后调整指针，失败返回 nullptr 或抛 bad_cast。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0017",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "static_cast、dynamic_cast、const_cast、reinterpret_cast 的区别。",
+      "answer": "static_cast 用于编译期可验证的数值转换、上下行转换等，下行不做运行时检查；dynamic_cast 用于多态继承的安全运行时转换；const_cast 只增删 const/volatile；reinterpret_cast 按位或地址语义重新解释，风险最高，不能保证对象真实类型正确。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0018",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "C++ 类对象的内存布局是怎样的？",
+      "answer": "对象通常只存非静态数据成员、必要的对齐填充，以及多态或虚继承产生的隐藏指针；静态成员和成员函数不在对象内。继承时包含各基类子对象和派生成员，多继承、虚继承的具体顺序由 ABI 决定。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0019",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "空类为什么通常占一个字节？",
+      "answer": "不同对象必须具有不同地址，即使类没有数据成员。编译器通常让空类占 1 字节，使数组中的元素也能拥有独立地址；作为基类时可能通过空基类优化不占额外空间。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0020",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "成员函数是否存放在对象内部？",
+      "answer": "不存放。非静态成员函数位于代码段，所有对象共享一份，通过隐藏的 this 指针访问当前对象；对象中只保存非静态数据及编译器需要的隐藏字段。虚函数表中保存的是函数地址而不是函数代码。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0021",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "指针和引用有什么区别？",
+      "answer": "指针是对象，可为空、可改指向、支持算术并占用存储；引用是已有对象的别名，必须初始化，语义上不可重新绑定，使用时通常自动解引用。引用是否占空间取决于是否需要实体化和编译器实现。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0022",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "引用在底层一定是指针实现的吗？",
+      "answer": "不一定。语言标准只规定引用的语义，不规定实现；很多情况下编译器用指针实现，但局部引用可能被直接优化掉，根本不占独立存储。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0023",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "左值、右值、将亡值分别是什么？",
+      "answer": "左值有稳定身份，通常可取地址；纯右值是临时计算结果，用于初始化对象；将亡值是仍有身份但资源可被复用的右值，如 std::move(x) 的结果。右值包括纯右值和将亡值。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0024",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "左值引用和右值引用有什么区别？",
+      "answer": "左值引用 T& 通常绑定可修改左值，const T& 还能绑定右值并延长临时对象生命周期；右值引用 T&& 绑定右值，用于表示可移动资源和实现完美转发。具名的右值引用变量本身表达式仍是左值。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0025",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "std::move 做了什么？它真的移动对象了吗？",
+      "answer": "std::move 不移动数据，它本质上把表达式转换成对应的右值引用，使移动构造或移动赋值有机会被重载决议选中。真正的资源转移由目标类型的移动操作完成。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0026",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "移动构造和移动赋值什么时候调用？",
+      "answer": "用同类型右值初始化新对象时调用移动构造，如 T b(std::move(a))；已有对象接收同类型右值时调用移动赋值，如 b=std::move(a)。若移动操作不可用或不满足条件，可能退化为拷贝。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0027",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "拷贝构造函数在什么情况下调用？",
+      "answer": "用同类型左值初始化对象、按值传参或返回值未被消除、以及显式复制对象时可能调用拷贝构造。现代编译器会通过 RVO/NRVO 和 C++17 保证的复制消除减少调用。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0028",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "深拷贝和浅拷贝有什么区别？",
+      "answer": "浅拷贝只复制指针值，多个对象可能共享同一资源，易重复释放或互相影响；深拷贝会重新申请资源并复制内容，各对象独立。资源拥有型类需要明确所有权，通常优先用 RAII 容器和智能指针。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0029",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Rule of Three、Rule of Five、Rule of Zero 分别是什么？",
+      "answer": "Rule of Three：自定义析构、拷贝构造、拷贝赋值中的一个时通常需要三个；Rule of Five 再加入移动构造和移动赋值；Rule of Zero 表示用标准 RAII 类型管理资源，使类无需手写这些特殊成员函数。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0030",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "new/delete 与 malloc/free 有什么区别？",
+      "answer": "new/delete 是 C++ 运算符，按类型分配并调用构造/析构，失败默认抛 bad_alloc；malloc/free 只处理原始字节，返回 void*，失败返回 nullptr，不调用构造析构。两组必须配对，不能混用。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0031",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "new 的完整执行过程是什么？",
+      "answer": "new 表达式先计算大小并调用 operator new 获取原始内存，再在该内存上调用构造函数；若构造抛异常，会调用匹配的 operator delete 回收内存。最后返回类型化指针。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0032",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "堆、栈、全局区、代码区、常量区分别存什么？",
+      "answer": "栈保存局部自动对象、调用帧等；堆用于动态分配；全局/静态区保存静态存储期对象，未初始化数据常在 BSS；代码区保存指令；字符串字面量和只读常量通常在只读数据段。实际段布局由平台决定。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0033",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "内存对齐是什么？为什么需要内存对齐？",
+      "answer": "内存对齐要求对象地址满足其对齐倍数，并在成员间插入填充。这样 CPU 能高效访问，某些架构还要求对齐才能正确读取，同时保证数组元素和 SIMD 类型布局合法。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0034",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "结构体大小怎么计算？",
+      "answer": "按成员声明顺序排列，每个成员起始地址向上对齐到自身对齐值，结构体总大小再向上对齐到最大成员对齐值；继承、位域、pragma pack 和 ABI 会改变结果。可通过调整成员顺序减少填充。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0035",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "内存泄漏、野指针、悬空指针有什么区别？",
+      "answer": "内存泄漏是已分配资源失去释放路径；野指针通常指未初始化或内容非法的指针；悬空指针曾经有效，但对象已析构或内存已释放。后两者解引用都可能导致未定义行为。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0036",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何定位内存泄漏？",
+      "answer": "先看进程内存趋势和复现路径，再用 AddressSanitizer、LeakSanitizer、Valgrind、Visual Studio Diagnostic Tools 或 Unity Memory Profiler 定位分配栈；结合 RAII、智能指针和资源生命周期检查所有权闭环。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0037",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "RAII 是什么？",
+      "answer": "RAII 把资源获取绑定到对象构造，把释放绑定到析构，利用作用域退出自动清理，即使异常也安全。锁、文件、内存和句柄都可用 RAII 封装。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0038",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "placement new 是什么？",
+      "answer": "placement new 在调用者提供的内存地址上构造对象，不负责分配内存，如 new(buffer) T(args)。使用后必须显式调用析构函数，并确保地址、大小和对齐满足要求。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0039",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "delete 与 delete[] 为什么不能混用？",
+      "answer": "new[] 可能保存数组元素数量并逐个构造，delete[] 需要逐个析构并使用匹配的释放协议；delete 只按单对象处理。混用会导致未定义行为，可能析构次数错误或破坏分配器元数据。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0040",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "对象析构后，内存和对象生命周期分别发生了什么？",
+      "answer": "析构函数结束后对象生命周期终止，其成员和不变量不再可用；但底层存储不一定马上消失，例如栈空间要等作用域回收，placement new 的存储仍由调用者管理，delete 才会在析构后释放动态内存。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0041",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "unique_ptr、shared_ptr、weak_ptr 的区别。",
+      "answer": "unique_ptr 表示独占所有权，只能移动；shared_ptr 通过控制块共享所有权；weak_ptr 不增加强引用，仅观察 shared_ptr 管理的对象，可通过 lock 临时获取 shared_ptr，常用于打破循环引用。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0042",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "unique_ptr 为什么不能拷贝？",
+      "answer": "独占所有权意味着同一资源只能有一个 owner，若允许拷贝会出现两个对象都认为自己负责 delete 的问题。unique_ptr 删除拷贝操作，只允许移动来转移所有权。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0043",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何手写一个简化版 unique_ptr？",
+      "answer": "保存 T*，析构时 delete；删除拷贝构造和拷贝赋值，实现移动构造、移动赋值、get、operator*、operator->、release、reset 和 bool 转换。移动后要把源指针置空，并在 reset 前释放旧资源。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0044",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "shared_ptr 的控制块中通常有什么？",
+      "answer": "通常包含强引用计数、弱引用计数、删除器、分配器，以及被管理对象的指针或对象本体。make_shared 常把对象和控制块放在一次分配中。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0045",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "强引用计数和弱引用计数分别是什么？",
+      "answer": "强引用计数表示有多少 shared_ptr 拥有对象，降为 0 时销毁对象；弱引用计数表示有多少 weak_ptr 或控制块内部弱引用仍依赖控制块，强弱都归零后释放控制块。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0046",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "shared_ptr 的引用计数是否线程安全？",
+      "answer": "同一控制块的引用计数增减通常是原子操作，因此不同 shared_ptr 副本的生命周期管理线程安全；但 shared_ptr 对象本身的并发读写和其指向对象的内容并不自动线程安全，仍需同步或 atomic<shared_ptr>。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0047",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "shared_ptr 指向的对象什么时候析构？",
+      "answer": "最后一个拥有该对象的 shared_ptr 被销毁、reset 或重新赋值，使强引用计数降到 0 时，对象通过控制块中的删除器析构。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0048",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "shared_ptr 的控制块什么时候释放？",
+      "answer": "对象销毁后控制块可能仍需供 weak_ptr 查询。通常强引用和弱引用相关计数都归零时才释放控制块。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0049",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么循环引用会造成内存泄漏？",
+      "answer": "若两个对象互相用 shared_ptr 持有，对外引用消失后双方强计数仍至少为 1，永远无法降到 0，所以析构不会发生。其本质是所有权图形成环。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0050",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "weak_ptr 如何解决循环引用？",
+      "answer": "把环中的至少一条非拥有关系改为 weak_ptr。weak_ptr 不增加强计数，因此外部 owner 消失后强计数仍能归零，对象可正常析构；访问前通过 lock 检查对象是否仍存在。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0051",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "weak_ptr::lock() 做了什么？",
+      "answer": "lock 原子地检查强引用计数是否大于 0，若对象仍存活就增加强计数并返回 shared_ptr，否则返回空 shared_ptr。相比先 expired 再构造，它避免检查与获取之间的竞态。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0052",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "make_shared 和直接 new 有什么区别？",
+      "answer": "make_shared 通常只进行一次内存分配，把对象和控制块放在一起，缓存局部性和异常安全更好；shared_ptr(new T) 通常分配对象和控制块两次。缺点是对象销毁后，只要 weak_ptr 仍在，合并分配的整块内存不能完全释放，且自定义删除器更受限制。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0053",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "一个裸指针能否构造两个独立的 shared_ptr？为什么？",
+      "answer": "不能安全地这样做。两个独立 shared_ptr 会创建两个控制块，各自认为自己拥有同一裸指针，最终会重复 delete；应复制已有 shared_ptr，或使用 enable_shared_from_this 获取共享同一控制块的指针。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0054",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "enable_shared_from_this 用来解决什么问题？",
+      "answer": "解决对象成员函数里直接用 shared_ptr(this) 会产生新控制块的问题。类继承 enable_shared_from_this 后，已有 shared_ptr 会初始化其内部 weak_ptr，shared_from_this() 可返回共享原控制块的 shared_ptr；对象必须先被 shared_ptr 管理。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0055",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "shared_ptr 的自定义删除器存在哪里？",
+      "answer": "删除器通常作为控制块的一部分保存，而不是放在 shared_ptr 对象里。因此不同 shared_ptr 副本共享同一删除策略，shared_ptr 本身仍通常只保存对象指针和控制块指针。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0056",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "vector 的底层结构是什么？",
+      "answer": "vector 底层是连续动态数组，通常保存 begin、end 和 capacity_end 三个指针或等价信息。支持 O(1) 随机访问和良好缓存局部性，尾插均摊 O(1)，中间插删需要搬移元素。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0057",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "vector 扩容时发生什么？",
+      "answer": "容量不足时申请更大的连续内存，把旧元素移动或拷贝构造到新区域，销毁旧元素并释放旧内存，再更新指针。所有指向旧存储的迭代器、引用和指针失效。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0058",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么 vector 通常按倍数扩容？",
+      "answer": "按固定增量扩容会导致总搬移量接近平方级；按倍数扩容可保证 n 次插入的总搬移量为 O(n)，因此尾插均摊 O(1)。倍率太大浪费内存，常见实现取约 1.5 或 2，但标准不强制。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0059",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "vector 能否直接在原内存后面扩容？",
+      "answer": "通常不能保证，因为后面的地址可能已被其他分配占用，vector 需要连续存储。底层分配器理论上可能原地扩展，但标准库不能依赖这一点，常规语义仍按重新分配处理。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0060",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "vector 扩容会导致哪些迭代器失效？",
+      "answer": "发生重新分配时全部迭代器、引用和指针失效；未重新分配的尾插通常只使 end 失效；中间插入或删除会使操作位置及其后的迭代器、引用失效，具体看容器操作规则。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0061",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "vector 和 list 有什么区别？",
+      "answer": "vector 连续存储，随机访问快、缓存友好，但中间插删慢且扩容会失效；list 是双向链表，已知位置插删 O(1)、迭代器较稳定，但不支持随机访问，节点开销大且缓存差。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0062",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "vector、deque、list 分别适用于什么场景？",
+      "answer": "vector 适合大多数顺序数据和随机访问；deque 适合两端频繁插删且仍需随机访问；list 适合频繁在已知节点处插删、splice，且不要求随机访问。实践中因缓存优势优先考虑 vector。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0063",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "map 和 unordered_map 的底层实现分别是什么？",
+      "answer": "map 通常是红黑树，元素按 key 有序，操作 O(log n)；unordered_map 通常是哈希表，平均 O(1)、最坏 O(n)，无序，并受哈希质量和负载因子影响。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0064",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "红黑树为什么适合实现 map？",
+      "answer": "红黑树是近似平衡二叉搜索树，插入删除只需少量旋转和染色，树高保证 O(log n)。它兼顾有序遍历、范围查询和稳定的最坏复杂度，适合 map/set。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0065",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "哈希冲突如何处理？",
+      "answer": "常见方法有链地址法，把同桶元素放链表或其他结构中；开放寻址法，通过线性、二次探测或双重哈希找空槽。还需控制负载因子并在必要时 rehash。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0066",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "unordered_map 什么时候会 rehash？",
+      "answer": "插入后元素数量超过 max_load_factor×bucket_count，或显式调用 rehash/reserve 时会重新分桶。rehash 会使迭代器失效，但元素引用和指针在标准条件下通常仍有效。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0067",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "set 和 map 有什么区别？",
+      "answer": "set 只存 key，元素本身就是键且通常不可直接修改；map 存 key-value 对，按 key 排序或哈希。二者有序版本通常基于平衡树，无序版本基于哈希表。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0068",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "priority_queue 底层是什么？",
+      "answer": "priority_queue 是容器适配器，默认以 vector 为底层容器，使用 heap 算法维护大顶堆；可通过比较器改成小顶堆。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0069",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "堆的插入和删除复杂度是多少？",
+      "answer": "二叉堆插入把元素放末尾后上浮，删除堆顶用末尾替换后下沉，时间都是 O(log n)；查看堆顶 O(1)，建堆可 O(n)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0070",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "std::sort 通常采用什么算法？",
+      "answer": "常见实现是 introsort：先快速排序，递归过深时切换堆排序保证 O(n log n)，小区间用插入排序优化。标准只要求平均或规定的复杂度，不强制具体实现。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0071",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "容器中存储对象时，什么时候发生拷贝或移动？",
+      "answer": "插入左值通常拷贝，插入右值通常移动；扩容时已有元素优先移动，但若移动构造可能抛异常且类型可拷贝，vector 为保证强异常安全可能选择拷贝。就地构造可减少临时对象。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0072",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "emplace_back 和 push_back 有什么区别？",
+      "answer": "push_back 接收一个已存在或临时对象，再拷贝/移动进容器；emplace_back 把构造参数转发到容器内部直接构造元素。它可能省一次临时对象，但并非总比 push_back 快，也要避免意外匹配构造函数。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0073",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "reserve 和 resize 的区别。",
+      "answer": "reserve 只调整容量，不改变 size，也不构造新元素；resize 改变 size，变大时构造元素，变小时析构尾部元素，必要时也可能扩容。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0074",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "list::splice 的作用和复杂度是什么？",
+      "answer": "splice 把同一或另一 list 中的节点直接链接到目标位置，不复制元素。单个节点或整表在常见条件下是 O(1)，范围 splice 的复杂度取决于是否需要统计元素数和是否同一容器。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0075",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何在数组、链表、树和哈希表之间做数据结构选择？",
+      "answer": "需要随机访问和缓存局部性选数组/vector；频繁已知位置插删选链表，但要考虑缓存代价；需要有序查找和范围查询选平衡树；需要平均 O(1) 精确查找选哈希表。还要考虑内存、稳定性、遍历模式和最坏复杂度。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0076",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Lambda 表达式的本质是什么？",
+      "answer": "Lambda 本质是编译器生成的匿名闭包类对象，捕获项成为成员变量，函数体成为 operator()。无捕获 Lambda 还可转换为普通函数指针。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0077",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Lambda 闭包对象中存储了什么？",
+      "answer": "按值捕获的变量副本、按引用捕获所需的引用或指针，以及捕获 this 时的 this 指针或 C++17 的 *this 副本。未捕获的全局变量和静态变量不需要存入闭包。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0078",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Lambda 按值捕获和按引用捕获的区别。",
+      "answer": "按值捕获在创建闭包时复制变量，之后与外部变化相互独立；按引用捕获访问原变量，能看到并修改外部状态，但必须保证引用生命周期长于 Lambda 使用期。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0079",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么 Lambda 按值捕获默认不能修改？",
+      "answer": "闭包类的 operator() 默认是 const，因此不能修改按值捕获形成的成员。这样能保持调用对象的 const 语义；加 mutable 后 operator() 变为非 const，只能修改闭包副本，不会改外部原变量。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0080",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Lambda 的 mutable 改变了什么？",
+      "answer": "mutable 取消 Lambda 默认 operator() 的 const 限定，使按值捕获的成员副本可修改。它不会把按值捕获变成按引用捕获，也不改变外部变量。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0081",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Lambda 如何转换为函数指针？",
+      "answer": "只有无捕获 Lambda 能隐式转换为与其签名兼容的函数指针，因为它不依赖闭包对象状态。带捕获 Lambda 需要对象实例，不能直接变成普通函数指针。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0082",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "std::function 如何保存不同类型的可调用对象？",
+      "answer": "std::function 使用类型擦除：内部保存统一的调用接口，以及具体可调用对象和对应的调用、复制、销毁函数。小对象可能使用小对象优化放在内部缓冲区，大对象通常堆分配，因此比模板直接调用开销更高。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0083",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "std::bind 的作用是什么？",
+      "answer": "std::bind 把可调用对象和部分参数绑定，生成新的可调用对象，可用占位符保留参数位置。现代 C++ 中 Lambda 通常更直观、类型推导更好，优先使用 Lambda。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0084",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "模板什么时候实例化？",
+      "answer": "模板被实际使用且需要完整定义时实例化，编译器根据具体模板实参生成代码；类模板通常只实例化用到的成员。也可显式实例化或 extern template 控制重复生成。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0085",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "函数模板和类模板有什么区别？",
+      "answer": "函数模板通过调用参数进行模板实参推导并参与重载决议；类模板通常需要显式参数或 C++17 类模板实参推导，实例化后形成具体类型。两者特化规则也不同。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0086",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "可变参数模板是什么？",
+      "answer": "可变参数模板允许模板接收任意数量和类型的参数，用 parameter pack 表示，并通过递归、折叠表达式或 std::apply 展开，常用于 make_shared、tuple 和完美转发。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0087",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "引用折叠规则是什么？",
+      "answer": "引用折叠规则是：只要有一个左值引用，结果就是左值引用，只有 T&& 与 && 组合才得到右值引用，即 &+&=&、&+&&=&、&&+&=&、&&+&&=&&。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0088",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "什么是转发引用？",
+      "answer": "在模板类型推导上下文中形如 T&&，且 T 需要从实参推导时，它是转发引用；传左值时 T 推导为 U&，传右值时推导为 U。普通类中的 T&& 或 const T&& 不是转发引用。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0089",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "std::forward 如何实现完美转发？",
+      "answer": "std::forward<T>(x) 根据 T 是否为左值引用，有条件地把 x 转回左值或右值，本质是带条件的 static_cast。它保留调用者的值类别，使参数能无损传递给下一级函数。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0090",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "constexpr、consteval、constinit 的区别。",
+      "answer": "constexpr 表示变量或函数可在常量表达式中求值，但也能运行时执行；consteval 要求函数每次调用都在编译期求值；constinit 保证静态存储期变量进行静态初始化，但变量本身不一定 const。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0091",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "auto 与 decltype 的区别。",
+      "answer": "auto 根据初始化表达式按模板推导规则推导变量类型，通常丢顶层 const 和引用；decltype 按表达式规则获取精确类型，decltype((x)) 还能反映值类别。auto 用于声明，decltype 常用于类型计算和返回类型。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0092",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "noexcept 有什么作用？",
+      "answer": "noexcept 表明函数不应抛异常，可参与重载和优化；若异常逃出 noexcept 函数会调用 std::terminate。标准容器在扩容时也会依据移动构造是否 noexcept 决定移动还是拷贝。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0093",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "inline 是否意味着编译器一定会内联？",
+      "answer": "不一定。inline 主要允许函数或变量在多个翻译单元重复定义而不违反 ODR，并建议内联；最终是否展开由优化器根据成本决定，未标 inline 的函数也可能被内联。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0094",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "i++ 和 ++i 的实现及返回值有什么区别？",
+      "answer": "前置 ++i 先修改并返回左值引用，通常无额外临时；后置 i++ 返回修改前的值，需要保存旧值，用户自定义迭代器可能更贵。对内置整数优化后通常没有差别。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0095",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "enum class 相比传统 enum 有什么优势？",
+      "answer": "enum class 具有独立作用域，不会把枚举名泄漏到外层，也不会隐式转换为整数，类型安全更好，并可显式指定底层类型。传统 enum 更宽松但更易命名冲突和误转换。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0096",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "进程和线程的区别。",
+      "answer": "进程是资源分配和保护的基本单位，拥有独立虚拟地址空间；线程是 CPU 调度的基本单位，同进程线程共享代码、堆和全局资源，但各自有栈、寄存器和线程局部存储。进程隔离强，线程通信快但同步更复杂。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0097",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么线程切换通常比进程切换快？",
+      "answer": "线程切换通常无需切换地址空间和大部分页表，缓存与 TLB 受影响较小；进程切换还涉及内存映射、权限和更多内核资源状态。不过线程切换仍需保存寄存器、栈指针和调度信息。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0098",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "进程之间有哪些通信方式？",
+      "answer": "常见有管道和命名管道、消息队列、共享内存、信号、Socket、内存映射文件，以及 RPC。共享内存最快但需要额外同步，Socket 最通用并可跨机器。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0099",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "线程之间共享什么，独享什么？",
+      "answer": "同进程线程共享虚拟地址空间、代码段、堆、全局变量、打开文件等；每个线程独享寄存器上下文、栈、线程局部存储、调度状态和线程 ID。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0100",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "用户态线程和内核态线程的区别。",
+      "answer": "用户态线程由用户库调度，切换快但内核可能看不到每个线程，阻塞系统调用可能影响整体；内核线程由操作系统调度，可真正多核并行并独立阻塞，但创建和切换开销更高。现代运行时常采用 M:N 映射。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0101",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "协程和线程有什么区别？",
+      "answer": "协程是用户态可暂停和恢复的执行单元，通常在一个或少量线程上协作调度；线程由操作系统抢占调度，可并行运行。协程切换开销小、适合大量 IO 或流程逻辑，但阻塞调用会阻塞所在工作线程，CPU 并行仍需多线程。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0102",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "上下文切换需要保存哪些内容？",
+      "answer": "需要保存程序计数器、栈指针、通用寄存器、浮点/SIMD 寄存器、线程状态和调度信息；进程切换还可能切换页表、地址空间和相关内核资源。保存越多、缓存失效越严重，切换成本越高。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0103",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "线程创建过多为什么会变慢？",
+      "answer": "线程会占用栈和内核对象，增加调度、上下文切换、锁竞争和缓存抖动；线程数远超 CPU 核数时，CPU 花更多时间切换而非执行。通常用线程池限制并发并按任务类型拆分。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0104",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "线程池如何设计？",
+      "answer": "线程池包含固定或动态数量的工作线程、线程安全任务队列、条件变量和停止标志。提交任务入队并唤醒线程，工作线程循环取任务执行；需要处理优雅关闭、异常、队列上限、任务优先级和工作窃取。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0105",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "线程池的任务队列应该使用什么数据结构？",
+      "answer": "普通线程池可用受互斥锁保护的 queue/deque，FIFO 公平；需要优先级时用 priority_queue；工作窃取线程池通常每线程一个 deque，本线程从尾取、其他线程从头偷。选择取决于公平性、优先级和竞争程度。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0106",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "进程有哪些状态？",
+      "answer": "典型状态有新建、就绪、运行、阻塞/等待和终止；有些系统还区分挂起就绪与挂起阻塞。状态转换由调度、IO、锁等待、时间片耗尽和退出触发。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0107",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "常见 CPU 调度算法有哪些？",
+      "answer": "常见有先来先服务、短作业优先、最短剩余时间、时间片轮转、优先级调度、多级反馈队列和实时调度。系统通常综合响应时间、吞吐量、公平性和截止时间选择。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0108",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "什么是时间片？",
+      "answer": "时间片是抢占式调度中线程或进程一次连续运行的最大 CPU 时间。太短会增加切换开销，太长会降低交互响应，时间片耗尽后任务通常回到就绪队列。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0109",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "什么是优先级反转？",
+      "answer": "低优先级线程持有高优先级线程需要的锁，高优先级线程被迫等待，而中优先级线程又持续抢占低优先级线程，导致高优先级任务迟迟无法运行。可用优先级继承、优先级天花板或减少锁持有时间解决。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0110",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何减少线程切换开销？",
+      "answer": "控制线程数量接近有效并行度，使用线程池和批处理，减少共享锁和阻塞，采用任务分片、无锁或线程本地数据，避免频繁唤醒；同时提升缓存局部性并减少跨核迁移。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0111",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "互斥锁、自旋锁、读写锁、信号量的区别。",
+      "answer": "互斥锁睡眠等待，适合较长临界区；自旋锁忙等，适合极短且无阻塞临界区；读写锁允许多读单写，适合读多写少；信号量维护计数，可限制并发资源数，也可用于线程同步，不强调所有权。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0112",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "自旋锁适合什么场景？",
+      "answer": "适合临界区极短、竞争较低、持锁线程很快会运行且不能睡眠的场景，如内核或低层结构。若等待时间长或单核环境，自旋会浪费 CPU，通常应改用阻塞锁。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0113",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "信号量和锁有什么区别？",
+      "answer": "锁用于互斥访问临界区，通常由加锁线程解锁并具有所有权语义；信号量是计数器，可表示 N 个资源或事件通知，wait 减计数、post 加计数，不要求同一线程释放。二值信号量也不完全等同互斥锁。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0114",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "CAS 是什么？",
+      "answer": "CAS 即比较并交换：原子地比较内存值是否等于期望值，相等则写入新值，否则返回当前值。它是许多原子变量、自旋锁和无锁结构的基础。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0115",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "CAS 为什么会出现 ABA 问题？",
+      "answer": "某线程读取值 A 后暂停，其他线程把值改成 B 又改回 A，原线程 CAS 仍成功，却没发现中间状态变化。对指针结构可能导致节点已被删除重用，破坏逻辑正确性。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0116",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何解决 ABA 问题？",
+      "answer": "给值附带版本号或时间戳，每次修改同时递增，CAS 比较“值+版本”；还可使用 tagged pointer、hazard pointer、epoch reclamation 或引用计数，避免节点过早回收和地址复用。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0117",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "compare_exchange_weak 和 compare_exchange_strong 的区别。",
+      "answer": "weak 允许伪失败，即值相等也可能失败，适合循环重试，某些架构效率更高；strong 不允许伪失败，适合只尝试一次的逻辑。两者在真正比较不等时都会更新 expected。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0118",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "原子操作为什么是原子的？",
+      "answer": "由 CPU 提供不可分割的读改写指令、缓存一致性协议和内存屏障实现，如 lock 指令或 LL/SC。编译器还必须遵守原子语义，不能把操作拆分或非法重排。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0119",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "volatile 能否保证线程安全？",
+      "answer": "不能。volatile 主要阻止编译器省略对该对象的访问，适合硬件寄存器或信号场景，不提供原子性、线程间同步和内存顺序。多线程应使用 mutex 或 std::atomic。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0120",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "什么是内存序？",
+      "answer": "内存序规定原子操作之间以及原子与普通内存访问之间允许怎样重排、何时对其他线程可见。它决定同步强度，从 relaxed 到 acquire/release，再到默认的 sequentially consistent。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0121",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "memory_order_relaxed、acquire、release 分别是什么？",
+      "answer": "relaxed 只保证该原子操作本身原子，不建立跨线程顺序；release 保证它之前的写不能移到其后，并向读取同一原子的 acquire 发布；acquire 保证读取后续操作不能移到前面，并能看到对应 release 之前的写。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0122",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "条件变量为什么需要配合锁？",
+      "answer": "条件变量只负责通知，不保护共享条件。检查条件和进入等待必须在同一把锁下原子衔接，否则可能发生丢失唤醒；被唤醒后也要重新持锁再读取共享状态。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0123",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "条件变量为什么要使用 while 检查条件？",
+      "answer": "条件变量可能伪唤醒，也可能多个线程同时被唤醒后条件只够一个线程使用。用 while 重新检查谓词，才能保证线程只在条件真正满足时继续。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0124",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "死锁的四个必要条件是什么？",
+      "answer": "互斥、占有且等待、不可剥夺、循环等待。四者同时成立才可能死锁，破坏任一条件可预防死锁。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0125",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何预防、避免、检测和解除死锁？",
+      "answer": "预防是破坏四条件，如统一加锁顺序；避免是在运行时判断分配后是否安全，如银行家算法；检测是构建等待图查环；解除可终止任务、回滚或抢占资源。工程中常用锁顺序、try_lock、超时和缩小临界区。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0126",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "什么是活锁和饥饿？",
+      "answer": "活锁是线程都在运行和让步，但状态不断变化却无进展；饥饿是某线程长期得不到 CPU 或资源。可通过随机退避、公平锁、优先级调整和限制重试解决。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0127",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "乐观锁和悲观锁的区别。",
+      "answer": "悲观锁假设冲突多，先加锁再访问，适合写多或临界区复杂；乐观锁假设冲突少，先操作后用版本或 CAS 校验，失败重试，适合读多写少但高冲突时可能反复失败。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0128",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "无锁数据结构一定比加锁快吗？",
+      "answer": "不一定。无锁结构会增加 CAS 重试、缓存行争用、内存回收和实现复杂度；低竞争或临界区较长时普通锁更快、更稳定。应基于真实负载测量，而不是只看“无锁”标签。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0129",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "多线程读取一个变量，如何保证可见性？",
+      "answer": "使用 mutex 建立 happens-before，或用 std::atomic 对变量读写并选择合适内存序；也可通过条件变量、消息队列等同步。仅普通读写即使 CPU 缓存最终一致，也可能因数据竞争产生未定义行为。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0130",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "什么是伪共享？",
+      "answer": "多个线程修改同一缓存行中的不同变量，会让缓存行在核心间反复失效，虽然逻辑上不共享变量却产生严重竞争。可用 alignas、填充、分片或线程本地数据把热点变量放到不同缓存行。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0131",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "虚拟内存有什么作用？",
+      "answer": "虚拟内存为每个进程提供独立、连续的地址空间，实现隔离、权限控制、按需加载、共享映射和比物理内存更大的逻辑空间，也简化程序链接和内存管理。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0132",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "虚拟地址如何转换为物理地址？",
+      "answer": "CPU 的 MMU 按虚拟页号查询 TLB，命中后得到物理页框号；未命中则按多级页表遍历，结合页内偏移形成物理地址。页表项无效或权限不符会触发缺页或保护异常。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0133",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "页表是什么？",
+      "answer": "页表是操作系统维护、MMU 使用的映射结构，把虚拟页映射到物理页框，并保存存在位、读写执行权限、脏位、访问位等状态。每个进程通常有自己的页表根。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0134",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "多级页表为什么能节省内存？",
+      "answer": "单级页表必须为整个虚拟地址空间预留大量页表项。多级页表按需创建下级表，未使用的大段虚拟地址只需上级空项，因此稀疏地址空间可显著节省内存，代价是页表遍历层数增加。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0135",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "TLB 是什么？",
+      "answer": "TLB 是 MMU 内部的页表项高速缓存，保存近期虚拟页到物理页框的映射。命中可避免多级页表访问；上下文切换和映射变化需要刷新或使用 ASID 区分进程。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0136",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "什么是缺页异常？",
+      "answer": "访问的虚拟页不在物理内存、尚未映射，或权限不满足时 CPU 触发异常进入内核。内核判断是否合法，必要时分配页框、从磁盘加载或建立映射，更新页表后重执行指令；非法访问则终止进程。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0137",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "什么是按需分页？",
+      "answer": "程序只在第一次真正访问某页时才分配物理页或从磁盘加载，而不是启动时全部载入。它降低启动时间和内存占用，但首次访问会产生缺页开销。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0138",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "页面置换算法有哪些？",
+      "answer": "常见有 FIFO、最优 OPT、LRU、Clock/Second Chance、LFU 等。OPT 仅用于理论比较；实际系统常用 Clock 或近似 LRU，在开销和命中率之间折中。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0139",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "什么是内存抖动？",
+      "answer": "工作集大于可用物理内存时，系统频繁换入换出页面，CPU 大量时间处理缺页而非执行程序，称为抖动。可通过增加内存、减少并发、优化访问局部性或限制工作集缓解。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0140",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "brk 和 mmap 的区别。",
+      "answer": "brk 调整进程堆顶，适合分配器管理较小连续区域，释放中间块不能直接归还系统；mmap 创建独立虚拟内存映射，适合大块或文件映射，可单独 munmap，但映射管理和缺页开销更高。具体阈值由分配器决定。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0141",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "malloc 如何向操作系统申请内存？",
+      "answer": "malloc 先从用户态分配器的线程缓存、空闲链表和 arena 中找 chunk；不足时再通过 brk 扩展堆或 mmap 获取虚拟内存。返回的通常只是虚拟地址，物理页可能在首次访问时按需分配。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0142",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "什么是 VMA？",
+      "answer": "VMA 是内核描述一段连续虚拟地址区间的数据结构，记录范围、读写执行权限、映射文件、匿名映射和共享私有属性。进程的代码、堆、栈和 mmap 区域都由多个 VMA 表示。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0143",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "写时复制是什么？",
+      "answer": "写时复制让多个进程先共享同一只读物理页，如 fork 后父子进程。任一方写入时触发保护异常，内核复制该页并为写方建立私有映射，从而避免无谓的提前复制。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0144",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "共享内存为什么快？",
+      "answer": "共享内存让多个进程把同一物理页映射到各自地址空间，数据交换不需要在内核和用户空间反复复制，因此吞吐高。它不自带同步，需要 mutex、信号量或原子操作协调。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0145",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "栈溢出和堆内存不足分别如何表现？",
+      "answer": "栈溢出常因递归过深或局部对象过大，触及保护页后出现访问异常；堆内存不足时 malloc 返回 nullptr，new 默认抛 bad_alloc，也可能因系统 overcommit 在实际访问时被 OOM Killer 终止。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0146",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "TCP 和 UDP 的区别。",
+      "answer": "TCP 面向连接、可靠、有序、字节流，带重传、流控和拥塞控制；UDP 无连接、按数据报、不保证到达和顺序，头部小、时延低并支持广播/组播。选择取决于可靠性、实时性和协议控制需求。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0147",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "游戏中为什么经常使用 UDP？",
+      "answer": "实时游戏更在意低延迟和可控性，过期状态即使重传也没有价值。UDP 无队头阻塞，应用可自己决定哪些消息可靠、重传多久、如何排序和拥塞控制，更适合高频位置和输入同步。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0148",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "UDP 不可靠，如何实现可靠 UDP？",
+      "answer": "在 UDP 上增加序列号、确认 ACK、超时重传、滑动窗口、去重和乱序重排；按消息类型决定可靠有序、可靠无序或不可靠。还需实现拥塞控制、分片重组和校验，类似 KCP、QUIC 的部分机制。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0149",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "TCP 三次握手为什么不是两次？",
+      "answer": "两次握手不能让服务器确认客户端是否收到了服务器的初始序列号，也无法可靠区分旧的重复连接请求。第三次 ACK 让双方确认发送和接收能力以及初始序列号同步，连接才可安全建立。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0150",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "TCP 四次挥手为什么通常是四次？",
+      "answer": "TCP 是全双工，两个方向要分别关闭。主动方 FIN 表示自己不再发送，对方先 ACK；对方处理完剩余数据后再 FIN，主动方再 ACK。若 ACK 和 FIN 可合并，也可能出现三次挥手。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0151",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "TIME_WAIT 的作用是什么？",
+      "answer": "让主动关闭方可靠地重发最后 ACK，防止对方因未收到 ACK 而重复 FIN；同时让旧连接中的延迟报文在 2MSL 内消失，避免污染相同四元组的新连接。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0152",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "TCP 如何保证可靠传输？",
+      "answer": "通过序列号和确认应答保证顺序与去重，校验和检测错误，超时和快速重传恢复丢包，滑动窗口实现流量控制，拥塞控制避免压垮网络，并用连接状态管理双方收发。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0153",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "滑动窗口是什么？",
+      "answer": "滑动窗口允许发送方在未收到每个 ACK 前连续发送一定范围的数据，提高链路利用率。窗口随 ACK 向前滑动，接收窗口用于流控，拥塞窗口用于网络拥塞控制，实际发送上限取二者较小值。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0154",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "流量控制和拥塞控制有什么区别？",
+      "answer": "流量控制防止发送方淹没接收方，依据接收缓冲区通告窗口；拥塞控制防止过多流量压垮网络，依据丢包、RTT 等调整拥塞窗口。一个关注端点能力，一个关注网络容量。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0155",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "TCP 粘包和拆包是什么？",
+      "answer": "TCP 是字节流，没有消息边界；一次 send 可能被拆成多次 recv，也可能多个 send 合并到一次 recv。应用需用固定长度、分隔符或“长度字段+消息体”自行分帧。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0156",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "UDP 是否存在粘包问题？",
+      "answer": "UDP 保留数据报边界，一次发送对应一个数据报，不存在 TCP 式粘包。但数据报可能丢失、乱序，过大时还可能 IP 分片，接收缓冲区过小会截断。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0157",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "select、poll、epoll 的区别。",
+      "answer": "select 使用位图且有 fd 数量限制，每次需复制和线性扫描；poll 用数组取消固定上限但仍线性扫描；epoll 在 Linux 内核维护关注集合和就绪队列，事件就绪时返回，适合大量连接，支持水平和边缘触发。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0158",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "阻塞 IO、非阻塞 IO、IO 多路复用的区别。",
+      "answer": "阻塞 IO 调用会睡眠直到完成；非阻塞 IO 立即返回，需要轮询；IO 多路复用让一个线程等待多个 fd 的就绪事件，再对就绪 fd 做非阻塞读写。多路复用减少线程数量，但业务处理仍可能需要线程池。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0159",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "游戏心跳机制如何设计？",
+      "answer": "客户端定期发送心跳或业务包，服务器记录最后活跃时间，超过超时阈值则判掉线；心跳间隔要平衡流量和检测速度。可带时间戳测 RTT，并考虑弱网、后台和临时抖动，避免一次超时就断开。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0160",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "断线重连如何设计？",
+      "answer": "客户端保存登录凭证和最后确认序列号，断线后指数退避重连；服务器恢复会话、重新认证，并下发快照或从断点补发关键消息。重连期间要处理重复请求、超时操作和状态冲突。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0161",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何判断客户端已经掉线？",
+      "answer": "通过连接关闭事件、读写错误，以及超过若干心跳周期未收到任何包判断。TCP 的物理断网不一定立即可见，所以业务层心跳和超时是必要补充。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0162",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "大量玩家同时连接时，如何降低网络开销？",
+      "answer": "使用事件驱动 IO、连接分片和线程池，压缩协议头与数据，批量发送、兴趣管理和差量同步；降低心跳频率，避免每玩家独立线程，并通过网关、负载均衡和分区扩展。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0163",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "网络数据如何序列化和反序列化？",
+      "answer": "定义稳定协议，将对象转成字节流，可用 Protobuf、FlatBuffers、MessagePack 或自定义二进制格式。需要处理字段编号、版本兼容、字节序、长度校验、压缩和非法数据校验。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0164",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "大端序和小端序是什么？",
+      "answer": "大端序把高位字节放低地址，小端序把低位字节放低地址。网络字节序通常是大端，跨平台传输多字节整数时需显式转换，避免不同 CPU 解释不一致。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0165",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "客户端为什么不能完全信任本地数据？",
+      "answer": "客户端在用户设备上，可被修改内存、抓包、改脚本或伪造请求。货币、伤害、位置合法性和奖励等关键结果必须由服务器验证或权威计算，客户端主要负责输入和表现。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0166",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "帧同步和状态同步的区别。",
+      "answer": "帧同步只同步每帧输入，各端运行相同确定性逻辑，流量小且便于回放，但怕不同步；状态同步由服务器计算权威状态并下发快照或增量，容错和反作弊好，但带宽更高并需要插值预测。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0167",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "哪类游戏适合帧同步？",
+      "answer": "玩家数量有限、逻辑规则明确、可做到确定性且需要完整回放的游戏，如 RTS、格斗、部分 MOBA。强物理、超大世界和大量不可控浮点逻辑通常不适合纯帧同步。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0168",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "哪类游戏适合状态同步？",
+      "answer": "FPS、MMO、开放世界等服务器权威、玩家多、状态复杂的游戏更适合状态同步。服务器可只向玩家同步 AOI 内对象，并按重要度和频率发送。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0169",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "帧同步为什么要求逻辑确定性？",
+      "answer": "各客户端只收到相同输入，不持续同步完整状态，因此必须从相同初始状态得到完全相同结果。随机数、浮点、容器遍历顺序和不同平台实现都需严格控制，否则误差会不断放大。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0170",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "浮点数为什么可能破坏确定性？",
+      "answer": "不同 CPU、编译器和优化选项可能产生不同舍入、扩展精度和指令顺序，浮点运算还不满足严格结合律。帧同步常用定点数、统一数学库和固定运算顺序来保证一致性。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0171",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "锁步同步是什么？",
+      "answer": "锁步同步把游戏分成逻辑帧，所有玩家提交第 N 帧输入，服务器收齐或超时后广播，再允许各端推进该帧。优点是确定性强，缺点是最慢玩家会影响推进，通常配合输入延迟和预测。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0172",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "客户端预测是什么？",
+      "answer": "客户端不等待服务器确认，先根据本地输入预测角色运动和表现，降低操作延迟；服务器状态到达后与预测结果比较并修正。预测逻辑必须尽量与服务器一致。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0173",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "服务器校正是什么？",
+      "answer": "服务器发送权威状态，客户端发现误差后回到确认状态，重新应用未确认输入，或平滑拉回正确位置。小误差插值纠正，大误差直接重置，避免长期漂移。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0174",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "回滚重演是什么？",
+      "answer": "保存过去若干帧状态和输入，收到迟到输入或服务器纠正时回到历史帧，应用新信息并快速重算到当前帧。常用于格斗和射击命中补偿，但要求状态可快照、逻辑可重复。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0175",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "插值和外推分别解决什么问题？",
+      "answer": "插值在两个已知历史状态之间平滑显示，稳定但会增加显示延迟；外推根据速度和趋势预测未来，延迟低但预测错误会产生修正。常用方案是略延迟渲染并插值，短暂缺包时有限外推。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0176",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何处理玩家操作延迟？",
+      "answer": "本地立即播放输入反馈并做客户端预测，网络层使用时间戳和序列号，服务器按权威规则处理；远端对象通过插值显示。对竞技操作还可采用回滚或延迟补偿，但不能牺牲公平性。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0177",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何处理丢包和乱序？",
+      "answer": "包带序列号和逻辑帧号，旧包丢弃、乱序包缓存重排；关键消息 ACK 重传，状态类消息可让新快照覆盖旧快照。合理控制 MTU，避免 IP 分片，并设置超时和丢包估计。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0178",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何处理位置瞬移和橡皮筋现象？",
+      "answer": "使用客户端预测和服务器校正时，对小误差分多帧平滑插值，对大误差或非法状态立即校正；优化碰撞和时间同步，减少预测模型差异。远端角色用缓冲快照插值，避免直接跳到最新位置。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0179",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "射击游戏中如何做延迟补偿？",
+      "answer": "服务器保存短时间的玩家历史位置。收到带客户端射击时间的请求后，根据时间同步和 RTT 回溯其他玩家碰撞体进行命中检测，再恢复当前状态；需限制最大回溯窗口并防止伪造时间。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0180",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "客户端与服务器状态不一致怎么办？",
+      "answer": "以服务器为权威。客户端收到快照后比较版本或状态哈希，丢弃过期数据，必要时用完整快照重置并重放未确认输入；还应记录差异和关键帧，定位确定性或协议问题。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0181",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "技能、碰撞和伤害由客户端算还是服务器算？",
+      "answer": "客户端可先做预测和特效反馈，但技能是否合法、碰撞是否命中、最终伤害和资源变化应由服务器校验或计算。非竞技单机可放客户端，联网竞技必须服务器权威。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0182",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何降低同步数据量？",
+      "answer": "使用 AOI、优先级和不同同步频率，只发送变化字段与增量，量化位置旋转、位压缩、字典编码和批量打包；不可靠状态用最新值覆盖旧值，关键事件才可靠传输。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0183",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "AOI 是什么？",
+      "answer": "AOI 是兴趣区域管理，只向玩家同步附近或相关对象。可用网格、四叉树、八叉树、BVH 或视野关系划分，显著降低服务器计算和网络广播量。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0184",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "录像和战斗回放如何实现？",
+      "answer": "帧同步可记录初始状态、随机种子和每帧输入并重新模拟；状态同步可记录关键帧快照和事件增量。回放需版本兼容、时间轴控制、快进和校验，竞技录像还应避免泄露未见信息。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0185",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何防止加速、瞬移和修改伤害？",
+      "answer": "服务器验证速度、加速度、位移、技能冷却、弹药、伤害范围和时间戳，对异常频率与状态变化做规则检测；关键逻辑服务器权威，并结合签名、加密、行为统计和封禁系统，但不能只依赖客户端反作弊。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0186",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "手撕反转链表。",
+      "answer": "用三个指针 prev、cur、next 迭代：保存 next=cur->next，把 cur->next 指向 prev，再整体前移，最后返回 prev。时间 O(n)，空间 O(1)；递归也可但占 O(n) 栈。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0187",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "手撕合并两个有序链表。",
+      "answer": "使用虚拟头结点和尾指针，比较两链表当前节点，小者接到结果链并前进，某一条耗尽后接上另一条剩余部分。时间 O(m+n)，额外空间 O(1)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0188",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "判断链表是否有环，并找出入环节点。",
+      "answer": "快慢指针从头出发，快指针每次两步、慢指针一步，相遇说明有环；让一个指针回到头部，两者每次一步，再次相遇点就是入环节点。时间 O(n)，空间 O(1)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0189",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "求链表倒数第 K 个节点。",
+      "answer": "使用快慢指针，先让 fast 前进 K 步，再让 fast 和 slow 同时前进；fast 到尾时 slow 即倒数第 K 个。若删除倒数第 K 个，可从 dummy 出发并保持 K+1 间距。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0190",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "设计并实现 LRU 缓存。",
+      "answer": "哈希表保存 key 到双向链表节点的映射，链表头表示最近使用、尾表示最久未使用。get 命中后移到头，put 更新或插头，超容量删除尾节点并从哈希表移除；两操作平均 O(1)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0191",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "实现二叉树层序遍历。",
+      "answer": "使用队列，根入队；每轮记录当前队列长度，弹出这一层所有节点并把左右孩子入队，将该轮值加入结果。时间 O(n)，空间 O(树最大宽度)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0192",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "求二叉树最近公共祖先。",
+      "answer": "普通二叉树递归：root 为空或等于 p/q 就返回 root；分别递归左右子树，若左右都非空则 root 是 LCA，否则返回非空的一侧。时间 O(n)，空间 O(h)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0193",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "判断一棵二叉树是否平衡。",
+      "answer": "后序遍历返回子树高度，若任一子树已不平衡或左右高度差超过 1 就返回特殊值 -1；否则返回 max(left,right)+1。每个节点只访问一次，时间 O(n)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0194",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "判断一棵二叉树是否为完全二叉树。",
+      "answer": "层序遍历，遇到第一个空孩子后设置标记，此后若再遇到非空节点则不是完全二叉树；也可把空节点入队后检查后面是否还有非空。时间 O(n)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0195",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "根据前序、中序或后序序列构造二叉树。",
+      "answer": "以前序+中序为例，前序首元素是根，在中序哈希表中找到位置，左侧长度决定前序左右区间，递归构造。后序+中序同理取后序末尾；要求节点值唯一，时间 O(n)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0196",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "实现二叉搜索树的查找、插入或删除。",
+      "answer": "查找按 key 与当前节点比较向左右走；插入在空位置创建节点；删除分无孩子、一个孩子、两个孩子，两个孩子时用中序后继或前驱替换再删除对应节点。平均 O(h)，平衡树 h=O(log n)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0197",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "手撕堆排序和快速排序。",
+      "answer": "堆排序先 O(n) 建大顶堆，反复交换堆顶与末尾并下沉，时间 O(n log n)、空间 O(1)；快速排序选 pivot 分区后递归两侧，平均 O(n log n)、最坏 O(n²)，可随机化和小区间插入排序优化。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0198",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "求数组中的 Top K。",
+      "answer": "可用大小为 K 的小顶堆遍历数组，堆满后只保留比堆顶大的元素，时间 O(n log K)、空间 O(K)；也可 quickselect 平均 O(n) 找第 K 大分界，但不保证有序。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0199",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "使用两个堆求数据流中位数。",
+      "answer": "维护大顶堆保存较小一半，小顶堆保存较大一半，保证大小差不超过 1 且大顶堆顶不大于小顶堆顶。插入 O(log n)，查询中位数 O(1)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0200",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "实现 Dijkstra 最短路径。",
+      "answer": "用邻接表和最小堆，dist[source]=0；每次弹出距离最小节点，若是过期记录跳过，遍历边做松弛并把新距离入堆。要求边权非负，复杂度 O((V+E)log V)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0201",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "实现拓扑排序。",
+      "answer": "统计每个节点入度，把入度为 0 的节点入队；不断弹出加入结果，并把其出边终点入度减 1，新变为 0 的节点入队。最终结果数量等于节点数则无环，否则图中存在环；复杂度 O(V+E)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0202",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "实现并查集，并解释路径压缩和按秩合并。",
+      "answer": "并查集用 parent 数组表示集合森林，find 找根，union 合并两个根。路径压缩把查找路径节点直接挂到根，按秩或大小合并把小树挂大树，均摊复杂度接近 O(1)，严格为 O(α(n))。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0203",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "解决网格类 BFS/DFS 问题。",
+      "answer": "先明确状态、邻接方向、边界和访问标记。BFS 用队列适合最短步数和分层，DFS 用递归或栈适合连通块、回溯；每个格子通常访问一次，复杂度 O(mn)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0204",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "求无重复字符的最长子串。",
+      "answer": "滑动窗口加哈希集合或字符最后位置。右指针扩展，出现重复时移动左指针直到窗口无重复，并更新最大长度；时间 O(n)，字符集固定时空间 O(1)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0205",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "解决接雨水问题。",
+      "answer": "双指针法维护左右最大高度，每次移动较低一侧，该位置积水为该侧最大值减当前高度；时间 O(n)、空间 O(1)。也可用单调栈处理凹槽，时间 O(n)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0206",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "求最长回文子串。",
+      "answer": "中心扩展枚举每个字符和字符间隙为中心，向两侧扩展，时间 O(n²)、空间 O(1)；若追求 O(n) 可用 Manacher。动态规划也可但空间 O(n²)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0207",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "解决 0-1 背包或完全背包问题。",
+      "answer": "0-1 背包一维 dp[j] 表示容量 j 的最大价值，每件物品的容量从大到小遍历，防止重复使用；完全背包从小到大遍历，允许同件物品多次转移。复杂度 O(nC)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0208",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "合并重叠区间。",
+      "answer": "先按区间左端点排序，维护结果最后区间；若当前左端点不大于最后右端点则合并并更新右端点，否则新增区间。排序主导复杂度 O(n log n)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0209",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "使用单调栈求最大矩形。",
+      "answer": "维护高度单调递增栈，遇到更矮柱时不断弹出，以弹出高度为高、当前索引和新栈顶确定宽度计算面积；末尾加 0 哨兵清栈。时间 O(n)，空间 O(n)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0210",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "实现字符串解析或表达式计算。",
+      "answer": "先明确语法和优先级。简单表达式可用双栈或中缀转后缀，遍历数字、括号和运算符，按优先级计算；递归下降可为 expression、term、factor 分层，便于支持括号、一元符号和扩展语法。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0211",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何判断物体在角色左侧还是右侧？",
+      "answer": "在同一平面上计算角色前向向量 forward 与“角色到目标”向量 dir 的叉积，通常看 Y 分量符号：cross(forward,dir).y>0 表示右侧还是左侧取决于坐标系约定。也可与角色 right 做点积，正负直接表示左右。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0212",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何判断物体在角色前方还是后方？",
+      "answer": "把目标方向归一化后与角色 forward 做点积。点积大于 0 在前方，小于 0 在后方，接近 0 在侧面；若需视野角，比较 dot 与 cos(半视角)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0213",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何判断一个点是否在三角形内？",
+      "answer": "可用重心坐标，求点 P 相对三角形三个顶点的权重 u、v、w，若都在 [0,1] 且和为 1 则在内部；二维也可检查 P 对三条边叉积符号是否一致。要处理退化三角形和浮点误差。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0214",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何判断射线与平面、包围盒或球体是否相交？",
+      "answer": "射线与平面解 O+tD 代入平面方程，t≥0 才命中；与球体解二次方程或投影距离；与 AABB 用 slab 法分别求各轴 t 区间并求交。OBB 可先把射线变换到盒子局部空间。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0215",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何求二维点集的凸包？",
+      "answer": "常用 Graham Scan 或 Andrew 单调链。先按坐标排序，分别构造上下凸包，利用叉积判断转向并弹出非凸点；复杂度由排序决定为 O(n log n)。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0216",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何求点到线段的最短距离？",
+      "answer": "将点 P 投影到线段 AB，t=dot(P-A,B-A)/|B-A|²，再把 t 截断到 [0,1]；最近点为 A+t(B-A)，距离是 P 到该点的长度。退化线段需单独处理。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0217",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何判断圆与矩形是否相交？",
+      "answer": "先找圆心到矩形的最近点：将圆心坐标分别 clamp 到矩形范围，计算最近点与圆心距离，距离平方小于等于半径平方则相交。对旋转矩形可先把圆心变到矩形局部坐标。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0218",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "AABB 和 OBB 的区别是什么？",
+      "answer": "AABB 与世界坐标轴对齐，存 min/max，检测快但旋转后包围空隙大；OBB 可任意旋转，包围更紧，但相交检测常需分离轴定理，计算更贵。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0219",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "四叉树、八叉树如何划分空间？",
+      "answer": "四叉树递归把二维区域分四块，八叉树把三维空间分八块；节点对象数超过阈值或尺寸足够大时继续划分。查询只访问与范围相交的节点，适合空间分布较均匀的对象。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0220",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "大量物体如何进行快速碰撞初筛？",
+      "answer": "采用宽阶段空间划分，如均匀网格、Sweep and Prune、四叉树、八叉树或 BVH，先找可能相交的对象对，再在窄阶段做精确碰撞。还可按层和碰撞矩阵过滤不可能交互的类型。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0221",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Awake、OnEnable、Start 的执行顺序是什么？",
+      "answer": "同一对象通常先 Awake，再 OnEnable，Start 在首次启用且脚本第一次 Update 前调用。场景中不同对象之间的精确顺序默认不保证，可用 Script Execution Order 或显式初始化流程控制。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0222",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Update、FixedUpdate、LateUpdate 的区别。",
+      "answer": "Update 每渲染帧执行，适合输入和普通逻辑；FixedUpdate 按固定时间步执行，可能一帧多次或零次，适合物理；LateUpdate 在所有 Update 后执行，适合相机跟随和依赖其他对象最终位置的逻辑。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0223",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "物理逻辑为什么通常放在 FixedUpdate？",
+      "answer": "Unity 物理模拟按固定时间步推进，Rigidbody 力和运动放在 FixedUpdate 能与物理步一致，减少帧率变化导致的行为差异。输入应在 Update 采集，再缓存给 FixedUpdate 使用。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0224",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "相机跟随为什么常放在 LateUpdate？",
+      "answer": "角色通常在 Update 或物理步骤中先完成移动，LateUpdate 再根据角色最终位置更新相机，可避免相机使用上一阶段位置产生抖动，也减少脚本执行顺序依赖。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0225",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "OnDisable 和 OnDestroy 的区别。",
+      "answer": "OnDisable 在组件或 GameObject 被禁用、销毁前等情况下调用，对象可能之后再次启用；OnDestroy 在对象真正销毁时调用，通常用于最终释放。反复开关对象会多次触发 OnDisable，但 OnDestroy 一生通常一次。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0226",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "MonoBehaviour 能否使用 new 创建？为什么？",
+      "answer": "不能用 new 正确创建可挂载的 MonoBehaviour。它的生命周期、原生对象和序列化由 Unity 引擎管理，应通过 AddComponent<T>() 或 Instantiate 含组件的 Prefab 创建；普通 C# 类才直接 new。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0227",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Unity 中组件模式有什么优点？",
+      "answer": "组件模式用组合替代深继承，一个 GameObject 可按需组合渲染、碰撞、行为等组件，便于复用和编辑器配置。缺点是组件通信和生命周期过多时容易分散，应通过接口、事件和模块边界控制。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0228",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "GameObject 和 Component 的关系是什么？",
+      "answer": "GameObject 是场景中的实体容器，Transform 是必备组件；Component 是附着其上的功能单元，不能脱离 GameObject 独立存在。脚本通常继承 MonoBehaviour，也是一种 Component。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0229",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "ScriptableObject 适合解决什么问题？",
+      "answer": "ScriptableObject 适合保存可复用、可序列化且不依赖场景对象的数据，如武器配置、技能配置、事件通道和共享资源。它能减少 Prefab 重复数据，但运行时可变状态与静态配置要分离。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0230",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Unity 中如何进行模块解耦？",
+      "answer": "按职责划分输入、角色、战斗、UI、资源等模块，用接口和事件通信，避免直接查找具体对象；配置用 ScriptableObject 或表驱动，依赖由初始化器或依赖注入提供，并限制单例和跨层引用。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0231",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Unity 协程是什么？",
+      "answer": "Unity 协程是把一段逻辑拆成多个帧继续执行的主线程流程工具。IEnumerator 每次 MoveNext 运行到 yield，Unity 根据 yield 对象决定何时恢复；它不是独立线程。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0232",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "协程和线程有什么区别？",
+      "answer": "协程在主线程上协作执行，切换点由 yield 决定，不能提供 CPU 并行；线程可在多核并行并由操作系统调度，但不能随意访问大多数 Unity API。协程适合时间流程，线程适合纯计算或阻塞 IO。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0233",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Unity 协程底层如何实现？",
+      "answer": "C# 编译器把带 yield 的迭代器方法转换为状态机对象，局部变量和当前位置成为字段。Unity 每帧或满足等待条件时调用 MoveNext，直到返回 false 或被停止。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0234",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "yield return null 表示什么？",
+      "answer": "暂停当前协程，并在下一帧的合适阶段继续执行。它至少跨过一帧，不保证固定时间长度，具体恢复时机还受 Unity PlayerLoop 调度影响。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0235",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "WaitForSeconds 会产生 GC 吗？",
+      "answer": "每次 new WaitForSeconds 会创建一个托管等待对象，频繁创建可能产生 GC Alloc；固定时长可缓存实例，但动态时长通常需要新对象。是否产生可见 GC 也受 Unity 版本和实现优化影响，应以 Profiler 为准。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0236",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "GameObject 被禁用后协程是否继续？",
+      "answer": "当承载协程的 GameObject 被 SetActive(false) 时，该 MonoBehaviour 上的协程会停止；重新启用后不会自动从原位置继续，需要重新启动或把协程放到常驻管理器。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0237",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "MonoBehaviour 被禁用后协程是否继续？",
+      "answer": "仅把 MonoBehaviour.enabled 设为 false 时，已启动协程通常仍会继续运行；禁用 GameObject 或销毁组件会停止。不要把 enabled=false 当作自动暂停协程的机制。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0238",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何停止协程？",
+      "answer": "可保存 StartCoroutine 返回的 Coroutine 并传给 StopCoroutine，或用同一个 IEnumerator 停止；StopAllCoroutines 只停止当前 MonoBehaviour 启动的协程。也可用取消标志让流程自行退出并清理状态。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0239",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "协程适合做什么，不适合做什么？",
+      "answer": "适合分帧流程、延时、动画串联、波次生成和异步加载等待；不适合重 CPU 计算、严格实时定时、需要多核并行或复杂可恢复任务。复杂流程可考虑状态机、async/await 或 Job System。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0240",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "大量协程可能产生什么性能问题？",
+      "answer": "每个协程有状态机对象和调度成本，大量协程会增加 MoveNext 调用、托管分配和难以追踪的生命周期；频繁 new YieldInstruction 还会产生 GC。可合并调度、缓存等待对象和使用集中计时器。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0241",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "C# 垃圾回收的基本原理是什么？",
+      "answer": "GC 从托管根开始标记仍可达对象，未被标记的对象回收，并可能整理或分代处理堆。Unity 使用的具体 GC 取决于运行时和平台，回收时可能造成主线程停顿，因此游戏需要减少高频分配。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0242",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Unity 中哪些操作容易产生 GC Alloc？",
+      "answer": "频繁 new 对象或集合、字符串拼接、装箱、LINQ、闭包、foreach 某些枚举器、数组返回 API、每帧创建委托和 YieldInstruction 都可能产生 GC Alloc。应通过 Profiler 的 GC Alloc 列确认，而不是只凭经验。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0243",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "字符串拼接为什么容易产生垃圾？",
+      "answer": "C# string 不可变，每次拼接通常创建新字符串并复制旧内容，循环拼接会产生大量临时对象。少量可用插值，循环或大量拼接用 StringBuilder、缓存格式或 UI 文本更新降频。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0244",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "装箱和拆箱是什么？",
+      "answer": "装箱把值类型复制到堆上的 object 或接口对象中，产生分配；拆箱从 object 检查类型并取回值。使用泛型集合、泛型接口和避免把结构体当 object 传递可减少装箱。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0245",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "闭包为什么可能产生堆分配？",
+      "answer": "Lambda 捕获外部局部变量时，编译器可能生成显示类，把捕获变量放到堆上，委托再引用该对象。高频创建捕获 Lambda 会产生分配，可改用静态函数、缓存委托或显式传参。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0246",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "LINQ 为什么不适合高频游戏逻辑？",
+      "answer": "LINQ 常创建枚举器、迭代器状态机、委托和中间集合，并有额外间接调用；在每帧热点逻辑中可能带来 GC 和 CPU 开销。非热点初始化和工具代码中可优先可读性，热点路径手写循环。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0247",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何减少 Update 中的 GC？",
+      "answer": "复用集合并 Clear 而不是反复 new，缓存组件、字符串、委托和等待对象，避免 LINQ、装箱和每帧闭包；使用 NonAlloc 物理 API 和预分配数组，把低频工作移出 Update，并用 Profiler 验证 GC Alloc 为 0 或可控。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0248",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "对象池为什么能降低 GC 压力？",
+      "answer": "频繁 Instantiate/Destroy 会产生托管和原生分配、构造销毁及 GC 压力。对象池预先创建并重复启停对象，把成本摊到初始化，减少瞬时分配和回收峰值。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0249",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "对象池取出对象时需要重置哪些状态？",
+      "answer": "需要重置 Transform、速度角速度、血量、计时器、动画状态、粒子、碰撞器、Trail、材质属性、事件订阅、协程和引用等。最好定义统一 OnSpawn/OnDespawn 接口，由对象自己恢复可复用状态。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0250",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "增量 GC 是什么？",
+      "answer": "增量 GC 把一次较长的标记工作拆到多个帧执行，降低单帧尖峰，但总工作量不一定减少，并可能在分配压力过高时仍触发明显回收。仍应控制分配并调节每帧增量预算。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0251",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Managed Heap 与 Native Memory 的区别。",
+      "answer": "Managed Heap 保存 C# 对象，由 GC 管理；Native Memory 保存纹理、Mesh、音频、引擎对象和插件分配等，由 Unity 原生层或开发者显式管理。托管引用释放不代表原生资源立刻释放。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0252",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么 UnityEngine.Object 的判空比较特殊？",
+      "answer": "UnityEngine.Object 同时有 C# 包装对象和原生对象，Unity 重载了 ==。Destroy 后原生对象已不存在，但 C# 包装引用可能仍非 CLR null，比较 obj==null 却返回 true，称为 fake null。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0253",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Destroy 后的对象为什么可能仍有 C# 引用？",
+      "answer": "Destroy 通常在当前帧结束时销毁原生对象，C# 变量仍指向包装对象，直到引用被清除并由 GC 回收。访问已销毁对象会表现为 null 或抛 MissingReferenceException，因此应清理缓存和事件引用。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0254",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Resources.UnloadUnusedAssets 做了什么？",
+      "answer": "它查找当前没有被场景对象、静态字段等引用的可卸载资源，并异步释放对应原生资源，可能触发较重扫描和卡顿。不能替代正确的资源引用计数和 Addressables/AssetBundle 卸载管理。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0255",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何定位内存泄漏和资源未释放问题？",
+      "answer": "使用 Unity Memory Profiler 比较多次快照，观察 Managed、Native、Texture、Mesh 和 AssetBundle 增长；从引用链查谁持有对象，并检查事件未解绑、静态集合、DontDestroyOnLoad、AssetBundle 未卸载和对象池容量。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0256",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Resources、AssetBundle、Addressables 的区别。",
+      "answer": "Resources 使用简单但所有目录资源会进入包且管理粗糙；AssetBundle 可自定义分包、远程下载和卸载，但依赖与版本需自己管理；Addressables 基于 AssetBundle 提供地址、依赖、异步句柄、远程目录和引用计数等上层能力。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0257",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "AssetBundle 的依赖关系如何管理？",
+      "answer": "构建时生成依赖清单或由 Addressables 目录管理；加载目标 Bundle 前先递归加载依赖，并对 Bundle 和资源做引用计数。公共依赖应单独成包以避免重复，但过度拆分会增加请求和管理成本。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0258",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "异步加载资源如何实现？",
+      "answer": "使用 Resources.LoadAsync、AssetBundle.LoadAssetAsync、Addressables.LoadAssetAsync 或 SceneManager.LoadSceneAsync，持有句柄并在主线程轮询/await 完成。IO 和解压可异步，最终 Unity 对象创建及回调通常仍在主线程调度。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0259",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么异步 IO 结束后不一定能直接创建 Unity 对象？",
+      "answer": "大多数 UnityEngine.Object 与渲染、场景和原生引擎状态绑定，只允许主线程访问。后台线程可做文件 IO、解压、反序列化纯数据，完成后必须切回主线程创建纹理、Mesh、GameObject 等对象。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0260",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "资源引用计数如何设计？",
+      "answer": "以资源地址或唯一 ID 为 key 保存加载状态、对象/句柄、引用计数和依赖。首次请求发起加载，后续复用同一任务；Acquire 加计数，Release 减计数，归零后按策略卸载，并处理异步未完成时取消与失败。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0261",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "重复加载资源如何避免？",
+      "answer": "建立全局或模块级资源缓存，把 key 映射到正在加载的共享任务和已加载句柄；并发请求合并，完成后统一返回。通过引用计数决定卸载，避免每个界面独立 Load 同一资源。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0262",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "场景切换时如何管理资源生命周期？",
+      "answer": "区分常驻资源、场景资源和界面临时资源；进入场景预加载并 Acquire，退出时按模块成组 Release，切换后在安全时机卸载未使用资源。用场景上下文或资源域集中记录所有句柄。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0263",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "包体如何拆分？",
+      "answer": "按更新频率、使用场景、依赖和加载时机拆分：基础常驻、公共依赖、场景、角色、UI、音频等。避免一个小改动导致大包重下，也要避免过碎造成大量文件、请求和依赖链。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0264",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "热更新如何设计？",
+      "answer": "代码层可用 ILRuntime、HybridCLR 或 Lua 等方案加载可更新逻辑，资源层用 AssetBundle/Addressables 远程目录和增量包。需要版本清单、差分下载、校验、回滚、兼容策略和安全签名，并遵守平台审核规则。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0265",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "AssetBundle 常见的内存冗余问题有哪些？",
+      "answer": "同一资源被打进多个 Bundle 导致重复；公共依赖未单独打包；加载 Bundle 后资源和 Bundle 生命周期处理不当；压缩数据、解压缓存和实例同时存在；材质或 Mesh 因运行时修改产生副本。应分析依赖和内存快照。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0266",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "图集有什么作用？",
+      "answer": "图集把多张小纹理合并到一张大纹理，多个 UI/精灵可共享材质和纹理，减少纹理切换和 Draw Call。代价是可能加载无关图片、增加整张图内存，并需控制 Padding、压缩和分包。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0267",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "UI 资源如何按界面分包？",
+      "answer": "按 UI 功能和生命周期分包，如大厅、战斗、活动；常驻公共图标单独图集，避免所有界面共享一个巨型包。面板打开时加载自身包和依赖，关闭后按缓存策略释放。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0268",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "大量角色换装资源如何避免卡顿？",
+      "answer": "按角色部位和品质分包，先显示低配或占位资源，再异步加载高质量资源；预热常用材质、Shader 和骨骼绑定，限制同帧实例化数量，使用缓存、对象池和分帧换装，避免重复 Mesh/材质实例。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0269",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "预加载和按需加载如何取舍？",
+      "answer": "高概率马上使用、首次卡顿不可接受的资源预加载；体积大、低频和可延迟内容按需加载。可根据场景预测做分级预取，并设置内存预算和 LRU 缓存，避免全量预加载挤爆内存。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0270",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何实现准确的加载进度条？",
+      "answer": "总进度应按各阶段真实权重合成，如下载字节、解压、依赖加载、资源创建和场景激活，而不是简单平均任务百分比。Unity 异步场景在允许激活前常停在特定进度，应给最后激活阶段预留显示区间并做平滑。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0271",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Canvas 的作用是什么？",
+      "answer": "Canvas 是 UGUI 的渲染和布局根节点，把子 UI 生成批次并提交渲染，同时定义屏幕空间或世界空间坐标。一个 Canvas 内发生需要重建的变化时，可能影响较大范围的几何和批次。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0272",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Screen Space Overlay、Screen Space Camera、World Space 的区别。",
+      "answer": "Overlay 直接覆盖屏幕，不需相机，最简单；Camera 由指定相机渲染，可控制距离、后处理和层；World Space 把 UI 当三维场景物体，可被透视和遮挡。选择取决于 HUD、相机效果和世界交互。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0273",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Canvas 重建为什么昂贵？",
+      "answer": "Canvas 内布局、顶点或材质变化可能触发布局重算、网格重建和批次重组，范围大时 CPU 成本高。应把高频变化 UI 与静态 UI 拆到不同 Canvas，但也不能拆得过碎增加 Draw Call。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0274",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么频繁改变 UI 容易产生性能问题？",
+      "answer": "改变 RectTransform、文本、图片、层级或布局参数可能触发 Layout 和 Canvas rebuild；若在大 Canvas 中每帧修改，会重复遍历和生成网格。应减少高频属性变化、关闭复杂布局组件并拆分动态区域。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0275",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "LayoutGroup、ContentSizeFitter 有什么性能风险？",
+      "answer": "它们会在尺寸变化时递归计算布局，ContentSizeFitter 与 LayoutGroup 组合还可能产生多次重建或循环依赖。动态列表中应减少嵌套，布局稳定后禁用组件，或手动计算尺寸。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0276",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "UI 如何适配不同分辨率、比例和刘海屏？",
+      "answer": "使用 CanvasScaler 的合适参考分辨率和 Match，锚点按相对布局设置；针对超宽屏和刘海读取 Screen.safeArea 做安全区域适配，并在多种宽高比、DPI 和横竖屏真机测试。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0277",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "图集为什么可以降低 Draw Call？",
+      "answer": "同一图集中的图片共享纹理和通常共享材质，连续 UI 元素可合并到同一批次，减少纹理切换和 Draw Call。若层级被不同材质、Mask 或重叠顺序打断，仍可能拆批。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0278",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Mask 和 RectMask2D 的区别。",
+      "answer": "Mask 通常利用模板缓冲，可支持任意 Image 形状，但会增加额外绘制和破坏批次；RectMask2D 用矩形裁剪，不依赖模板，适合矩形滚动区域且通常更高效，但不支持任意形状。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0279",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "EventSystem 如何进行点击检测？",
+      "answer": "EventSystem 读取输入模块产生的指针事件，通过 GraphicRaycaster 对 Canvas 中可射线检测的 Graphic 按深度筛选，也可结合 PhysicsRaycaster 检测 3D/2D Collider，然后把事件发送给实现对应接口的对象。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0280",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "UI 层级如何管理？",
+      "answer": "可定义固定层级如 Background、Normal、Popup、Guide、Toast，并由 UIManager 管理各层 Canvas、sortingOrder 和遮罩。避免业务脚本随意 SetSiblingIndex，统一处理模态、输入阻挡和返回键。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0281",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "UI 窗口栈如何设计？",
+      "answer": "打开窗口时压栈，顶层接收输入；关闭时弹栈并恢复上一窗口，可区分全屏、弹窗和提示层。栈项保存界面实例、参数和生命周期，支持去重、覆盖、返回、缓存和资源释放。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0282",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "血条跟随世界坐标如何实现？",
+      "answer": "每帧把世界坐标加偏移通过 Camera.WorldToScreenPoint 转成屏幕坐标，再转换到目标 Canvas 的局部坐标设置 RectTransform。要处理目标在相机后方、不同 Canvas 模式和屏幕边缘裁剪。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0283",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "大量怪物血条如何优化？",
+      "answer": "只显示可见或近距离目标，使用对象池复用血条，集中管理批量更新并降低刷新频率；避免每个血条独立 Update、复杂 Layout 和文本频繁变化。远距离可隐藏或使用 GPU/世界空间方案。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0284",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "滚动列表如何实现复用？",
+      "answer": "只创建可视区域加少量缓冲的 Item，根据滚动位置计算数据索引，把离开视口的 Item 重新绑定到新数据并移动位置。固定高度最简单，变高列表需维护累计高度或索引结构。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0285",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何避免一个 UI 面板引用大量资源？",
+      "answer": "面板不要直接序列化引用整个资源集合，只保存地址或轻量配置；打开时按需加载并记录句柄，关闭时释放。把公共资源和面板私有资源分开，避免静态事件和全局缓存长期持有面板。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0286",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Collider 和 Trigger 的区别。",
+      "answer": "Collider 参与物理碰撞并产生阻挡与接触响应；勾选 IsTrigger 后只检测重叠并触发 Trigger 回调，不产生物理阻挡。两者都可用于查询，是否触发回调还取决于 Rigidbody 和层碰撞设置。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0287",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Collision 和 Trigger 回调分别需要满足什么条件？",
+      "answer": "3D 物理中，双方需有 Collider 且层允许交互，通常至少一方带 Rigidbody；Collision 要求非 Trigger，Trigger 要求至少一方 Collider 为 Trigger。静态碰撞体之间通常不会产生完整回调，具体以 Unity 物理规则为准。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0288",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "使用 Rigidbody 时为什么不建议直接修改 Transform？",
+      "answer": "直接改 Transform 会绕过 Rigidbody 的速度、插值和碰撞求解，可能造成穿透、抖动或物理状态不同步。动态刚体应在 FixedUpdate 使用力、速度或 MovePosition/MoveRotation；瞬移时再显式设置并同步状态。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0289",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Raycast、SphereCast、BoxCast 的区别。",
+      "answer": "Raycast 用无体积射线，适合视线和精确瞄准；SphereCast 用球体扫掠，对粗目标和角色移动更稳；BoxCast 用盒体扫掠，适合体积碰撞检测。体积 Cast 更准确但计算更贵。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0290",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "连续碰撞检测解决什么问题？",
+      "answer": "离散检测只检查每个物理步的位置，高速物体可能跨过薄碰撞体。连续碰撞检测对运动轨迹做扫掠或预测，降低隧穿，但 CPU 成本更高，应只给高速关键物体使用。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0291",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "高速子弹穿透如何解决？",
+      "answer": "可增加碰撞体长度或降低固定步长，启用 Rigidbody 连续碰撞检测，或在每帧从上一位置到当前位置做 Raycast/SphereCast。命中后只结算一次并立刻回收，必要时使用射线武器。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0292",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Animator Controller 的基本结构是什么？",
+      "answer": "Animator Controller 由参数、状态、动画片段、Blend Tree、Transition、层和 Avatar Mask 组成。运行时根据参数和退出时间在状态间切换，并可在不同层混合动画。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0293",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "动画状态机如何切换？",
+      "answer": "通过 bool、trigger、int、float 参数和条件配置 Transition，可结合 Has Exit Time、过渡时长和中断设置。程序只改变语义参数，避免到处直接 Play；关键逻辑不要完全依赖动画状态读取。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0294",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Blend Tree 是什么？",
+      "answer": "Blend Tree 根据一个或多个连续参数在多个动画间插值，如速度控制走跑、二维方向控制移动。它比大量离散状态切换更平滑，并可减少状态数量。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0295",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Root Motion 是什么？",
+      "answer": "Root Motion 使用动画根骨骼的位移和旋转驱动角色，而不是代码计算移动。表现自然但控制和网络同步更复杂；可在 OnAnimatorMove 中读取并决定如何应用。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0296",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "骨骼动画和蒙皮的基本原理。",
+      "answer": "骨骼形成层级变换，动画改变骨骼姿态；蒙皮网格每个顶点保存若干骨骼索引和权重，渲染时用当前骨骼矩阵加权变换顶点。GPU Skinning 可把计算放到顶点着色器。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0297",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "角色上下半身播放不同动画如何实现？",
+      "answer": "使用 Animator 多层，上层设置 Avatar Mask 只影响上半身，下层负责移动；调整层权重并选择 Override 或 Additive 混合。射击、换弹动画放上层即可与腿部移动同时播放。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0298",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "IK 是什么？Two Bone IK 如何工作？",
+      "answer": "IK 根据末端目标反推关节姿态。Two Bone IK 对根关节、中间关节和末端关节求解，使末端到达目标，并用 Hint 控制肘或膝弯曲方向，常用于手握武器和脚贴地。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0299",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "NavMesh 的寻路基础是什么？",
+      "answer": "NavMesh 把可行走区域烘焙成导航多边形网格，查询时在多边形图上用 A* 等算法找通道，再用漏斗算法得到平滑路径，NavMeshAgent 负责沿路径移动和局部避障。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0300",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "NavMesh、A* 和自定义网格寻路有什么区别？",
+      "answer": "NavMesh 适合连续三维场景且自带烘焙、路径和平滑避障；A* 是通用搜索算法，需要自行定义图和移动；自定义网格适合确定性、特殊规则或大规模优化，但开发维护成本更高。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0301",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "完整描述一次物体从 CPU 到屏幕的渲染过程。",
+      "answer": "CPU 进行脚本更新、动画、剔除和渲染排序，准备 Mesh、材质和常量后提交 Draw Call；GPU 顶点着色器把顶点变换到裁剪空间，经过图元装配、裁剪、透视除法和视口变换，再光栅化生成片元，片元着色器计算颜色，最后经过深度、模板和混合写入帧缓冲并显示。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0302",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "顶点着色器做什么？",
+      "answer": "顶点着色器逐顶点执行，主要完成模型空间到裁剪空间的坐标变换，也可处理蒙皮、顶点动画、法线和纹理坐标等属性，并输出供光栅化插值的数据。它不能直接生成任意数量像素。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0303",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "片元着色器做什么？",
+      "answer": "片元着色器对光栅化产生的候选片元计算颜色、法线、材质、光照和纹理采样等输出。结果还要经过深度、模板、混合等测试，片元不一定最终成为屏幕像素。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0304",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "图元装配是什么？",
+      "answer": "图元装配按索引和拓扑把顶点组合成三角形、线或点，并准备后续裁剪与光栅化。三角形列表通常每三个索引组成一个三角形。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0305",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "裁剪、透视除法和视口变换分别做什么？",
+      "answer": "裁剪把裁剪空间中视锥外的图元删除或切割；透视除法用 xyz 除以 w 得到 NDC；视口变换把 NDC 映射到屏幕像素范围和深度范围。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0306",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "光栅化是什么？",
+      "answer": "光栅化把屏幕空间图元覆盖的区域转换为片元，并根据重心坐标插值深度、UV、颜色等顶点输出。它连接几何阶段和逐片元着色阶段。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0307",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "深度测试、模板测试和混合的顺序是什么？",
+      "answer": "概念上片元着色后经过深度/模板测试再混合写入，但现代 GPU 可在片元着色前执行 Early-Z/Early Stencil，前提是 Shader 不修改深度、不 discard 等。具体顺序受渲染 API、硬件和 Shader 状态影响。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0308",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Alpha Test 和 Alpha Blend 的区别。",
+      "answer": "Alpha Test 根据阈值直接保留或丢弃片元，边缘硬，可写深度且排序问题较少；Alpha Blend 把源颜色与背景按透明度混合，边缘平滑，但通常不写深度并需要排序，会产生 Overdraw。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0309",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么透明物体通常后渲染？",
+      "answer": "先渲染不透明物体并写深度，可让透明物体正确与场景遮挡；透明混合依赖已有背景颜色，若先画会被后续不透明物体覆盖，也难得到正确混合结果。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0310",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么透明物体通常从远到近排序？",
+      "answer": "常见透明混合不是交换律，先画近处再画远处会用错误背景混合。按相机距离从远到近绘制，让后面的近处透明层叠加在远处结果上；相交透明物体仍可能无法靠物体级排序完全解决。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0311",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "MVP 矩阵分别是什么？",
+      "answer": "M 是模型矩阵，把局部坐标变到世界坐标；V 是观察矩阵，把世界坐标变到相机空间；P 是投影矩阵，把相机空间变到裁剪空间。列向量约定下通常 clip=P×V×M×position。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0312",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "世界坐标如何转换为屏幕坐标？",
+      "answer": "用模型矩阵到世界空间，再乘视图和投影矩阵得到裁剪坐标，除以 w 得 NDC，最后按视口尺寸映射到屏幕坐标。Unity 可用 Camera.WorldToScreenPoint，并注意相机后方和坐标原点差异。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0313",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "法线矩阵为什么不能总是直接使用模型矩阵？",
+      "answer": "非均匀缩放下直接用模型矩阵变换法线会使法线不再垂直表面。正确方法是使用模型矩阵左上 3×3 的逆转置矩阵，再归一化；纯旋转或统一缩放时可简化。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0314",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "欧拉角、旋转矩阵、四元数的区别。",
+      "answer": "欧拉角直观、易编辑但有万向节锁和插值问题；旋转矩阵组合方便、可直接变换向量但占空间且会数值漂移；四元数紧凑、适合平滑插值且无万向节锁，但不直观，仍需归一化。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0315",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "万向节锁是什么？",
+      "answer": "使用欧拉角顺序旋转时，两个旋转轴可能重合，失去一个自由度，称为万向节锁。四元数表示旋转可避免这种参数化奇异，但把四元数转回欧拉角显示时仍可能出现跳变。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0316",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Draw Call 是什么？",
+      "answer": "Draw Call 是 CPU 向图形 API/驱动提交一次绘制命令，指定 Mesh、材质、Shader 状态和实例数据。一个 Draw Call 可绘制很多三角形，瓶颈不只看数量，还看状态切换和每次提交成本。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0317",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么 Draw Call 多会增加 CPU 压力？",
+      "answer": "每次 Draw Call 都需要脚本或引擎遍历、设置渲染状态、更新常量、经过驱动验证并写入命令缓冲。数量过多时主线程或 Render Thread 花大量时间提交小批次，GPU 反而吃不饱。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0318",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "静态合批和动态合批的区别。",
+      "answer": "静态合批在构建或运行前把不移动物体的顶点变到世界空间并合并，运行时 CPU 开销低但占更多顶点内存；动态合批每帧在 CPU 变换并合并小 Mesh，限制多且会增加 CPU 开销，现代平台常不如 Instancing/SRP Batcher。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0319",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "GPU Instancing 是什么？",
+      "answer": "GPU Instancing 用一次或少量 Draw Call 绘制同一 Mesh 和材质的多个实例，每个实例提供不同矩阵和少量属性。适合草木、子弹等重复对象，但 Shader、材质关键字和 Mesh 通常要一致。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0320",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "SRP Batcher 是什么？",
+      "answer": "SRP Batcher 缓存兼容 Shader 的材质常量布局，减少 URP/HDRP 中切换材质时 CPU 设置成本。它不一定减少 Draw Call，而是让同一 Shader 变体下的连续批次更便宜；Shader 必须满足统一常量缓冲布局。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0321",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "合批需要满足什么条件？",
+      "answer": "通常要求相同或兼容的材质、Shader 变体、纹理和渲染状态，且渲染顺序可合并。静态/动态合批还有顶点数量、缩放和光照限制；任何材质实例化、关键字、Mask 或透明排序都可能打断批次。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0322",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "图集为什么能减少 Draw Call？",
+      "answer": "把多张小图放进同一纹理后，多个对象可共享材质和纹理，减少 SetPass 和纹理切换，从而更容易合批。若每个对象仍使用不同 Shader 状态或排序被打断，则不能只靠图集消灭 Draw Call。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0323",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "视锥剔除是什么？",
+      "answer": "视锥剔除用相机六个平面测试物体包围体，完全在视锥外的对象不提交渲染。它通常在 CPU 完成，成本较低，但不能剔除被其他物体遮挡的对象。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0324",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "遮挡剔除是什么？",
+      "answer": "遮挡剔除判断物体虽在视锥内但被其他物体完全挡住时不渲染。可使用预计算 PVS、层级 Z 缓冲或硬件查询；动态场景和细碎遮挡会增加计算与错误收益风险。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0325",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "四叉树、八叉树和 BVH 如何用于剔除？",
+      "answer": "这些层次结构把空间或包围体分层，查询相机视锥或遮挡范围时，若父节点整体不可见即可跳过所有子节点。四叉树适合二维地面，八叉树适合三维空间，BVH 更贴合对象分布和动态更新。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0326",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "LOD 是什么？",
+      "answer": "LOD 根据距离或屏幕占比切换不同复杂度的 Mesh、材质、动画或特效，减少远处对象的顶点和像素成本。需要设置合理切换阈值、交叉淡化和最低层，避免明显跳变。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0327",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "MipMap 是什么？",
+      "answer": "MipMap 是同一纹理预生成的一系列逐级缩小版本。采样器根据屏幕覆盖选择合适层级，减少远处纹理多个像素压到一个像素时的混叠，代价通常约增加三分之一纹理内存。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0328",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "MipMap 为什么能减少闪烁和缓存压力？",
+      "answer": "远处采样高分辨率纹理会跨越很多 texel，产生闪烁且缓存命中差。MipMap 使用接近屏幕分辨率的层级，过滤更稳定，读取数据更少，提升纹理缓存局部性和带宽效率。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0329",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "纹理内存如何计算？",
+      "answer": "未压缩纹理约为宽×高×每像素字节数，RGBA32 为 4 字节；含完整 MipMap 再乘约 4/3。压缩格式按每块固定字节计算，还要考虑纹理副本、读写开启和运行平台实际格式。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0330",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "压缩纹理有什么代价？",
+      "answer": "压缩可降低显存、带宽和包体，但会损失质量，某些格式不支持透明或产生块状伪影；运行时不支持的格式可能被解压成更大纹理。选择需匹配平台，如 ASTC、ETC2、BC 系列，并合理设置块大小。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0331",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Forward Rendering 和 Deferred Rendering 的区别。",
+      "answer": "Forward 对每个物体直接计算灯光并输出颜色，透明和 MSAA 友好，灯多时重复计算；Deferred 先写 GBuffer，再按灯光做屏幕空间计算，适合大量动态灯，但占带宽和显存、透明仍需 Forward，移动端成本较高。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0332",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "移动端为什么常使用 Tile-Based Rendering？",
+      "answer": "移动 GPU 常把屏幕分成小 Tile，在片上高速缓存完成深度、着色和混合，减少昂贵的外部显存带宽。应避免频繁切换 RenderTarget、无效 Load/Store 和高 Overdraw，充分利用 Tile 架构。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0333",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Overdraw 是什么？",
+      "answer": "Overdraw 是同一屏幕像素被多个图元反复着色，前面的结果最终被覆盖。透明 UI、粒子和大面积面片最常见，会消耗片元运算和带宽，可通过裁剪、排序、减少透明层和简化 Shader 优化。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0334",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Fill Rate 瓶颈是什么？",
+      "answer": "Fill Rate 瓶颈表示每秒需要处理和写入的像素/片元超过 GPU 能力，常由高分辨率、Overdraw、多 RenderTarget 和复杂片元 Shader 导致。降低分辨率后帧率明显提升通常是信号之一。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0335",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Shader Variant 为什么可能导致包体和加载问题？",
+      "answer": "每组关键字组合可能生成一个 Shader Variant，组合数呈乘法增长，增加编译时间、包体、加载内存和运行时预热卡顿。应限制 multi_compile、使用 shader_feature、剥离无用变体并建立 Shader Variant Collection。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0336",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "游戏突然从 60 FPS 降到 25 FPS，如何定位？",
+      "answer": "先稳定复现并用 Profiler/平台工具录制卡顿前后帧，查看 CPU 主线程、Render Thread、GPU、GC、内存和加载；判断是持续瓶颈还是单帧尖峰，再沿最耗时采样展开调用栈，逐项修改并在同设备同场景复测。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0337",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何判断是 CPU 瓶颈还是 GPU 瓶颈？",
+      "answer": "查看 CPU 和 GPU 帧时间，真正帧率由较慢者决定；降低分辨率或画质后明显变快多为 GPU 瓶颈，减少脚本/AI 后变快多为 CPU。Unity Profiler、Frame Debugger 和 GPU Profiler 可进一步确认，但要注意 VSync 等待会伪装耗时。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0338",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "CPU 主线程耗时过高怎么办？",
+      "answer": "在 CPU Timeline 找最耗时函数，检查脚本 Update、物理、动画、GC、UI 和加载。通过降频、分帧、缓存、批处理、Job/Burst、减少组件调用和算法优化处理，避免只做微小语法优化。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0339",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Render Thread 耗时过高怎么办？",
+      "answer": "Render Thread 高通常说明 Draw Call、SetPass、材质切换或驱动提交过多。用 Frame Debugger 看批次来源，应用合批、Instancing、SRP Batcher、材质共享、剔除和减少阴影对象，并在真机验证。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0340",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "GPU Fragment 阶段耗时过高怎么办？",
+      "answer": "检查 Overdraw、分辨率、透明、全屏后处理、实时阴影和 Shader 指令/纹理采样。用 RenderDoc、Xcode GPU Frame Debugger 或平台 GPU Profiler 定位 Pass，降低屏幕覆盖、Shader 复杂度和 RenderTarget 带宽。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0341",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何查看和定位 GC 峰值？",
+      "answer": "在 Profiler 的 CPU Usage 查看 GC.Alloc 和 GC.Collect，切到 Timeline 找产生分配的调用栈；必要时开启 Deep Profile 或 Allocation Call Stacks 短时复现。修复后确认热点帧分配归零或稳定在预算内。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0342",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何定位某一帧的卡顿？",
+      "answer": "在 Profiler 中锁定尖峰帧，与前后帧对比 CPU Timeline、GPU、GC、Loading 和 Physics；检查是否是同步资源加载、Shader 编译、Instantiate、日志、锁等待或系统调度。建立可重复场景后再优化。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0343",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何判断是否发生资源加载卡顿？",
+      "answer": "查看 Loading、File IO 和主线程中 Resources.Load、AssetBundle、Addressables 回调、纹理解压和对象实例化耗时。若 IO 已异步但完成帧仍卡，通常是主线程资源创建、依赖激活或一次实例化太多。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0344",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何分析 Draw Call、SetPass Call 和三角形数量？",
+      "answer": "Profiler Rendering 和 Stats 看批次数、SetPass、三角形与顶点，Frame Debugger 逐次查看为何拆批、使用了哪个材质和 Pass。数值要结合 CPU/GPU 时间，三角形多不一定比大量小 Draw Call 更严重。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0345",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "真机性能与编辑器性能为什么可能不同？",
+      "answer": "编辑器有 Inspector、Scene View、脚本调试和额外统计开销，使用的图形 API、分辨率、编译后端和资源格式也可能不同；真机会有温控、内存带宽和驱动差异。性能结论必须以目标设备 Development Build 为准。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0346",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "移动端发热和降频如何处理？",
+      "answer": "先降低持续 CPU/GPU 功耗而非只看瞬时帧率：限制目标帧率，降低分辨率、阴影、后处理和刷新频率，减少忙轮询与过度并行；在不同温度阶段做长时间测试，观察频率和帧时间，设计动态画质降级。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0347",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "内存不断增长如何排查？",
+      "answer": "区分 Managed、Native、Texture、Mesh、Audio 和 Graphics Driver 内存，用 Memory Profiler 连续快照比较新增对象和引用链；检查静态集合、事件、对象池、场景残留、Addressables 句柄、Bundle 与 RenderTexture 是否释放。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0348",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "加载场景时卡顿如何拆解？",
+      "answer": "把加载拆成下载/磁盘 IO、解压反序列化、资源创建、Instantiate、Awake/OnEnable/Start、Shader 编译和场景激活阶段。各阶段单独计时，使用异步、预热、分帧实例化和加载界面隐藏尖峰。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0349",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "大量敌人同时出现如何优化？",
+      "answer": "逻辑上使用对象池、集中 Tick、分帧 AI、降低寻路与感知频率、空间索引和 Job/Burst；渲染上用 LOD、剔除、Instancing、动画降级和远处简化；物理上减少碰撞体、层过滤和查询频率。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0350",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "优化后如何用数据证明有效？",
+      "answer": "设定基线设备、场景、相机路径和运行时长，记录优化前后平均帧时间、P95/P99、CPU/GPU 各模块、内存、GC、Draw Call 和功耗；每次只改一个变量，重复多次并保存 Profiler 截图或自动化数据。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0351",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "单例模式的优缺点。",
+      "answer": "优点是全局唯一、访问方便、生命周期集中；缺点是隐藏依赖、难测试、初始化顺序不清、容易变成全局状态和并发瓶颈。适合真正唯一且稳定的服务，但应通过接口暴露并控制使用范围。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0352",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Unity 中滥用单例有什么问题？",
+      "answer": "大量脚本直接访问 Singleton 会形成网状依赖，场景切换和初始化顺序难管理，测试无法替换实现，状态残留也容易产生 Bug。可用场景上下文、依赖注入、事件和模块 Facade 替代。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0353",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "观察者模式和事件系统有什么区别？",
+      "answer": "观察者模式是一对多通知的设计结构，定义订阅者和主题；事件系统通常是其工程化实现，可通过中心总线解耦发送者和接收者。全局事件总线更松耦合，但事件来源、顺序和生命周期更难追踪。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0354",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "C# 委托、事件和观察者模式的关系。",
+      "answer": "委托是类型安全的可调用对象引用，可组合多个函数；event 是对委托的封装，限制外部只能订阅/退订，只有发布者能触发；观察者模式可用委托和事件实现，也可用接口列表实现。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0355",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "工厂模式适合创建哪些游戏对象？",
+      "answer": "适合创建类型多、构造复杂、需要配置或对象池管理的对象，如敌人、武器、技能效果、UI 窗口和关卡元素。调用方只依赖抽象或配置，不直接 new 具体类型。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0356",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "抽象工厂与普通工厂的区别。",
+      "answer": "普通工厂通常创建同一产品层次中的一个对象；抽象工厂提供一组相关产品的创建接口，如同时生成某主题下的按钮、窗口和图标，保证产品族一致。抽象工厂结构更重，适合多套平台或主题实现。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0357",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "对象池属于什么设计思想？",
+      "answer": "对象池体现复用、缓存和以空间换时间的思想，也可看作对象创建管理模式。它减少反复分配和销毁，但需要严格重置状态和容量管理。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0358",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "状态模式和普通 switch 状态机的区别。",
+      "answer": "switch 状态机简单直接，状态少时性能和可读性很好；状态模式把每个状态封装成对象，进入、更新、退出和转换更独立，扩展和测试更方便，但对象和跳转结构更多。可根据规模渐进升级。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0359",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "策略模式如何用于武器或技能行为？",
+      "answer": "定义 IWeaponStrategy 或 ISkillStrategy，封装射击方式、目标选择、伤害计算等算法，角色或武器持有当前策略并可运行时替换。新增行为只加新策略，避免在主逻辑中堆大量 if/switch。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0360",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "命令模式如何实现输入、撤销和回放？",
+      "answer": "把一次操作封装为 Command，包含 Execute 和可选 Undo；输入层生成命令，执行器按帧执行并可保存历史。网络帧同步、录像和回放只需记录命令参数和时间，撤销则保存逆操作或旧状态。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0361",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "责任链如何用于伤害结算？",
+      "answer": "把伤害流程拆成多个处理器，如合法性、暴击、护甲、抗性、护盾、Buff 和最终扣血，每个处理器处理后传给下一个。顺序可配置，扩展新规则不需修改所有攻击者，但要避免链过长和隐式副作用。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0362",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "MVC、MVP、MVVM 的区别。",
+      "answer": "MVC 中 Controller 处理输入并更新 Model，View 观察展示；MVP 由 Presenter 协调 View 接口，便于测试但代码较多；MVVM 通过 ViewModel 和数据绑定同步状态，适合 UI 框架但要控制绑定性能和调试复杂度。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0363",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "ECS 是什么？",
+      "answer": "ECS 把实体当 ID，组件只保存数据，系统批量处理拥有特定组件组合的实体。它强调数据导向和组合，Unity DOTS 还结合 Job System、Burst 和连续内存布局提升并行与缓存效率。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0364",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "ECS 相比面向对象组件架构有什么优势？",
+      "answer": "相同组件数据可连续存储，系统批量遍历，缓存命中高且容易并行；实体组合灵活，避免深继承。代价是思维方式、工具链和跨实体关系更复杂，不是所有规模项目都值得使用。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0365",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "数据驱动设计是什么？",
+      "answer": "数据驱动把武器、技能、关卡和行为参数放入配置或组件数据，程序读取数据执行通用逻辑，而不是为每种内容写分支。这样策划可独立迭代，热更新和批量校验也更容易。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0366",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "配置表如何设计和读取？",
+      "answer": "用唯一 ID、明确字段类型和默认值，区分静态配置与运行时状态；支持 Excel/CSV/JSON/二进制生成，构建时做重复 ID、引用、范围和版本校验。运行时加载到只读字典或紧凑结构，并提供查询接口。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0367",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "模块之间如何通信？",
+      "answer": "同步强依赖用接口调用，跨层通知用事件，异步任务用消息或 Task，数据共享通过只读 Model/Service。通信方向要明确，避免双方直接引用；重要流程可由协调器或 Facade 统一编排。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0368",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "事件中心如何避免内存泄漏？",
+      "answer": "订阅者销毁或禁用时必须退订，或使用可释放的订阅令牌和弱引用；事件中心清理失效监听，避免匿名 Lambda 无法退订。推荐 OnEnable 订阅、OnDisable 退订，并对常驻发布者特别警惕。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0369",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何处理事件调用顺序？",
+      "answer": "不要依赖事件注册先后决定业务正确性。需要顺序时明确优先级、分阶段事件或由流程控制器直接调用；同一事件的监听中避免修改监听列表，可复制快照或延迟增删。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0370",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何避免模块之间循环依赖？",
+      "answer": "定义单向依赖层次和接口模块，把公共协议下沉到独立程序集；通过事件、回调或依赖反转让上层依赖抽象。循环依赖通常说明职责边界不清，应引入中介模块而非互相引用。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0371",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "服务定位器和依赖注入有什么区别？",
+      "answer": "服务定位器让对象运行时主动从全局容器取依赖，使用方便但依赖隐藏；依赖注入由外部把依赖通过构造、属性或方法传入，依赖显式、易测试。Unity 中可用安装器或入口统一注入。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0372",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何设计可扩展的技能系统？",
+      "answer": "把技能拆为配置、施法条件、目标选择、消耗、执行阶段、效果节点和表现；通过组合效果如伤害、位移、Buff、召唤构建技能，使用事件或时间轴驱动。服务器权威时配置需版本一致且逻辑与表现分离。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0373",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何设计 Buff 系统？",
+      "answer": "Buff 实例包含类型、来源、层数、持续时间和效果列表；统一 BuffManager 负责添加、刷新、叠层、Tick、移除和属性聚合。规则用配置决定唯一、覆盖、叠层或取最大值，并用事件更新表现。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0374",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何设计任务系统？",
+      "answer": "任务由配置定义条件、目标值、奖励和前后置关系，运行时实例保存进度和状态；监听击杀、收集等领域事件增量更新，完成后校验并发奖。持久化只存任务 ID、版本和状态，避免每帧轮询所有任务。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0375",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何设计 UI 管理系统？",
+      "answer": "UIManager 管理层级、窗口注册、打开关闭、参数、缓存和资源句柄；窗口遵循 Init/Open/Close/Dispose 生命周期，数据通过 Presenter/ViewModel 提供。支持窗口栈、模态遮罩、返回键、对象池和异步加载。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0376",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "角色移动是直接修改 Transform，还是使用 Rigidbody 或 CharacterController？",
+      "answer": "我的移动端 TPS 使用 CharacterController 或基于 Transform 的受控移动更合适，当前核心目标是快速验证操作与战斗，不需要完整刚体动力学。移动通过统一控制器处理碰撞、重力和位移，不让多个脚本直接改 Transform。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0377",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么选择当前的角色移动方式？",
+      "answer": "选择该方式是因为角色需要可控、稳定的第三人称移动，而不是被力学完全驱动；它便于处理摇杆输入、坡度和碰撞，也减少刚体抖动。若后续加入击飞和复杂物理，可在状态切换时结合 Rigidbody。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0378",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "移动方向如何根据相机方向进行坐标转换？",
+      "answer": "读取相机 forward 和 right，去掉竖直分量并归一化，世界移动方向为 forward×摇杆Y + right×摇杆X。这样摇杆向上始终表示朝镜头前方移动，再交给角色控制器执行。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0379",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何实现角色转向平滑？",
+      "answer": "先得到目标朝向 Quaternion.LookRotation(moveDir)，再用 Quaternion.Slerp 或 RotateTowards 按 deltaTime 平滑旋转。旋转速度设为配置，并在输入很小时保持当前朝向，避免抖动。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0380",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "镜头跟随放在哪个生命周期函数？为什么？",
+      "answer": "镜头跟随放在 LateUpdate，因为角色在本帧 Update/物理阶段完成移动后，相机再读取最终位置，可减少一帧延迟和抖动。输入旋转仍可在 Update 采集。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0381",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何处理第三人称镜头穿墙？",
+      "answer": "从角色或镜头枢轴向期望相机位置做 SphereCast，命中墙体时把相机拉到碰撞点前并保留安全距离；离开遮挡后平滑恢复。SphereCast 比单 Raycast 更能避免相机边缘穿墙。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0382",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何实现瞄准状态与普通移动状态切换？",
+      "answer": "使用角色状态和输入上下文切换：普通状态按相机方向移动并让镜头自由跟随，瞄准状态调整相机偏移、角色朝向和移动速度，显示准星。进入退出统一处理动画、灵敏度和 UI，避免多个 bool 各自控制。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0383",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "移动、瞄准、射击同时发生时如何处理输入优先级？",
+      "answer": "先把输入解析成移动、瞄准、射击等命令，再由状态机判断当前允许的动作；死亡优先级最高，切枪/换弹可阻止射击，移动通常可并行。冲突规则集中配置，不在各按钮回调里互相改状态。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0384",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "虚拟摇杆如何处理死区？",
+      "answer": "计算触点相对摇杆中心的归一化距离，小于死区直接输出 0；超过后把剩余区间重新映射到 0到1，避免突然跳变。外圈 clamp 到最大半径，抬手时平滑或立即归零。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0385",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "不同分辨率下如何保持摇杆灵敏度一致？",
+      "answer": "使用 CanvasScaler 和 RectTransform 局部坐标计算摇杆位移，再除以摇杆实际半径得到归一化输入，而不是直接用屏幕像素。相机旋转灵敏度使用 delta/屏幕尺寸或 DPI 校准，并在真机调整。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0386",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么使用实体子弹，而不是 Raycast？",
+      "answer": "当前使用实体子弹是为了展示弹道飞行、旅行时间和碰撞反馈，也方便做不同速度和可见弹道的武器。它更贴合 Demo 的 PVE 表现目标，但高速或精准武器可改用 Raycast 或混合方案。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0387",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "实体子弹和射线检测的优缺点是什么？",
+      "answer": "实体子弹有真实飞行时间、可见轨迹和途中碰撞，但对象多、可能穿透且网络同步复杂；Raycast 命中即时、计算稳定、适合高速枪械，但弹道表现需额外模拟，远距离延迟和下坠要自行计算。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0388",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "高速子弹穿墙如何解决？",
+      "answer": "保存上一帧和当前子弹位置，在两点之间做 Raycast/SphereCast；或启用连续碰撞检测并限制速度与固定步长。命中后立即标记已结算、关闭碰撞并回收，避免下一帧再次穿过。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0389",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "子弹碰撞后如何避免重复结算？",
+      "answer": "子弹维护 hasHit/isActive 标志，碰撞回调第一行用原子式逻辑检查并置位，之后关闭 Collider、停止速度和取消事件，再统一回收。还要用 LayerMask 过滤非目标，并避免同一对象多个碰撞体重复伤害。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0390",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "射速如何保证不受帧率影响？",
+      "answer": "用下一次可射击时间 nextFireTime 控制，判断 Time.time>=nextFireTime 后发射并增加 1/fireRate，而不是按帧计数；自动武器可用 while 补偿低帧率漏掉的射击次数，但要限制单帧上限。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0391",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "后坐力是修改枪、角色还是相机？为什么？",
+      "answer": "后坐力拆成武器模型表现和相机瞄准偏移：相机负责玩家感受到的枪口抬升，武器局部动画负责视觉反馈，角色本体只在需要时影响散布或朝向。这样逻辑、镜头和美术表现可独立调参。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0392",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何实现后坐力恢复曲线？",
+      "answer": "记录目标后坐力和当前偏移，射击时按曲线或随机模式累加，停止射击后用 SmoothDamp/Spring 向零恢复。把上升速度、最大偏移、水平随机和恢复时间做成武器配置。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0393",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "换弹过程中切枪怎么办？",
+      "answer": "由状态机定义规则：换弹中请求切枪时取消换弹，不结算未完成的弹药转移，退出 Reload 状态并进入 Switch 状态；动画和 UI 一并重置。也可设计不可取消窗口，但必须规则统一。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0394",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "切枪过程中射击怎么办？",
+      "answer": "切枪状态不允许发射，射击输入可忽略或缓存到切枪完成后的极短窗口。只有装备完成事件触发后，当前武器才切换为可射击状态，避免旧武器和新武器同时响应。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0395",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "弹匣子弹和背包子弹如何维护？",
+      "answer": "每把武器保存 magazineAmmo 和 reserveAmmo，射击只减弹匣；换弹量为 min(弹匣缺口, reserve)，完成时一次性从 reserve 转入 magazine。切枪时状态属于各武器或背包数据，UI 只订阅当前武器变化。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0396",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "武器基类如何设计？",
+      "answer": "武器基类或接口定义 Equip、Unequip、TryFire、Reload 和配置引用，公共层处理弹药、射速和状态，具体武器实现命中方式、弹丸生成和后坐力。数据与行为分离，配置用 ScriptableObject。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0397",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "新增霰弹枪、狙击枪需要改哪些代码？",
+      "answer": "若架构正确，新增配置和对应 FireStrategy 即可：霰弹枪一次生成多条散布射线/弹丸，狙击枪使用高伤害单射、开镜和可能穿透。背包、UI 和状态机只依赖统一武器接口，不需要大量修改。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0398",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "命中角色不同部位如何计算不同伤害？",
+      "answer": "角色不同部位使用不同 Collider 或 HitBox，命中结果携带部位枚举和伤害倍率；最终伤害由统一 DamageSystem 根据基础伤害、部位、护甲和 Buff 计算，避免子弹直接修改血量。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0399",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何实现爆头判定？",
+      "answer": "头部设置独立 HitBox 或骨骼绑定碰撞体，Raycast/弹丸命中后读取 HitZone.Head，服务器或本地权威逻辑再次验证，再应用爆头倍率和反馈。碰撞层和模型 LOD 要保持判定一致。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0400",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "项目改为联机后，命中检测应该由客户端还是服务器负责？",
+      "answer": "客户端可立即预测命中特效，但最终命中和伤害应由服务器验证。服务器根据射击时间、枪械状态和历史位置做延迟补偿，防止客户端伪造命中、弹药和伤害。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0401",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "武器切换采用状态机还是简单布尔值？为什么？",
+      "answer": "我会用状态机而不是一组互相牵制的布尔值。切枪至少包含开始、收起、切换数据、装备完成等阶段，状态机能集中管理进入、退出和允许操作，减少出现“正在换弹又能切枪又能射击”的非法组合。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0402",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "射击、换弹、切枪、受击、死亡状态如何避免冲突？",
+      "answer": "定义明确的动作优先级和状态转换表：死亡最高，受击是否打断由配置决定，切枪和换弹互斥，射击只在武器 Ready 状态允许。每个状态的 Enter/Update/Exit 负责清理自身动画、计时器和输入锁。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0403",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "状态切换条件放在哪里？",
+      "answer": "转换条件由状态机或状态对象统一判断，输入层只提交命令，动画事件只上报“阶段完成”。不要让 UI、武器和角色脚本分别直接改状态，否则条件会散落并形成竞态。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0404",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "状态之间如何共享数据？",
+      "answer": "共享的角色上下文保存 Animator、当前武器、输入、计时器和服务引用，各状态持有该上下文但只操作自己负责的数据。跨状态持久数据放上下文，临时数据放状态实例，避免全局变量。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0405",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何处理动画结束事件？",
+      "answer": "动画事件只作为表现阶段通知，例如换弹装填点或切枪完成，再转发给状态机校验当前状态和动画版本。不能完全信任事件，状态退出时要取消等待，并设置超时或规范化状态作为兜底。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0406",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "状态机状态越来越多怎么办？",
+      "answer": "把状态按层级和职责拆分，如角色主状态、武器动作子状态、移动子状态；公共行为放基类或组合组件，转换表数据化。若状态之间组合爆炸，可采用分层状态机或并行状态机，而不是继续增加一个大 enum。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0407",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "分层状态机是什么？",
+      "answer": "分层状态机允许父状态包含共享逻辑和多个子状态，例如 Alive 下有 Move/Attack，Attack 下有 Fire/Reload。父层处理通用进入退出和高优先级转换，减少重复代码并控制状态数量。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0408",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "状态模式相比 enum 加 switch 有什么优势？",
+      "answer": "状态模式把每个状态行为封装，新增状态通常不修改巨大 switch，易测试且 Enter/Exit 清晰；enum+switch 对小型状态机更简单、分配少。项目初期可用 switch，复杂后再重构为对象或数据化状态机。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0409",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何实现武器配置数据化？",
+      "answer": "用 ScriptableObject 或配置表保存武器 ID、模型、射速、伤害、弹匣、后坐力和策略类型；运行时武器实例只保存弹药和冷却等状态。这样改数值无需改代码，新武器可组合已有策略。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0410",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何避免武器代码直接操作 UI？",
+      "answer": "武器只发布 AmmoChanged、StateChanged 等事件，或更新一个只读 WeaponModel；UI 订阅当前武器数据并刷新显示。武器层不持有具体 Text、Image 或面板引用，切换 UI 实现不影响战斗逻辑。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0411",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么自己使用 A*，而不是全部使用 NavMesh？",
+      "answer": "TPS Demo 中自己实现 A* 可以展示并掌握寻路核心，也便于控制网格、代价和调试；NavMesh 更适合成熟三维场景并自带烘焙和避障。实际产品会根据地图规模和动态需求选择，必要时用 NavMesh 而不是重复造轮子。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0412",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "A* 的启发函数是什么？",
+      "answer": "启发函数 h(n) 估计当前节点到目标的剩余代价。四方向网格常用曼哈顿距离，八方向可用对角距离，任意平面可用欧氏距离，并应与移动代价尺度一致。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0413",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "A* 的启发函数为什么不能随便取？",
+      "answer": "若要保证最短路径，启发函数不能高估真实剩余代价，即可采纳；为避免重复扩展通常还希望一致性。取太小会退化为 Dijkstra，取太大虽然更快但可能得到非最优路径。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0414",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "A* 的开放列表和关闭列表分别使用什么数据结构？",
+      "answer": "开放列表需要快速取最小 f 值，常用最小堆，并配合哈希表或数组记录节点状态和最新代价；关闭列表用 bool 数组、位图或哈希集合。若网格固定，数组比哈希更快且少 GC。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0415",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何降低大量敌人同时寻路的开销？",
+      "answer": "不让所有敌人同帧寻路：分帧调度、降低重算频率、共享同目标的流场或路径、缓存路径、分层寻路，并用 Job/Burst 并行。近距离重要敌人优先，远处敌人用简化移动。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0416",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "敌人是否每帧重新寻路？为什么？",
+      "answer": "不会。每帧重算浪费 CPU，路径只在目标移动超过阈值、路径失效、敌人卡住或定时器到期时更新；沿已有路径每帧只做移动和局部避障。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0417",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "玩家位置变化后，什么时候重新规划路径？",
+      "answer": "玩家与上次规划位置距离超过阈值、当前路径剩余方向明显错误、视线或地图变化时重规划，并设置最小间隔和随机抖动，防止大量敌人同时触发寻路峰值。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0418",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "多个敌人堵在一起如何处理？",
+      "answer": "使用局部避障、分离力、不同到达点和拥挤代价，避免所有敌人追同一点；攻击时为玩家周围分配槽位，未拿到槽位的敌人保持外围或绕行。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0419",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何避免敌人重叠？",
+      "answer": "给敌人 Collider 和合适 Layer，使用 NavMeshAgent avoidance 或自定义分离力；逻辑上设置个人空间和目标槽位。不能只靠刚体互相推，因为大量敌人会产生抖动和昂贵物理计算。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0420",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "敌人状态机包含哪些状态？",
+      "answer": "至少包含 Spawn、Idle/Patrol、Chase、Attack、Hit、Dead，可根据游戏增加 Search、Stun、Return。每个状态定义进入、更新、退出和转换条件，死亡状态清理所有行为。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0421",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "追击状态如何转为攻击状态？",
+      "answer": "当目标有效、距离小于攻击范围、视线通过且攻击冷却完成时进入 Attack；若目标离开范围或视线丢失则回 Chase。使用进入/退出不同阈值可避免边界反复切换。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0422",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "敌人受击时是否打断攻击？",
+      "answer": "由敌人类型和攻击阶段决定。普通敌人受击可打断并进入 Hit，Boss 或攻击后摇阶段可有霸体；规则配置化，并确保取消攻击时停止伤害判定和动画事件。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0423",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "敌人死亡后如何清理事件和引用？",
+      "answer": "进入 Dead 时立即停止 AI、寻路、碰撞、协程和攻击事件，解除对玩家或管理器的订阅，播放表现后由对象池回收。回收前清空目标引用，防止对象池对象仍被外部持有。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0424",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何实现敌人的感知范围？",
+      "answer": "简单方案用距离平方和视野角检测，再用 Raycast 验证遮挡；数量大时由统一空间索引查询附近玩家，降低每个敌人独立 Physics.OverlapSphere 的成本，并按频率分帧更新。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0425",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何优化 100、500、1000 个敌人的逻辑与渲染？",
+      "answer": "100 个可用普通状态机和 NavMesh；500 个要集中 Tick、分帧感知寻路、对象池、LOD 和动画降频；1000 个应采用数据导向/Job/Burst、空间分区、群体路径或流场，远处只保留简化模拟和 Instancing。最终以 Profiler 数据决定分级。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0426",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "项目中哪些对象进入对象池？",
+      "answer": "高频创建销毁的子弹、命中特效、敌人、掉落物和伤害数字适合进入对象池；低频、生命周期很长或状态极复杂的对象不一定池化。当前项目优先池化子弹和战斗特效。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0427",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "对象池底层使用队列、栈还是列表？为什么？",
+      "answer": "空闲对象通常用 Stack，因为只需 O(1) 取出和归还，最近回收对象缓存更热；Queue 也可但没有明显优势。若需要遍历、删除或容量统计，再额外维护 List/HashSet，而不是用 List 线性取首元素。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0428",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "对象池为空时怎么办？",
+      "answer": "可按策略扩容：Instantiate 新对象并加入使用集合，同时记录峰值；若达到硬上限则拒绝、复用最旧对象或降级特效。关键子弹不能静默丢失，纯表现特效可允许丢弃。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0429",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "对象回收时如何重置状态？",
+      "answer": "调用统一 OnDespawn 清除速度、计时器、伤害标记、粒子、Trail、动画、父节点、协程、事件和目标引用，再 SetActive(false) 入池；OnSpawn 设置初始 Transform 和配置，确保对象像新创建一样。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0430",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "子弹回收后，速度、碰撞器和事件是否需要清理？",
+      "answer": "需要。Rigidbody 速度角速度归零，Collider 关闭或恢复，hasHit 清零，取消延迟回收和事件订阅，Trail/Clear、粒子停止并清理；否则下次取出会继承旧状态或重复结算。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0431",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "对象池如何处理不同类型的 Prefab？",
+      "answer": "用 Prefab 或类型 ID 作为 key，每种 Prefab 对应独立 Pool，Pool 负责预热、获取和回收。对象携带 PoolMember 记录所属池，回收时不靠运行时字符串查找。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0432",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "对象池会不会无限增长？",
+      "answer": "会，因此必须设预热数量、软上限和硬上限。超过软上限的临时扩容对象在空闲一段时间后销毁，或场景退出时整体释放，避免一次峰值让内存永久膨胀。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0433",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何设置对象池容量？",
+      "answer": "根据正常并发量预热，以压力测试的 P95/P99 峰值为参考留余量；特效可设置硬上限，核心玩法对象允许有限扩容。记录命中上限次数，若经常触顶说明容量或玩法峰值需调整。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0434",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Destroy 和 SetActive(false) 的性能差异是什么？",
+      "answer": "Destroy 会触发生命周期清理并延迟销毁原生对象，之后托管包装等待 GC；SetActive(false) 只禁用对象，便于快速复用，通常更省峰值时间。但禁用对象仍占内存，且 OnDisable/OnEnable 也有成本。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0435",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "对象池是否一定更快？",
+      "answer": "不一定。低频对象池会增加常驻内存和重置复杂度，池过大还拖累场景；对象状态复杂时重置成本可能接近重建。只有通过 Profiler 证明 Instantiate/Destroy 或 GC 是瓶颈时才值得池化。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0436",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "对象池中的对象会不会阻止资源释放？",
+      "answer": "会。池中的实例仍引用 Mesh、材质、纹理和 Prefab，且池管理器持有实例，因此资源不能卸载。场景退出或资源域释放时必须清空对应池，并避免全局池跨场景长期持有大资源。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0437",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何防止重复回收同一个对象？",
+      "answer": "对象维护 inPool 标志或状态枚举，回收时先检查并原子式切换；池还可用 HashSet 验证活动对象。重复回收应日志告警而不是把同一引用压栈两次。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0438",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么使用先进先出队列索敌？",
+      "answer": "先进先出能让炮塔优先攻击最早进入范围的敌人，实现简单且事件驱动，不必每帧排序。它适合当前固定路线 Demo，但它代表“进入顺序”，不一定是最接近终点的目标。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0439",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "最先进入攻击范围的敌人一定等于最接近终点的敌人吗？",
+      "answer": "不一定。不同路线、速度、减速、绕路和出生位置会让进入范围早的敌人落后。若设计要求攻击最接近终点者，应比较敌人的路径进度或剩余路程，而不是使用 FIFO。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0440",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "敌人离开攻击范围后如何从队列删除？",
+      "answer": "OnTriggerExit 时从候选集合移除。队列不擅长删除中间元素，可用 List/LinkedList 或“队列+有效集合+惰性删除”：离开时标记无效，取队首时不断弹出无效目标。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0441",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "队首敌人死亡后如何切换目标？",
+      "answer": "敌人死亡发布事件或候选目标在取用时检查 IsAlive。若队首无效就出队，继续取下一个有效目标；炮塔不应长期保存一个未校验的目标引用。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0442",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "索敌队列中保存了已经销毁的敌人怎么办？",
+      "answer": "Unity Destroy 后引用可能表现为 fake null，攻击前检查目标、存活状态和池版本。更稳妥的是敌人回收时主动通知所有观察者，候选结构使用唯一实例版本，防止池复用后把旧引用当新敌人。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0443",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "多个碰撞回调同时发生时如何保证队列正确性？",
+      "answer": "Unity 主线程回调不会真正并行，但同一帧进入、退出、死亡顺序可能交错。所有修改集中到一个候选管理接口，使用集合去重，删除采取幂等操作，并在 Update 末统一清理无效项。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0444",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何实现最近目标、最远目标、血量最低目标等索敌策略？",
+      "answer": "定义 ITargetStrategy，输入候选集合后返回目标；分别按距离、路径进度、血量或飞行类型评分。炮塔配置选择策略，新增索敌规则不修改炮塔攻击主流程。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0445",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "大量炮塔都使用触发器会有什么问题？",
+      "answer": "会增加物理 Broadphase、重叠对和回调数量，尤其炮塔与大量敌人交叉时成本高，还可能产生复杂生命周期问题。可降低检测频率、合理 Layer 矩阵，或改为空间查询和统一索敌系统。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0446",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "是否可以使用统一空间索引替代每座塔的碰撞器？",
+      "answer": "可以。把敌人注册到网格、四叉树或统一空间哈希，炮塔按攻击范围查询附近桶，再做距离筛选。这样避免每座塔持续维护触发器，数量大时更可控，但需要处理移动更新和查询调度。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0447",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何支持飞行单位和地面单位？",
+      "answer": "敌人配置 MovementType 或 TargetTag，炮塔配置可攻击类型掩码。索敌阶段先过滤地面/飞行，伤害和特效仍走统一接口；飞行单位可使用独立高度、路径和碰撞层。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0448",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "直接扣血和碰撞器触发伤害为什么采用两种方案？",
+      "answer": "单体锁定塔在攻击时直接调用目标伤害接口，判定稳定且不需要持续碰撞；范围持续塔用触发器维护范围内敌人，适合持续伤害和减速。两种方案对应不同玩法，但最终都应进入统一 DamageSystem。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0449",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "持续伤害如何实现？",
+      "answer": "Buff 或持续伤害实例保存来源、间隔、剩余时间和每跳伤害，由统一 BuffManager 按固定 Tick 结算。不要每个炮塔为每个敌人启动独立协程，数量大时应集中调度。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0450",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "减速效果能否叠加？",
+      "answer": "由设计规则决定。可以不叠加只取最强、刷新持续时间，或允许有限层数叠加；必须设速度下限，避免叠到负数，并明确不同来源和同源效果的规则。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0451",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "多个减速效果如何计算？",
+      "answer": "常见做法是多个减速倍率取最强值，或按乘法组合并设置最小速度比例；简单相加容易超过 100%。BuffManager 聚合所有生效效果，属性系统每次重算最终移动速度。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0452",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Buff 如何处理持续时间？",
+      "answer": "Buff 保存 expireTime 或剩余时间，统一 Tick 更新，到期后移除并撤销效果。暂停和时间缩放要明确使用 scaled time 还是 unscaled time，联网时以服务器时间为准。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0453",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "同一种 Buff 重复施加时，是刷新时间还是叠加层数？",
+      "answer": "配置中定义 Refresh、Stack、Replace、Independent 等策略。减速通常取最强并刷新时间，持续伤害可叠层但设上限；不同来源是否独立也要明确，避免代码中硬编码。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0454",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "敌人死亡时如何清除 Buff？",
+      "answer": "敌人进入死亡状态后停止 Buff Tick，调用 ClearAll 触发每个 Buff 的 OnRemove，解除属性修改、事件和特效，再回收对象。对象池再次取出时 Buff 容器必须为空且版本更新。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0455",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何设计通用伤害结算接口？",
+      "answer": "定义 IDamageable.TakeDamage(DamageContext)，上下文包含来源、攻击者、基础伤害、类型、命中部位和标签；DamageSystem 统一执行增伤、暴击、护甲、护盾和最终扣血，并返回 DamageResult 给表现层。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0456",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "加入暴击、护甲和抗性后，伤害系统如何扩展？",
+      "answer": "把伤害拆成可排序的计算阶段，属性系统提供攻击、暴击、护甲和抗性，效果通过 Modifier 修改上下文。新增规则只添加处理器或配置公式，不让每个炮塔复制一套 if 判断。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0457",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何避免炮塔和敌人之间强耦合？",
+      "answer": "炮塔只依赖 IDamageable、ITargetable 和 BuffService 接口，敌人实现接口但不暴露具体类；伤害通过上下文和事件传递。这样未来其他可受伤对象也能复用炮塔逻辑。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0458",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么使用协程生成波次？",
+      "answer": "协程天然适合“生成一个敌人，等待间隔，再生成下一个，等待波次间隔”的线性时序，代码比在 Update 中维护多个计时器更直观。波次数量大时仍应由关卡系统集中管理。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0459",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "协程和 Update 计时有什么区别？",
+      "answer": "协程把状态保存在迭代器里，流程写法顺序化；Update 计时需要显式保存阶段、计时器和分支，但更容易暂停、序列化和集中调度。性能差异取决于数量，少量波次协程足够合适。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0460",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "暂停游戏后协程是否继续？",
+      "answer": "取决于暂停实现。若只把 Time.timeScale 设为 0，使用 WaitForSeconds 的协程会停在等待阶段，但 yield return null 仍会逐帧恢复；若禁用承载 GameObject 或主动 StopCoroutine，则会停止。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0461",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Time.timeScale 为 0 时，WaitForSeconds 会怎样？",
+      "answer": "WaitForSeconds 使用缩放时间，timeScale=0 时等待时间不会推进，因此一直等待；需要暂停时仍计时可用 WaitForSecondsRealtime 或自行累计 Time.unscaledDeltaTime。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0462",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "一波敌人结束的判断条件是什么？",
+      "answer": "波次结束应同时满足：该波所有敌人已经生成完毕，且该波仍存活或未到终点的敌人数为 0。只看生成器完成会过早进入下一波。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0463",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "敌人生成完毕是否等于波次结束？",
+      "answer": "不等于。生成完毕只表示不会再出生，场上已有敌人仍可能在移动和战斗。生成器设置 spawnFinished，敌人管理器维护 aliveCount，两者共同决定结束。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0464",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "场上最后一个敌人死亡后如何通知关卡系统？",
+      "answer": "敌人生成时 aliveCount++，死亡、到达终点或异常移除时通过统一接口只减一次；当 spawnFinished 且 aliveCount==0，关卡系统收到 WaveCompleted。计数操作必须幂等，防止重复死亡回调。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0465",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "多条出生路线怎么扩展？",
+      "answer": "波次配置为每个 SpawnGroup 指定路线 ID、敌人类型、数量、间隔和起始延迟，生成器并行或按时间轴启动多个路线任务。路线对象只提供出生点和路径，不把逻辑写死在关卡脚本。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0466",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "波次配置如何数据化？",
+      "answer": "用 ScriptableObject/表格定义 Wave、SpawnGroup 和 EnemyEntry，包含敌人 ID、数量、间隔、路线、倍率和奖励；编辑器或构建阶段校验引用、时间和总数。运行时只读取配置执行通用流程。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0467",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "协程被意外停止后，关卡流程如何恢复？",
+      "answer": "关卡流程不只依赖协程局部变量，而是保存当前波次、组索引、已生成数和存活数。协程停止后可根据状态重新启动剩余流程；场景退出则明确标记取消，避免误恢复。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0468",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么采用固定地块建塔？",
+      "answer": "固定地块能确保路线可行，交互清晰，降低自由摆放的碰撞、寻路和关卡平衡复杂度，适合毕业设计规模。后续若做自由建造，需要增加网格占用、路径验证和预览反馈。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0469",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何判断地块是否可建造？",
+      "answer": "地块保存 Occupied、Unlocked 和 Building 状态，并检查玩家选择、金币、炮塔规则和地块类型。确认建造前再次由建造系统校验，不能只信 UI 按钮是否可点。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0470",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "建塔、升级、出售的金币逻辑放在哪里？",
+      "answer": "放在独立 Economy/BuildService，由它原子地校验余额、扣款、创建或升级并发布余额变化；炮塔和 UI 不直接修改金币。这样能避免重复扣除并便于存档和测试。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0471",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "出售返还比例如何配置？",
+      "answer": "写在炮塔等级或经济配置中，如 refundRate=0.7，也可按已投入总费用、使用时间或难度调整。出售时由经济系统计算并返回明细，UI 只展示预览值。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0472",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何避免金币被重复扣除？",
+      "answer": "建造请求带唯一操作 ID，按钮点击后立即进入处理中并禁用重复提交；经济系统在同一流程内检查并扣款，成功后记录交易。失败回滚，不能由 UI 和炮塔各扣一次。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0473",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "建塔失败后如何回滚？",
+      "answer": "采用事务式流程：先校验并预扣或保留资源，创建和初始化成功后提交；任一步失败则销毁半成品、恢复地块和金币，并记录错误。最好先生成预览，确认后再执行正式建造。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0474",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "炮塔升级是替换对象还是修改属性？",
+      "answer": "如果只是数值和外观小变化，修改同一对象的等级配置可保留状态且成本低；若模型、组件和攻击模式变化很大，可替换 Prefab，但要迁移目标、冷却和 Buff。当前项目更适合配置驱动修改属性。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0475",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "升级后已有攻击目标如何保留？",
+      "answer": "升级前保存目标引用和候选集合，应用新配置后重新校验目标是否仍在新射程和可攻击类型内；合法则保留，否则重新索敌。不要无条件清空造成明显攻击停顿。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0476",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "不同等级炮塔如何配置？",
+      "answer": "每个炮塔配置包含 Levels 列表，记录升级费用、伤害、射程、攻速、模型和技能；运行时只保存炮塔 ID 和 levelIndex。编辑器校验等级连续、费用非负和资源引用有效。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0477",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何加入科技树和分支升级？",
+      "answer": "把升级节点配置成图，包含前置节点、互斥分支、费用和效果列表；玩家选择后记录已解锁节点，属性系统汇总节点 Modifier。UI 根据图状态展示可选路径，避免把分支写成多层 if。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0478",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么塔防项目使用 NavMesh？",
+      "answer": "塔防场景路线在三维地形上，NavMesh 能快速完成可行走区域烘焙、转弯和平滑移动，减少手工维护大量路径点。对毕业设计规模，它能更快得到稳定结果。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0479",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "固定路线为什么不直接使用路径点？",
+      "answer": "路径点更轻量且完全确定，固定路线其实是可行方案；选择 NavMesh 是为了减少转弯插值和地形适配工作，并保留动态目标能力。若追求大量敌人性能，我会改用共享路径点或流场。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0480",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "NavMeshAgent 如何选择路径？",
+      "answer": "NavMeshAgent 把起点和终点映射到 NavMesh 多边形，在多边形邻接图上搜索代价较低的路径，再生成角点并沿路径移动；区域 Area Cost 会影响选择，局部避障只影响短期速度而非全局路径。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0481",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "建塔能否动态阻挡道路？",
+      "answer": "可以使用 NavMeshObstacle Carving 或运行时更新 NavMesh，但需要等待重算并有成本。建造前应先验证阻挡后仍存在可达路径，不能先放塔再发现终点被堵死。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0482",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如果玩家把道路完全堵死怎么办？",
+      "answer": "建造预览阶段临时把地块标记为阻挡，执行快速连通性或路径查询；若任一入口到终点不可达则禁止建造并提示。这样保证玩家始终留有路线，也可设计允许堵路但敌人攻击障碍的玩法。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0483",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "NavMesh 动态烘焙有什么成本？",
+      "answer": "动态烘焙会重新采集几何、构建导航数据并更新查询结构，可能造成 CPU 峰值和短暂路径失效。应限定局部范围、低频异步更新，或用预定义网格连通性代替频繁全场烘焙。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0484",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何保证所有敌人都能到达终点？",
+      "answer": "关卡制作阶段对每个出生点执行路径验证；运行时建造前再次验证连通性。敌人生成后检查 PathComplete，若失败则回退、重新寻路或报告关卡错误，不能让敌人永久卡死。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0485",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "敌人卡住如何检测和处理？",
+      "answer": "监控一段时间内位移、速度和剩余距离；目标仍远但移动低于阈值则判卡住，尝试重新寻路、轻微位置修正或回到最近合法点，多次失败后安全移除并告警。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0486",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "NavMeshAgent 和 Rigidbody 同时使用有什么问题？",
+      "answer": "NavMeshAgent 和非运动学 Rigidbody 都可能同时写 Transform，导致抖动、速度冲突和碰撞异常。通常 Agent 控制移动时 Rigidbody 设为 isKinematic，仅用于触发器；需要物理击飞时暂时禁用 Agent 再交给 Rigidbody。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0487",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "大量 NavMeshAgent 如何优化？",
+      "answer": "减少 active Agent 数和避障质量，远处敌人停止 Agent 使用简化路径；共享路径、降低更新频率、分批 SetDestination，关闭不必要的自动更新和碰撞，并考虑路径点或流场替代大规模独立 Agent。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0488",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "你的项目最难的部分是什么？",
+      "answer": "TPS 中最难的是把移动、瞄准、射击、换弹和切枪串成不会互相冲突的流程；塔防中最难的是让波次、敌人、炮塔和资源系统形成完整闭环。我通过模块拆分和状态约束逐步解决，而不是把逻辑都堆在一个脚本里。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0489",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "项目中哪一部分是你独立完成的？",
+      "answer": "两个项目的核心程序逻辑基本由我独立完成，包括角色与射击、武器交互、敌人 AI、UI、对象池，以及塔防的敌人、炮塔、波次、建造和资源系统。美术资源主要使用现有素材，重点是程序实现和系统整合。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0490",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "项目的模块如何划分？",
+      "answer": "按角色/敌人、武器/炮塔、战斗结算、关卡波次、建造资源、UI、配置和通用服务划分。模块内部管理自身状态，对外通过接口和事件提供能力，避免一个 GameManager 承担所有逻辑。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0491",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "模块之间如何通信？",
+      "answer": "强依赖和有返回值的流程使用接口调用，例如伤害接口；状态变化使用事件通知 UI；跨模块流程由关卡或战斗管理器协调。当前项目有部分单例访问，后续会进一步改成显式依赖。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0492",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么使用单例？",
+      "answer": "当时使用单例是为了让小型独立项目快速访问音频、关卡、资源和 UI 管理器，减少场景对象查找。它适合原型验证，但我会限制为真正全局服务，不让业务对象都变成单例。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0493",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "单例给项目带来了哪些问题？",
+      "answer": "依赖被隐藏，初始化顺序和场景切换状态容易出问题，测试也难替换；模块直接互相调用后耦合增加。重构时会让入口统一创建服务，通过接口传入，并用事件只做跨层通知。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0494",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如果重新做一次，你会如何重构？",
+      "answer": "我会先建立清晰的 GameContext 和配置层，把输入、战斗逻辑和表现分离；用分层状态机统一角色和武器动作，用统一 Damage/Buff 接口，资源和对象池按生命周期管理，并补充 Profiler 数据和自动化测试。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0495",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "项目中出现过最严重的 Bug 是什么？",
+      "answer": "典型严重 Bug 是对象池复用后子弹仍保留上次命中或速度状态，导致新子弹刚生成就失效或重复伤害；另一类是波次敌人计数重复减少，导致提前结算。这些都来自生命周期清理不完整。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0496",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "你如何定位和修复这个 Bug？",
+      "answer": "先稳定复现并加最小日志，确认错误发生在生成、命中还是回收阶段；用 Profiler/断点追踪对象实例 ID 和状态变化，找到重复回调。之后把回收改成幂等接口，统一重置状态并增加 inPool/hasHit 防护。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0497",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "项目做过哪些性能测试？",
+      "answer": "目前主要做过 Unity Profiler 的 CPU、Rendering、Memory 和 GC 观察，以及 iOS 真机运行稳定性测试；项目仍是技术 Demo，尚未建立完整自动化压力基准。后续会增加固定场景下敌人数和帧时间测试。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0498",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "优化前后的数据是多少？",
+      "answer": "目前没有足够规范的优化前后量化数据，因此不会虚构数字。可以明确说明对象池消除了战斗高峰频繁 Instantiate/Destroy，并在后续用同设备记录平均、P95 帧时间、GC Alloc 和峰值内存给出可信结果。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0499",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "你使用过 Unity Profiler 的哪些模块？",
+      "answer": "使用过 CPU Usage/Timeline 查看脚本和 GC，Rendering 查看 Batches/SetPass，Memory 观察托管与资源占用，也会结合 Frame Debugger 看拆批。真机问题需要 Development Build 和目标平台工具进一步验证。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0500",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "项目当前最大的性能瓶颈是什么？",
+      "answer": "当前 Demo 规模下没有明显严重瓶颈，潜在风险是大量敌人的寻路与 Update、实体子弹和特效数量，以及 UI/对象创建峰值。下一步会先建立压力场景，再根据 Profiler 而不是猜测决定优化顺序。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0501",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何支持数据配置，而不是在代码中写死？",
+      "answer": "把武器、敌人、炮塔、波次和经济参数放到 ScriptableObject 或表格，运行时用 ID 查询配置，代码只实现通用行为；构建时做字段和引用校验。策划改数值后无需重新修改业务代码。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0502",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何给项目增加存档系统？",
+      "answer": "定义可序列化 SaveData，只存玩家进度、关卡、资源、已解锁内容和必要运行状态，不直接序列化 GameObject 引用；使用版本号、校验和和临时文件原子写入，加载时按 ID 恢复并支持版本迁移。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0503",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "项目如何实现热更新？",
+      "answer": "资源使用 Addressables/AssetBundle 的远程目录和版本清单，按哈希下载增量资源；代码可根据平台规则使用 HybridCLR/Lua 等方案。必须有校验、断点续传、兼容、回滚和灰度机制，当前项目尚未实际接入。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0504",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何将单机项目改成联网项目？",
+      "answer": "先确定服务器权威和同步方案，把输入、逻辑状态与表现分离；增加协议、登录、房间、时间同步、预测校正和断线重连。伤害、资源和关键状态迁到服务器，客户端保留预测与表现，不能简单把单机字段直接广播。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0505",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何编写单元测试或自动化测试？",
+      "answer": "纯 C# 算法和服务层用 NUnit 测试，如弹药、伤害、经济和状态转换；MonoBehaviour 通过 Unity Test Framework 做 PlayMode 测试。关键流程还可写自动战斗脚本和固定种子回归，避免只依赖手工点击。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0506",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如果策划频繁修改数值，如何降低程序工作量？",
+      "answer": "所有数值放配置表并提供默认值、范围和引用校验，编辑器一键导入并生成强类型数据；运行时支持热重载或快速进入指定关卡。程序只在规则变化时修改，普通数值迭代由策划完成。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0507",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如果交给三个人合作，Git 和模块职责如何划分？",
+      "answer": "按模块拆分：一人角色与战斗、一人敌人/关卡、一人 UI/资源和工具，公共接口先评审；Git 使用 feature 分支、小提交和 Pull Request，Prefab/场景尽量拆分避免多人同时编辑，并约定代码格式和资源目录。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0508",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么选择 Unity，而不是 UE？",
+      "answer": "Unity 的 C# 开发效率、移动端生态、UGUI 和 Asset Store 更适合我当前的小型移动项目，能快速完成玩法验证。UE 在高端画面和大型项目上优势明显，我不排斥学习，选择应由项目目标决定。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0509",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "C# 相比 C++ 对游戏开发有什么优缺点？",
+      "answer": "C# 开发快、类型安全、反射和工具生态好，Unity 工作流成熟，但有 GC、运行时和底层控制限制；C++ 性能与内存控制更强、适合引擎和核心模块，但开发复杂、编译慢且更容易出现内存问题。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0510",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "MonoBehaviour 过多会有什么问题？",
+      "answer": "每个 MonoBehaviour 都参与生命周期调度和引擎到托管层调用，大量 Update 会增加调用开销，组件分散也难管理；还会增加序列化和查找成本。可集中 Tick、使用普通 C# 对象、禁用无用组件并按数据批处理。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0511",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何减少脚本之间的耦合？",
+      "answer": "单一职责拆分，使用接口和事件，数据与表现分离；不要互相 GetComponent 后直接改私有状态，公共流程由服务或协调器管理。依赖在初始化时显式传入，并限制静态全局访问。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0512",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "如何证明项目不是跟着教程照做的？",
+      "answer": "我能解释每个系统为何选择这种实现、踩过哪些 Bug、如何定位，以及如果扩大规模会怎样重构；也能现场修改功能并说明代码边界。项目不只展示结果，还保留自己的模块设计、真机适配和优化过程。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0513",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么想进入游戏行业？",
+      "answer": "我长期投入竞技、策略、养成和开放世界类游戏，也享受把规则、交互和技术组合成可玩的体验。相比只完成普通业务页面，游戏客户端能让我同时使用编程、图形、交互和系统设计能力，这是我愿意长期积累的方向。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0514",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么选择客户端开发？",
+      "answer": "客户端开发直接连接玩家体验，需要把输入、角色、UI、动画、网络和性能整合成稳定结果，反馈非常具体。我已有 Unity/C# 项目基础，也在补 C++、图形学和底层知识，因此选择客户端是能力与兴趣的交点。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0515",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么不选择后端、算法或普通互联网开发？",
+      "answer": "我并不是排斥后端或算法，而是更希望工作成果能直接转化为操作手感和玩法体验。研究生阶段的算法和计算机视觉训练提升了分析能力，但职业上我更愿意做实时交互、系统实现和性能优化。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0516",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "最近在玩什么游戏？",
+      "answer": "我长期玩的包括《英雄联盟》3000 多小时、《第五人格》和《光遇》各 6 年，也玩过《CS2》《文明6》《我的世界》等。最近会结合面试准备观察它们的操作反馈、系统循环和客户端表现，而不只是娱乐。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0517",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "你最喜欢的游戏是什么？为什么？",
+      "answer": "我很喜欢《英雄联盟》，因为它把操作、团队协作、英雄理解和长期版本学习结合得很深，3000 多小时仍能产生新的决策空间。它的反馈清晰、信息密度高，也让我持续关注竞技游戏的客户端体验。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0518",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "请分析一个游戏系统的优缺点。",
+      "answer": "以《光遇》的社交系统为例，优点是弱语言、动作与共同探索降低社交压力，情感体验独特；缺点是长期内容和多人目标相对弱，新鲜感下降后驱动力不足。我会增加不破坏氛围的开放世界事件和协作探索目标。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0519",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "你最关注游戏的玩法、技术还是美术？",
+      "answer": "我首先关注玩法是否形成长期可重复的决策，其次关注客户端技术是否把操作、镜头、动画和反馈做顺畅，美术则决定第一印象和情绪表达。三者不能割裂，但我的岗位价值主要是让玩法和表现可靠落地。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0520",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "你认为客户端开发在团队中负责什么？",
+      "answer": "客户端负责把策划规则转化为可操作、可显示、可联网的游戏，包括输入、角色、战斗、UI、动画、资源、网络同步和性能优化；同时要与服务器、美术、策划和测试协作，保证真机体验和可维护性。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0521",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "Unity 和 UE 你更倾向哪个？",
+      "answer": "目前更倾向 Unity，因为已有 C# 和移动端项目经验，能更快产出；但我会根据项目选择技术栈。若团队使用 UE，我愿意补齐 C++、Gameplay Framework 和渲染相关能力，而不是把引擎偏好当限制。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0522",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "你能接受项目技术栈调整吗？",
+      "answer": "可以。技术栈是解决项目问题的工具，我会先理解现有架构和规范，再用小任务建立反馈闭环；已有 C++、C#、Python 基础，切换时重点补工程习惯、引擎框架和调试工具。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0523",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "你能接受从 Unity 转向 UE 或 C++ 吗？",
+      "answer": "可以。我正在系统补 C++ 对象模型、内存、并发、网络和图形学，也理解 Unity 之外的客户端核心问题是相通的。转向 UE 或原生 C++ 会有学习成本，但我愿意用项目任务快速迁移。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0524",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "对工作城市有什么要求？",
+      "answer": "我对城市保持开放，更关注岗位方向、团队成长和项目质量；杭州、上海、广州、深圳等游戏岗位集中城市都可以考虑。具体会结合项目机会和长期发展沟通。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0525",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "能否接受加班和项目节点压力？",
+      "answer": "可以接受正常的版本节点压力和必要加班，但希望目标、优先级和风险透明，团队通过规划和工程方法减少长期无效加班。遇到节点我会主动承担并保证质量，同时及时暴露无法按期完成的风险。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0526",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "遇到策划需求不合理怎么办？",
+      "answer": "先确认需求目标和玩家价值，再用技术成本、风险和数据说明问题，而不是直接否定；提供可落地的替代方案或分阶段版本。若仍有争议，由负责人根据收益和排期决策，我配合执行并记录边界。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0527",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "和美术、策划意见冲突怎么办？",
+      "answer": "先把争议从个人偏好转成目标和约束，例如效果、性能、工期和资产成本；通过 Demo、截图、Profiler 数据或用户反馈验证。确定方案后尊重职责边界，同时把接口和交付标准写清楚。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0528",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "项目延期时你会怎么处理？",
+      "answer": "尽早拆解延期原因，区分需求增加、技术风险和资源依赖，重新评估关键路径；优先保证核心玩法，降低非关键范围，明确负责人和新节点。对外及时同步风险，不到最后一天才报告。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0529",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "为什么投递我们公司？",
+      "answer": "回答时会结合目标公司：说明我了解其代表产品、客户端技术特点和岗位要求，并指出我的 Unity 项目、C++/图形学准备与岗位匹配。不能只说“大厂平台好”，要讲具体产品和我能贡献的方向。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0530",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "你了解我们的哪些游戏？",
+      "answer": "面试前会重点体验和研究该公司的两到三款核心游戏，关注玩法循环、操作反馈、UI、性能和更新方向，并准备一个具体系统分析。若不了解某款产品会诚实说明，不会编造体验。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0531",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "你希望进入哪个项目组？",
+      "answer": "希望进入偏游戏客户端核心玩法或战斗系统的项目组，能参与角色、战斗、AI、UI和性能优化；初期也接受从基础功能和工具任务做起。项目类型上更偏竞技、动作或开放世界体验。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0532",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "未来三年的职业规划是什么？",
+      "answer": "第一年熟悉团队工程规范和完整上线流程，成为能独立交付模块的客户端开发；第二年深入战斗、性能或渲染中的一个方向；第三年能够负责较完整系统设计、跨模块协作并沉淀可复用工具。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0533",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "目前还有哪些 Offer 或面试流程？",
+      "answer": "如实说明当前流程和预计时间，不虚构 Offer，也不利用公司名称施压。可以表达自己会综合岗位方向、团队、项目和成长做选择，并在时间冲突时尽早沟通。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0534",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "你的优势和短板是什么？",
+      "answer": "优势是自学和系统梳理能力强，有 Unity 项目闭环经验，同时研究生训练让我能阅读资料、分析问题；短板是商业项目和大型团队经验不足，性能量化也需加强。我正通过系统面试复习、真机 Profiling 和重构项目弥补。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0535",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "最近学到的一项新技术是什么？",
+      "answer": "最近系统学习了 C++ 智能指针和对象模型，包括控制块、weak_ptr、虚表和 RTTI，并尝试手写简化版智能指针。它让我不只会用 API，还能从所有权和生命周期角度理解客户端内存问题。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0536",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "你如何使用 AI 辅助开发？",
+      "answer": "我用 AI 辅助查资料、生成样板代码、梳理测试用例和比较方案，也会让它解释不熟悉的 API；但架构选择、关键逻辑和最终代码由我负责。对项目私有信息会遵守公司安全规范，不直接上传敏感代码。"
+    },
+    {
+      "id": "file-7f26661485d1bb77161cba4d4931bb9d-0537",
+      "sourceId": "file-7f26661485d1bb77161cba4d4931bb9d",
+      "question": "AI 生成的代码如何验证正确性？",
+      "answer": "先阅读并解释每一行，检查边界、生命周期、线程安全和复杂度；再查官方文档、编译运行、写正常与异常测试，并用静态分析、Profiler 或 Sanitizer 验证。AI 输出只作为候选实现，未通过代码评审和测试不会合入。"
+    }
+  ]
+}

@@ -80,3 +80,13 @@ export const contentRevisions = sqliteTable(
   },
   (table) => [index("content_revisions_entity_idx").on(table.entityType, table.entityId)],
 );
+
+export const aiGradeUsage = sqliteTable(
+  "ai_grade_usage",
+  {
+    id: text("id").primaryKey(),
+    actorKey: text("actor_key").notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [index("ai_grade_usage_actor_idx").on(table.actorKey, table.createdAt)],
+);

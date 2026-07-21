@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
+import { strToU8, zipSync } from "fflate";
 import { Miniflare } from "miniflare";
 
 const root = new URL("../", import.meta.url);
@@ -125,6 +126,83 @@ test("serves the migrated blog and protects write APIs", async () => {
     const storedImage = await mf.dispatchFetch(new URL(uploadedPath, "http://localhost"));
     assert.equal(storedImage.status, 200);
     assert.equal(storedImage.headers.get("content-type"), "image/png");
+
+  } finally {
+    await mf.dispose();
+  }
+});
+
+test("serves questions without leaking answers and merges uploaded CSV files", async () => {
+  const mf = await createRuntime();
+  try {
+    const publicQuestionBank = await mf.dispatchFetch("http://localhost/api/question-bank");
+    assert.equal(publicQuestionBank.status, 200);
+    const publicQuestionData = await publicQuestionBank.json();
+    assert.equal(publicQuestionData.questions.length, 0);
+    assert.deepEqual(publicQuestionData.categorySummary.map(({ id, count }) => ({ id, count })), [
+      { id: "cpp", count: 0 },
+      { id: "computer-fundamentals", count: 0 },
+      { id: "graphics", count: 0 },
+    ]);
+
+    const csvForm = new FormData();
+    csvForm.append("file", new File([
+      "题目,参考答案\nC++ 虚函数如何实现,通过虚函数表和虚指针实现动态分派\n你能接受项目技术栈调整吗,可以\n",
+    ], "extra.csv", { type: "text/csv" }));
+    const encodedCsvForm = new Response(csvForm);
+    const uploadedQuestions = await mf.dispatchFetch("http://localhost/api/admin/question-banks", {
+      method: "POST",
+      headers: { ...ownerHeaders, "content-type": encodedCsvForm.headers.get("content-type") },
+      body: await encodedCsvForm.arrayBuffer(),
+    });
+    assert.equal(uploadedQuestions.status, 201, await uploadedQuestions.clone().text());
+    const sourceId = (await uploadedQuestions.json()).source.id;
+
+    const uploadedPublicBank = await mf.dispatchFetch("http://localhost/api/question-bank");
+    const uploadedPublicData = await uploadedPublicBank.json();
+    assert.equal(uploadedPublicData.questions.length, 1);
+    assert.equal(uploadedPublicData.questions[0].category, "cpp");
+    assert.equal(uploadedPublicData.categorySummary.find((item) => item.id === "cpp").count, 1);
+    assert.equal("answer" in uploadedPublicData.questions[0], false);
+    const grade = await mf.dispatchFetch("http://localhost/api/question-bank/grade", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ questionId: uploadedPublicData.questions[0].id, answer: "测试回答包含原理和实现。" }),
+    });
+    assert.equal(grade.status, 200, await grade.clone().text());
+    assert.equal((await grade.json()).mode, "local");
+
+    const xlsx = zipSync({
+      "xl/sharedStrings.xml": strToU8('<sst><si><t>题目</t></si><si><t>答案</t></si><si><t>TCP 三次握手为什么需要三次？</t></si><si><t>用于同步双方的初始序列号。</t></si></sst>'),
+      "xl/worksheets/sheet1.xml": strToU8('<worksheet><sheetData><row><c r="A1" t="s"><v>0</v></c><c r="B1" t="s"><v>1</v></c></row><row><c r="A2" t="s"><v>2</v></c><c r="B2" t="s"><v>3</v></c></row></sheetData></worksheet>'),
+    });
+    const xlsxForm = new FormData();
+    xlsxForm.append("file", new File([xlsx], "extra.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
+    const encodedXlsxForm = new Response(xlsxForm);
+    const uploadedXlsx = await mf.dispatchFetch("http://localhost/api/admin/question-banks", {
+      method: "POST",
+      headers: { ...ownerHeaders, "content-type": encodedXlsxForm.headers.get("content-type") },
+      body: await encodedXlsxForm.arrayBuffer(),
+    });
+    assert.equal(uploadedXlsx.status, 201, await uploadedXlsx.clone().text());
+    const xlsxSourceId = (await uploadedXlsx.json()).source.id;
+
+    const adminQuestionBank = await mf.dispatchFetch("http://localhost/api/admin/question-banks", { headers: ownerHeaders });
+    assert.equal(adminQuestionBank.status, 200);
+    const adminQuestionData = await adminQuestionBank.json();
+    assert.equal(adminQuestionData.sources.length, 2);
+    assert.equal(adminQuestionData.categorySummary.reduce((sum, item) => sum + item.count, 0), 2);
+
+    const deletedQuestionBank = await mf.dispatchFetch(`http://localhost/api/admin/question-banks/${encodeURIComponent(sourceId)}`, {
+      method: "DELETE",
+      headers: ownerHeaders,
+    });
+    assert.equal(deletedQuestionBank.status, 200);
+    const deletedXlsx = await mf.dispatchFetch(`http://localhost/api/admin/question-banks/${encodeURIComponent(xlsxSourceId)}`, {
+      method: "DELETE",
+      headers: ownerHeaders,
+    });
+    assert.equal(deletedXlsx.status, 200);
   } finally {
     await mf.dispose();
   }

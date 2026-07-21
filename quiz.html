@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="从游戏客户端面试题库中随机抽题，提交答案后获得智能评分、改进建议和参考答案。" />
+    <title>随机题库 | ian's Blog</title>
+    <link rel="stylesheet" href="./styles.css?v=20260721-quiz-categories" />
+  </head>
+  <body data-page="quiz">
+    <header class="site-header">
+      <a class="brand" href="./index.html" aria-label="回到首页">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-text">ian's Blog</span>
+      </a>
+      <nav class="desktop-nav" aria-label="主导航">
+        <a href="./index.html">首页</a>
+        <a href="./notes.html">学习笔记</a>
+        <a href="./projects.html">项目复盘</a>
+        <a href="./portfolio.html">作品集</a>
+        <a href="./quiz.html">随机题库</a>
+        <a href="./resume.html">关于博主</a>
+        <a href="./admin.html" data-local-admin hidden>后台</a>
+      </nav>
+      <div class="header-actions">
+        <button class="search-trigger" type="button" data-open-search>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.3-4.3m1.3-5.2a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" /></svg>
+          <span>搜索</span><kbd>Ctrl K</kbd>
+        </button>
+        <button class="icon-button" type="button" data-theme-toggle aria-label="切换主题">
+          <svg class="sun" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4V2m0 20v-2m8-8h2M2 12h2m14.1 6.1 1.4 1.4M4.5 4.5l1.4 1.4m0 12.2-1.4 1.4M19.5 4.5l-1.4 1.4" /><circle cx="12" cy="12" r="4" /></svg>
+          <svg class="moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 15.2A8.4 8.4 0 0 1 8.8 3.5 8.5 8.5 0 1 0 20.5 15.2Z" /></svg>
+        </button>
+        <button class="icon-button menu-button" type="button" data-menu-toggle aria-label="打开菜单">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="mobile-menu" data-mobile-menu>
+      <a href="./index.html">首页</a>
+      <a href="./notes.html">学习笔记</a>
+      <a href="./projects.html">项目复盘</a>
+      <a href="./portfolio.html">作品集</a>
+      <a href="./quiz.html">随机题库</a>
+      <a href="./resume.html">关于博主</a>
+      <a href="./admin.html" data-local-admin hidden>后台</a>
+    </div>
+
+    <main class="page-shell quiz-page">
+      <section class="quiz-hero" aria-labelledby="quiz-title">
+        <div>
+          <p class="eyebrow">Interview Lab</p>
+          <h1 id="quiz-title">随机面试题库</h1>
+          <p>从多份题库自动抽题。写下你的口述答案，交给智能评分检查技术正确性、表达完整度和遗漏要点。</p>
+        </div>
+        <dl class="quiz-library-stats" aria-label="题库统计">
+          <div><dt data-quiz-count>—</dt><dd>可抽题目</dd></div>
+          <div><dt data-source-count>—</dt><dd>题库来源</dd></div>
+          <div><dt data-reference-count>—</dt><dd>已有答案</dd></div>
+        </dl>
+      </section>
+
+      <section class="quiz-workspace" data-quiz-workspace aria-live="polite">
+        <aside class="quiz-setup-card">
+          <p class="quiz-step-label">本轮设置</p>
+          <fieldset class="quiz-category-picker">
+            <legend>选择子题库</legend>
+            <div class="quiz-category-options" data-quiz-category-options></div>
+            <p class="quiz-category-summary" data-quiz-category-summary>正在整理题目分类…</p>
+          </fieldset>
+          <label for="quiz-size">抽取题数</label>
+          <div class="quiz-count-control">
+            <input id="quiz-size" type="number" min="1" max="30" value="5" inputmode="numeric" data-quiz-size />
+            <span>题</span>
+          </div>
+          <button class="primary-link quiz-start-button" type="button" data-start-quiz disabled>开始随机抽题</button>
+          <p class="quiz-setup-note">同一轮内不会重复。每题满分 10 分，交卷后立即显示点评。</p>
+          <p class="quiz-status" data-quiz-status role="status">正在读取题库…</p>
+        </aside>
+
+      </section>
+    </main>
+
+        <div class="quiz-modal-backdrop" data-quiz-modal hidden>
+          <div class="quiz-modal" role="dialog" aria-modal="true" aria-labelledby="quiz-dialog-title">
+            <button class="quiz-modal-close" type="button" data-close-quiz aria-label="关闭答题弹窗">×</button>
+        <section class="quiz-stage" data-quiz-stage hidden>
+          <div class="quiz-progress-head">
+            <span data-quiz-progress>第 1 / 5 题</span>
+            <strong data-running-score>当前 0 分</strong>
+          </div>
+          <div class="quiz-progress-track" aria-hidden="true"><span data-progress-bar></span></div>
+
+          <article class="quiz-question-card">
+            <div class="quiz-question-meta">
+              <span data-question-category>QUESTION</span>
+              <span data-reference-badge></span>
+            </div>
+            <h2 id="quiz-dialog-title" data-question-text></h2>
+            <label for="quiz-answer">你的回答</label>
+            <textarea id="quiz-answer" rows="10" maxlength="6000" data-answer-input placeholder="建议先说结论，再解释原理、实现过程、边界条件和实际项目场景。"></textarea>
+            <div class="quiz-answer-actions">
+              <span data-answer-count>0 / 6000</span>
+              <button class="primary-link quiz-grade-button" type="button" data-grade-answer>提交并智能评分</button>
+            </div>
+          </article>
+
+          <article class="quiz-result-card" data-grade-result hidden>
+            <div class="quiz-score-ring" aria-label="本题得分"><strong data-grade-score>0</strong><span>/ 10</span></div>
+            <div class="quiz-result-content">
+              <div class="quiz-result-heading"><p class="eyebrow" data-grade-mode>智能评分</p><h3 data-grade-summary></h3></div>
+              <div class="quiz-feedback-grid">
+                <section><h4>答得好的地方</h4><ul data-grade-strengths></ul></section>
+                <section><h4>可以补充</h4><ul data-grade-improvements></ul></section>
+              </div>
+              <details class="quiz-reference" open><summary>参考答案</summary><p data-reference-answer></p></details>
+              <button class="primary-link quiz-next-button" type="button" data-next-question>下一题</button>
+            </div>
+          </article>
+        </section>
+
+        <section class="quiz-finish-card" data-quiz-finish hidden>
+          <p class="eyebrow">Round Complete</p>
+          <h2>本轮答题完成</h2>
+          <div class="quiz-final-score"><strong data-final-score>0</strong><span>平均分 / 10</span></div>
+          <p data-final-summary></p>
+          <div class="quiz-round-list" data-round-list></div>
+          <button class="primary-link" type="button" data-restart-quiz>再来一轮</button>
+        </section>
+          </div>
+        </div>
+
+    <footer class="site-footer"><p>© 2026 ian's Blog</p><a href="./index.html">回到首页</a></footer>
+
+    <div class="modal-backdrop" data-search-modal hidden>
+      <section class="search-modal" role="dialog" aria-modal="true" aria-labelledby="search-title">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.3-4.3m1.3-5.2a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0Z" /></svg>
+          <input id="site-search" type="search" placeholder="搜索文章、复盘或标签" autocomplete="off" />
+          <button type="button" data-close-search aria-label="关闭搜索">Esc</button>
+        </div>
+        <h2 id="search-title">搜索结果</h2><div class="search-results" data-search-results></div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" data-post-modal hidden>
+      <article class="post-modal" role="dialog" aria-modal="true" aria-labelledby="post-title">
+        <button class="close-post" type="button" data-close-post aria-label="关闭文章"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg></button>
+        <p class="eyebrow" data-post-meta></p><h2 id="post-title" data-post-title></h2><div class="post-body" data-post-body></div>
+      </article>
+    </div>
+
+    <script src="./script.js?v=20260721-quiz"></script>
+    <script src="./question-categories.js?v=20260721-quiz-categories"></script>
+    <script src="./quiz.js?v=20260721-quiz-categories"></script>
+  </body>
+</html>

@@ -63,6 +63,14 @@ const contentTypes = {
     title: "作品集管理",
     newButton: "新建作品"
   },
+  questionBank: {
+    api: "/api/admin/question-banks",
+    label: "题库",
+    title: "随机题库管理",
+    newButton: "",
+    saveButton: "",
+    deleteButton: ""
+  },
   resume: {
     api: "/api/admin/resume",
     label: "关于博主",
@@ -90,10 +98,12 @@ const state = {
     posts: false,
     projects: false,
     portfolio: false,
+    questionBank: false,
     music: false
   },
   resumeLoaded: false,
   resume: null,
+  questionBank: { sources: [], questionCount: 0, referenceCount: 0, categorySummary: [] },
   items: {
     posts: [],
     projects: [],
@@ -170,6 +180,14 @@ const els = {
   portfolioDemoUpload: document.querySelector("[data-portfolio-demo-upload]"),
   portfolioDelete: document.querySelector("[data-delete-portfolio]"),
   portfolioClear: document.querySelector("[data-clear-portfolio]"),
+  questionBankAdmin: document.querySelector("[data-question-bank-admin]"),
+  questionBankForm: document.querySelector("[data-question-bank-form]"),
+  questionBankFiles: document.querySelector("[data-question-bank-files]"),
+  questionBankList: document.querySelector("[data-question-bank-source-list]"),
+  questionBankTotal: document.querySelector("[data-question-bank-total]"),
+  questionBankReferences: document.querySelector("[data-question-bank-references]"),
+  questionBankCategoryStats: document.querySelector("[data-question-bank-category-stats]"),
+  questionBankMessage: document.querySelector("[data-question-bank-message]"),
   labels: {
     title: document.querySelector("[data-title-label]"),
     id: document.querySelector("[data-id-label]"),
@@ -390,16 +408,18 @@ function updateModeUI() {
   const isResume = state.contentType === "resume";
   const isMusic = state.contentType === "music";
   const isPortfolio = state.contentType === "portfolio";
+  const isQuestionBank = state.contentType === "questionBank";
 
-  els.adminLayout.hidden = isResume || isMusic || isPortfolio;
+  els.adminLayout.hidden = isResume || isMusic || isPortfolio || isQuestionBank;
   els.resumeForm.hidden = !isResume;
   if (els.musicAdmin) els.musicAdmin.hidden = !isMusic;
   if (els.portfolioAdmin) els.portfolioAdmin.hidden = !isPortfolio;
-  els.newEntry.hidden = isResume || isMusic || isPortfolio;
+  if (els.questionBankAdmin) els.questionBankAdmin.hidden = !isQuestionBank;
+  els.newEntry.hidden = isResume || isMusic || isPortfolio || isQuestionBank;
   els.editorForm.contentType.value = state.contentType;
   els.dashboardTitle.textContent = config.title;
 
-  if (isResume || isMusic || isPortfolio) {
+  if (isResume || isMusic || isPortfolio || isQuestionBank) {
     els.tabs.forEach((tab) => {
       const active = tab.dataset.contentType === state.contentType;
       tab.classList.toggle("is-active", active);
@@ -641,6 +661,49 @@ async function loadPortfolioForAdmin() {
   if (!els.portfolioForm.originalId.value) fillPortfolioForm();
 }
 
+function renderQuestionBankAdmin() {
+  const library = state.questionBank;
+  setText(els.questionBankTotal, String(library.questionCount || 0));
+  setText(els.questionBankReferences, String(library.referenceCount || 0));
+  if (els.questionBankCategoryStats) {
+    els.questionBankCategoryStats.innerHTML = (library.categorySummary || []).length
+      ? library.categorySummary
+          .map((item) => `
+            <article>
+              <strong>${escapeHtml(item.label)}</strong>
+              <span>${escapeHtml(String(item.count || 0))} 道题</span>
+            </article>`)
+          .join("")
+      : '<p class="manager-empty">暂无可汇总的题目。</p>';
+  }
+  if (!els.questionBankList) return;
+  els.questionBankList.innerHTML = library.sources.length
+    ? library.sources
+        .map(
+          (source) => `
+            <article class="question-bank-source-item">
+              <span>
+                <strong>${escapeHtml(source.filename)}</strong>
+                <small>${escapeHtml(`${source.questionCount} 道题 · ${source.answerCount} 份答案 · ${new Date(source.importedAt).toLocaleDateString("zh-CN")}`)}</small>
+              </span>
+              ${
+                source.preset
+                  ? '<span class="manager-badge">预置题库</span>'
+                  : `<button class="admin-danger" type="button" data-delete-question-bank="${escapeHtml(source.id)}">删除</button>`
+              }
+            </article>`
+        )
+        .join("")
+    : '<p class="manager-empty">还没有题库文件。</p>';
+}
+
+async function loadQuestionBankForAdmin() {
+  state.questionBank = await api(contentTypes.questionBank.api);
+  state.loaded.questionBank = true;
+  renderQuestionBankAdmin();
+  setMessage(els.questionBankMessage, "");
+}
+
 function portfolioFormToItem() {
   const form = new FormData(els.portfolioForm);
   const demoSrc = String(form.get("demoSrc") || "").trim();
@@ -692,6 +755,12 @@ async function switchContentType(type) {
   if (type === "portfolio") {
     if (!state.loaded.portfolio) await loadPortfolioForAdmin();
     else renderPortfolioAdmin();
+    return;
+  }
+
+  if (type === "questionBank") {
+    if (!state.loaded.questionBank) await loadQuestionBankForAdmin();
+    else renderQuestionBankAdmin();
     return;
   }
 
@@ -916,7 +985,12 @@ els.logout.addEventListener("click", async () => {
 els.tabs.forEach((tab) => {
   tab.addEventListener("click", () => {
     switchContentType(tab.dataset.contentType).catch((error) => {
-      const messageTarget = tab.dataset.contentType === "portfolio" ? els.portfolioMessage : els.editorMessage;
+      const messageTarget =
+        tab.dataset.contentType === "portfolio"
+          ? els.portfolioMessage
+          : tab.dataset.contentType === "questionBank"
+            ? els.questionBankMessage
+            : els.editorMessage;
       setMessage(messageTarget, error.message, "error");
     });
   });
@@ -1086,6 +1160,48 @@ els.musicList?.addEventListener("click", async (event) => {
     setMessage(els.musicMessage, "已删除。", "success");
   } catch (error) {
     setMessage(els.musicMessage, error.message, "error");
+  }
+});
+
+els.questionBankForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const files = Array.from(els.questionBankFiles?.files || []);
+  if (!files.length) {
+    setMessage(els.questionBankMessage, "请选择至少一份 CSV 或 XLSX 文件。", "error");
+    return;
+  }
+
+  setMessage(els.questionBankMessage, `正在上传 0 / ${files.length}…`);
+  try {
+    for (const [index, file] of files.entries()) {
+      const form = new FormData();
+      form.append("file", file);
+      await api(contentTypes.questionBank.api, { method: "POST", body: form });
+      setMessage(els.questionBankMessage, `正在上传 ${index + 1} / ${files.length}…`);
+    }
+    els.questionBankForm.reset();
+    await loadQuestionBankForAdmin();
+    setMessage(els.questionBankMessage, `已整合 ${files.length} 份题库文件。`, "success");
+  } catch (error) {
+    await loadQuestionBankForAdmin().catch(() => {});
+    setMessage(els.questionBankMessage, error.message, "error");
+  }
+});
+
+els.questionBankList?.addEventListener("click", async (event) => {
+  const button = event.target.closest("[data-delete-question-bank]");
+  if (!button || button.disabled) return;
+  const source = state.questionBank.sources.find((item) => item.id === button.dataset.deleteQuestionBank);
+  if (!source || !window.confirm(`确认删除题库「${source.filename}」？`)) return;
+  button.disabled = true;
+  setMessage(els.questionBankMessage, "正在删除题库…");
+  try {
+    await api(`${contentTypes.questionBank.api}/${encodeURIComponent(source.id)}`, { method: "DELETE" });
+    await loadQuestionBankForAdmin();
+    setMessage(els.questionBankMessage, "已删除并重新整合题库。", "success");
+  } catch (error) {
+    button.disabled = false;
+    setMessage(els.questionBankMessage, error.message, "error");
   }
 });
 

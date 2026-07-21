@@ -20,3 +20,8 @@ export function getMediaBucket(): R2Bucket {
   if (!bucket) throw new Error("R2 binding `MEDIA` is unavailable");
   return bucket;
 }
+
+export function getRuntimeString(key: string): string {
+  const value = (env as unknown as Record<string, unknown>)[key];
+  return typeof value === "string" ? value.trim() : "";
+}
