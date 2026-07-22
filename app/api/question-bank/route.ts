@@ -1,5 +1,5 @@
 import { listMergedQuestions, getQuestionBankState } from "@/lib/question-bank";
-import { classifyQuestion, summarizeQuestionCategories } from "@/lib/question-category";
+import { resolveQuestionCategory, summarizeQuestionCategories } from "@/lib/question-category";
 import { errorResponse } from "@/lib/http";
 
 export async function GET() {
@@ -9,10 +9,11 @@ export async function GET() {
       questions: questions.map((item) => ({
         id: item.id,
         question: item.question,
-        category: classifyQuestion(item.question, item.answer),
+        category: resolveQuestionCategory(item),
         hasReference: Boolean(item.answer),
       })),
-      categorySummary: summarizeQuestionCategories(questions),
+      categories: state.categories,
+      categorySummary: summarizeQuestionCategories(questions, state.categories),
       sourceCount: state.sources.length,
       referenceCount: questions.filter((item) => item.answer).length,
     });

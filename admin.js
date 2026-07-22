@@ -103,7 +103,7 @@ const state = {
   },
   resumeLoaded: false,
   resume: null,
-  questionBank: { sources: [], questionCount: 0, referenceCount: 0, categorySummary: [] },
+  questionBank: { sources: [], categories: [], questionCount: 0, referenceCount: 0, categorySummary: [] },
   items: {
     posts: [],
     projects: [],
@@ -183,6 +183,11 @@ const els = {
   questionBankAdmin: document.querySelector("[data-question-bank-admin]"),
   questionBankForm: document.querySelector("[data-question-bank-form]"),
   questionBankFiles: document.querySelector("[data-question-bank-files]"),
+  questionBankTargetMode: document.querySelector("[data-question-bank-target-mode]"),
+  questionBankExistingCategory: document.querySelector("[data-question-bank-existing-category]"),
+  questionBankExistingCategoryField: document.querySelector("[data-question-bank-existing-category-field]"),
+  questionBankNewCategory: document.querySelector("[data-question-bank-new-category]"),
+  questionBankNewCategoryField: document.querySelector("[data-question-bank-new-category-field]"),
   questionBankList: document.querySelector("[data-question-bank-source-list]"),
   questionBankTotal: document.querySelector("[data-question-bank-total]"),
   questionBankReferences: document.querySelector("[data-question-bank-references]"),
@@ -663,6 +668,16 @@ async function loadPortfolioForAdmin() {
 
 function renderQuestionBankAdmin() {
   const library = state.questionBank;
+  const categories = Array.isArray(library.categories) && library.categories.length
+    ? library.categories
+    : (library.categorySummary || []);
+  if (els.questionBankExistingCategory) {
+    const selected = els.questionBankExistingCategory.value;
+    els.questionBankExistingCategory.innerHTML = categories.length
+      ? categories.map((item) => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.label)}</option>`).join("")
+      : '<option value="">暂无子题库</option>';
+    if (categories.some((item) => item.id === selected)) els.questionBankExistingCategory.value = selected;
+  }
   setText(els.questionBankTotal, String(library.questionCount || 0));
   setText(els.questionBankReferences, String(library.referenceCount || 0));
   if (els.questionBankCategoryStats) {
@@ -679,22 +694,31 @@ function renderQuestionBankAdmin() {
   if (!els.questionBankList) return;
   els.questionBankList.innerHTML = library.sources.length
     ? library.sources
-        .map(
-          (source) => `
+        .map((source) => {
+          const categoryLabel = categories.find((item) => item.id === source.categoryId)?.label || "自动分类";
+          return `
             <article class="question-bank-source-item">
               <span>
                 <strong>${escapeHtml(source.filename)}</strong>
-                <small>${escapeHtml(`${source.questionCount} 道题 · ${source.answerCount} 份答案 · ${new Date(source.importedAt).toLocaleDateString("zh-CN")}`)}</small>
+                <small>${escapeHtml(`${source.questionCount} 道题 · ${source.answerCount} 份答案 · ${categoryLabel} · ${new Date(source.importedAt).toLocaleDateString("zh-CN")}`)}</small>
               </span>
               ${
                 source.preset
                   ? '<span class="manager-badge">预置题库</span>'
                   : `<button class="admin-danger" type="button" data-delete-question-bank="${escapeHtml(source.id)}">删除</button>`
               }
-            </article>`
-        )
+            </article>`;
+        })
         .join("")
     : '<p class="manager-empty">还没有题库文件。</p>';
+}
+
+function updateQuestionBankTargetFields() {
+  const mode = els.questionBankTargetMode?.value || "auto";
+  if (els.questionBankExistingCategoryField) els.questionBankExistingCategoryField.hidden = mode !== "existing";
+  if (els.questionBankNewCategoryField) els.questionBankNewCategoryField.hidden = mode !== "new";
+  if (els.questionBankExistingCategory) els.questionBankExistingCategory.required = mode === "existing";
+  if (els.questionBankNewCategory) els.questionBankNewCategory.required = mode === "new";
 }
 
 async function loadQuestionBankForAdmin() {
@@ -1171,15 +1195,36 @@ els.questionBankForm?.addEventListener("submit", async (event) => {
     return;
   }
 
+  const selectedMode = els.questionBankTargetMode?.value || "auto";
+  let uploadMode = selectedMode;
+  let categoryId = els.questionBankExistingCategory?.value || "";
+  const categoryName = els.questionBankNewCategory?.value.trim() || "";
+  if (selectedMode === "existing" && !categoryId) {
+    setMessage(els.questionBankMessage, "请选择一个已有子题库。", "error");
+    return;
+  }
+  if (selectedMode === "new" && !categoryName) {
+    setMessage(els.questionBankMessage, "请填写新子题库名称。", "error");
+    return;
+  }
+
   setMessage(els.questionBankMessage, `正在上传 0 / ${files.length}…`);
   try {
     for (const [index, file] of files.entries()) {
       const form = new FormData();
       form.append("file", file);
-      await api(contentTypes.questionBank.api, { method: "POST", body: form });
+      form.append("targetMode", uploadMode);
+      if (uploadMode === "existing") form.append("categoryId", categoryId);
+      if (uploadMode === "new") form.append("categoryName", categoryName);
+      const result = await api(contentTypes.questionBank.api, { method: "POST", body: form });
+      if (uploadMode === "new") {
+        categoryId = result.source.categoryId;
+        uploadMode = "existing";
+      }
       setMessage(els.questionBankMessage, `正在上传 ${index + 1} / ${files.length}…`);
     }
     els.questionBankForm.reset();
+    updateQuestionBankTargetFields();
     await loadQuestionBankForAdmin();
     setMessage(els.questionBankMessage, `已整合 ${files.length} 份题库文件。`, "success");
   } catch (error) {
@@ -1187,6 +1232,9 @@ els.questionBankForm?.addEventListener("submit", async (event) => {
     setMessage(els.questionBankMessage, error.message, "error");
   }
 });
+
+els.questionBankTargetMode?.addEventListener("change", updateQuestionBankTargetFields);
+updateQuestionBankTargetFields();
 
 els.questionBankList?.addEventListener("click", async (event) => {
   const button = event.target.closest("[data-delete-question-bank]");

@@ -15,7 +15,10 @@ function decodeXml(value: string): string {
 }
 
 function textNodes(xml: string): string {
-  return Array.from(xml.matchAll(/<t\b[^>]*>([\s\S]*?)<\/t>/g), (match) => decodeXml(match[1])).join("");
+  return Array.from(
+    xml.matchAll(/<(?:[A-Za-z_][\w.-]*:)?t\b[^>]*>([\s\S]*?)<\/(?:[A-Za-z_][\w.-]*:)?t>/g),
+    (match) => decodeXml(match[1]),
+  ).join("");
 }
 
 function columnIndex(reference: string): number {
@@ -26,18 +29,21 @@ function columnIndex(reference: string): number {
 }
 
 function sharedStrings(xml: string): string[] {
-  return Array.from(xml.matchAll(/<si\b[^>]*>([\s\S]*?)<\/si>/g), (match) => textNodes(match[1]));
+  return Array.from(
+    xml.matchAll(/<(?:[A-Za-z_][\w.-]*:)?si\b[^>]*>([\s\S]*?)<\/(?:[A-Za-z_][\w.-]*:)?si>/g),
+    (match) => textNodes(match[1]),
+  );
 }
 
 function worksheetRows(xml: string, strings: string[]): string[][] {
-  return Array.from(xml.matchAll(/<row\b[^>]*>([\s\S]*?)<\/row>/g), (rowMatch) => {
+  return Array.from(xml.matchAll(/<(?:[A-Za-z_][\w.-]*:)?row\b[^>]*>([\s\S]*?)<\/(?:[A-Za-z_][\w.-]*:)?row>/g), (rowMatch) => {
     const row: string[] = [];
-    for (const cellMatch of rowMatch[1].matchAll(/<c\b([^>]*)>([\s\S]*?)<\/c>/g)) {
+    for (const cellMatch of rowMatch[1].matchAll(/<(?:[A-Za-z_][\w.-]*:)?c\b([^>]*)>([\s\S]*?)<\/(?:[A-Za-z_][\w.-]*:)?c>/g)) {
       const attributes = cellMatch[1];
       const content = cellMatch[2];
       const reference = attributes.match(/\br="([^"]+)"/)?.[1] || "A1";
       const type = attributes.match(/\bt="([^"]+)"/)?.[1] || "n";
-      const raw = content.match(/<v\b[^>]*>([\s\S]*?)<\/v>/)?.[1] || "";
+      const raw = content.match(/<(?:[A-Za-z_][\w.-]*:)?v\b[^>]*>([\s\S]*?)<\/(?:[A-Za-z_][\w.-]*:)?v>/)?.[1] || "";
       let value = "";
       if (type === "s") value = strings[Number(raw)] || "";
       else if (type === "inlineStr") value = textNodes(content);

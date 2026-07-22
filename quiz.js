@@ -146,7 +146,7 @@
     const merged = new Map();
     (payload.questions || []).forEach((item) => {
       if (!item?.id || !item?.question || !sourceIds.has(item.sourceId)) return;
-      if (!isQuestionInScope(item.question, item.answer)) return;
+      if (!item.category && !isQuestionInScope(item.question, item.answer)) return;
       const key = normalized(item.question);
       const current = merged.get(key);
       if (!current) merged.set(key, {
@@ -162,6 +162,8 @@
     const questions = [...merged.values()];
     return {
       questions,
+      categories: payload.categories || [],
+      categorySummary: categoryTools.summarize(questions, payload.categories || []),
       sourceCount: sources.length,
       referenceCount: questions.filter((item) => item.answer).length
     };
@@ -208,7 +210,19 @@
   }
 
   function categoryLabel(categoryId) {
-    return categoryTools.definitions.find((item) => item.id === categoryId)?.label || "计算机基础";
+    return state.categorySummary.find((item) => item.id === categoryId)?.label
+      || categoryTools.definitions.find((item) => item.id === categoryId)?.label
+      || "计算机基础";
+  }
+
+  function escapeHtml(value) {
+    return String(value ?? "").replace(/[&<>'"]/g, (character) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      "'": "&#39;",
+      '"': "&quot;"
+    })[character]);
   }
 
   function selectedLibrary() {
@@ -239,8 +253,8 @@
     els.categoryOptions.innerHTML = summary
       .map((item) => `
         <label class="quiz-category-option">
-          <input type="checkbox" value="${item.id}" data-quiz-category ${item.count ? "checked" : "disabled"} />
-          <span><strong>${item.label}</strong><small>${item.count} 道题</small></span>
+          <input type="checkbox" value="${escapeHtml(item.id)}" data-quiz-category ${item.count ? "checked" : "disabled"} />
+          <span><strong>${escapeHtml(item.label)}</strong><small>${escapeHtml(item.count)} 道题</small></span>
         </label>
       `)
       .join("");

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>后台管理 | ian's Blog</title>
       <link rel="stylesheet" href="./styles.css?v=20260715-portfolio" />
-      <link rel="stylesheet" href="./admin.css?v=20260715-portfolio" />
+      <link rel="stylesheet" href="./admin.css?v=20260722-question-bank-target" />
   </head>
   <body class="admin-page">
     <header class="admin-header">
@@ -194,7 +194,7 @@
             <div>
               <p class="eyebrow">Interview Library</p>
               <h2>随机题库管理</h2>
-              <p>上传多份 CSV 或 XLSX 后会自动合并题目并去重。系统只读取题目和答案两列。</p>
+              <p>上传多份 CSV 或 XLSX 后会自动合并题目并去重。可指定子题库，也可交给系统自动分类。</p>
             </div>
             <div class="question-bank-admin-stats">
               <span><strong data-question-bank-total>0</strong> 道题</span>
@@ -213,9 +213,28 @@
           <form class="question-bank-upload-form" data-question-bank-form>
             <label class="question-bank-dropzone">
               <span>选择一份或多份 CSV / XLSX</span>
-              <small>表头支持：问题/题目/question，以及答案/参考答案/个人答案/answer</small>
+              <small>题目列必需：问题/题目/question；答案列可选：答案/参考答案/个人答案/answer</small>
               <input name="files" type="file" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple required data-question-bank-files />
             </label>
+            <div class="question-bank-target-picker">
+              <label>
+                <span>上传到</span>
+                <select name="targetMode" data-question-bank-target-mode>
+                  <option value="auto">不指定，由网站自动筛选</option>
+                  <option value="existing">指定已有子题库</option>
+                  <option value="new">新建子题库</option>
+                </select>
+              </label>
+              <label data-question-bank-existing-category-field hidden>
+                <span>已有子题库</span>
+                <select name="categoryId" data-question-bank-existing-category></select>
+              </label>
+              <label data-question-bank-new-category-field hidden>
+                <span>新子题库名称</span>
+                <input name="categoryName" maxlength="40" placeholder="例如：米哈游客户端专项" data-question-bank-new-category />
+              </label>
+              <p class="field-help">指定后，本次上传的全部题目会进入所选子题库；不指定则继续按题目内容自动分类。</p>
+            </div>
             <div class="editor-actions">
               <button class="admin-primary" type="submit">上传并整合题库</button>
               <p class="admin-message" data-question-bank-message role="status"></p>
@@ -274,6 +293,6 @@
       </section>
     </main>
 
-    <script src="./admin.js?v=20260715-portfolio-fix"></script>
+    <script src="./admin.js?v=20260722-question-bank-target"></script>
   </body>
 </html>

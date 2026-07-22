@@ -24,6 +24,9 @@ test("build includes the random question page and protected admin upload channel
   assert.match(quizScript, /\/api\/question-bank\/grade/);
   assert.match(admin, /data-content-type="questionBank"/);
   assert.match(admin, /data-question-bank-files/);
+  assert.match(admin, /data-question-bank-target-mode/);
+  assert.match(admin, /data-question-bank-existing-category/);
+  assert.match(admin, /data-question-bank-new-category/);
   assert.match(admin, /data-question-bank-category-stats/);
   assert.match(admin, /\.xlsx/);
   assert.match(adminScript, /\/api\/admin\/question-banks/);
@@ -84,12 +87,15 @@ test("GitHub Pages falls back to the published static question bank", async () =
     }
     if (path === "./data/question-banks.json") {
       return Response.json({
+        categories: [{ id: "mihoyo-client", label: "米哈游客户端 <img src=x onerror=alert(1)>" }],
         sources: [{ id: "preset", filename: "preset.csv" }],
         questions: [
           { id: "q1", sourceId: "preset", question: "C++ 虚函数表如何工作？", answer: "虚函数表保存虚函数地址，对象通过虚指针访问。" },
           { id: "q2", sourceId: "preset", question: "TCP 为什么需要三次握手？", answer: "用于同步初始序列号并确认双方收发能力。" },
           { id: "q3", sourceId: "preset", question: "延迟渲染的 G-Buffer 保存哪些数据？", answer: "保存法线、材质和深度等信息。" },
-          { id: "q4", sourceId: "preset", question: "你能接受项目技术栈调整吗？", answer: "可以。" },
+          { id: "q4", sourceId: "preset", question: "是否可以使用统一空间索引替代每座塔的碰撞器？", answer: "可以使用空间索引统一管理。" },
+          { id: "q5", sourceId: "preset", question: "你能接受项目技术栈调整吗？", answer: "可以。" },
+          { id: "q6", sourceId: "preset", question: "请做自我介绍，并说明为什么选择游戏客户端方向？", answer: "专项答案。", category: "mihoyo-client" },
         ],
       });
     }
@@ -109,17 +115,22 @@ test("GitHub Pages falls back to the published static question bank", async () =
   await new Promise((resolve) => setTimeout(resolve, 20));
 
   assert.deepEqual(requestedPaths, ["./data/question-banks.json"]);
-  assert.equal(elements.get("[data-quiz-count]").textContent, "3");
+  assert.equal(elements.get("[data-quiz-count]").textContent, "5");
   assert.match(elements.get("[data-quiz-category-options]").innerHTML, /C\+\+/);
   assert.match(elements.get("[data-quiz-category-options]").innerHTML, /计算机基础/);
   assert.match(elements.get("[data-quiz-category-options]").innerHTML, /图形学/);
+  assert.match(elements.get("[data-quiz-category-options]").innerHTML, /游戏引擎/);
+  assert.match(elements.get("[data-quiz-category-options]").innerHTML, /米哈游客户端/);
+  assert.doesNotMatch(elements.get("[data-quiz-category-options]").innerHTML, /<img/);
   assert.equal(elements.get("[data-start-quiz]").disabled, false);
 
   const categoryOptions = elements.get("[data-quiz-category-options]");
   categoryOptions.listeners.change({ target: new FakeInput("cpp", false) });
-  assert.equal(elements.get("[data-quiz-count]").textContent, "2");
+  assert.equal(elements.get("[data-quiz-count]").textContent, "4");
   categoryOptions.listeners.change({ target: new FakeInput("computer-fundamentals", false) });
   categoryOptions.listeners.change({ target: new FakeInput("graphics", false) });
+  categoryOptions.listeners.change({ target: new FakeInput("game-engine", false) });
+  categoryOptions.listeners.change({ target: new FakeInput("mihoyo-client", false) });
   assert.equal(elements.get("[data-quiz-count]").textContent, "0");
   assert.equal(elements.get("[data-start-quiz]").disabled, true);
 });

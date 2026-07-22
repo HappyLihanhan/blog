@@ -143,6 +143,7 @@ test("serves questions without leaking answers and merges uploaded CSV files", a
       { id: "cpp", count: 0 },
       { id: "computer-fundamentals", count: 0 },
       { id: "graphics", count: 0 },
+      { id: "game-engine", count: 0 },
     ]);
 
     const csvForm = new FormData();
@@ -173,8 +174,7 @@ test("serves questions without leaking answers and merges uploaded CSV files", a
     assert.equal((await grade.json()).mode, "local");
 
     const xlsx = zipSync({
-      "xl/sharedStrings.xml": strToU8('<sst><si><t>题目</t></si><si><t>答案</t></si><si><t>TCP 三次握手为什么需要三次？</t></si><si><t>用于同步双方的初始序列号。</t></si></sst>'),
-      "xl/worksheets/sheet1.xml": strToU8('<worksheet><sheetData><row><c r="A1" t="s"><v>0</v></c><c r="B1" t="s"><v>1</v></c></row><row><c r="A2" t="s"><v>2</v></c><c r="B2" t="s"><v>3</v></c></row></sheetData></worksheet>'),
+      "xl/worksheets/sheet1.xml": strToU8('<x:worksheet xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><x:sheetData><x:row r="4"><x:c r="A4" t="str"><x:v>序号</x:v></x:c><x:c r="B4" t="str"><x:v>题目</x:v></x:c></x:row><x:row r="5"><x:c r="A5"><x:v>1</x:v></x:c><x:c r="B5" t="str"><x:v>TCP 三次握手为什么需要三次？</x:v></x:c></x:row></x:sheetData></x:worksheet>'),
     });
     const xlsxForm = new FormData();
     xlsxForm.append("file", new File([xlsx], "extra.xlsx", { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }));
@@ -185,13 +185,66 @@ test("serves questions without leaking answers and merges uploaded CSV files", a
       body: await encodedXlsxForm.arrayBuffer(),
     });
     assert.equal(uploadedXlsx.status, 201, await uploadedXlsx.clone().text());
-    const xlsxSourceId = (await uploadedXlsx.json()).source.id;
+    const xlsxSource = (await uploadedXlsx.json()).source;
+    const xlsxSourceId = xlsxSource.id;
+    assert.equal(xlsxSource.answerCount, 0);
+
+    const existingTargetForm = new FormData();
+    existingTargetForm.append("file", new File([
+      "题目,参考答案\n请做自我介绍并说明为什么选择游戏客户端方向,介绍项目经历与岗位动机\n",
+    ], "forced-graphics.csv", { type: "text/csv" }));
+    existingTargetForm.append("targetMode", "existing");
+    existingTargetForm.append("categoryId", "graphics");
+    const encodedExistingTargetForm = new Response(existingTargetForm);
+    const existingTargetUpload = await mf.dispatchFetch("http://localhost/api/admin/question-banks", {
+      method: "POST",
+      headers: { ...ownerHeaders, "content-type": encodedExistingTargetForm.headers.get("content-type") },
+      body: await encodedExistingTargetForm.arrayBuffer(),
+    });
+    assert.equal(existingTargetUpload.status, 201, await existingTargetUpload.clone().text());
+    const existingTargetSourceId = (await existingTargetUpload.json()).source.id;
+
+    const newTargetForm = new FormData();
+    newTargetForm.append("file", new File([
+      "题目,参考答案\nC++ 客户端帧循环如何组织,按固定更新和渲染阶段组织\n",
+    ], "mihoyo-client.csv", { type: "text/csv" }));
+    newTargetForm.append("targetMode", "new");
+    newTargetForm.append("categoryName", "米哈游客户端专项");
+    const encodedNewTargetForm = new Response(newTargetForm);
+    const newTargetUpload = await mf.dispatchFetch("http://localhost/api/admin/question-banks", {
+      method: "POST",
+      headers: { ...ownerHeaders, "content-type": encodedNewTargetForm.headers.get("content-type") },
+      body: await encodedNewTargetForm.arrayBuffer(),
+    });
+    assert.equal(newTargetUpload.status, 201, await newTargetUpload.clone().text());
+    const newTargetSource = (await newTargetUpload.json()).source;
+    assert.match(newTargetSource.categoryId, /^custom-/);
+
+    const targetedPublicBank = await mf.dispatchFetch("http://localhost/api/question-bank");
+    const targetedPublicData = await targetedPublicBank.json();
+    assert.equal(
+      targetedPublicData.questions.find((item) => item.question.includes("三次握手"))?.hasReference,
+      false,
+    );
+    assert.equal(
+      targetedPublicData.questions.find((item) => item.question.includes("自我介绍"))?.category,
+      "graphics",
+    );
+    assert.equal(
+      targetedPublicData.categorySummary.find((item) => item.id === newTargetSource.categoryId)?.label,
+      "米哈游客户端专项",
+    );
+    assert.equal(
+      targetedPublicData.categorySummary.find((item) => item.id === newTargetSource.categoryId)?.count,
+      1,
+    );
 
     const adminQuestionBank = await mf.dispatchFetch("http://localhost/api/admin/question-banks", { headers: ownerHeaders });
     assert.equal(adminQuestionBank.status, 200);
     const adminQuestionData = await adminQuestionBank.json();
-    assert.equal(adminQuestionData.sources.length, 2);
-    assert.equal(adminQuestionData.categorySummary.reduce((sum, item) => sum + item.count, 0), 2);
+    assert.equal(adminQuestionData.sources.length, 4);
+    assert.equal(adminQuestionData.categorySummary.reduce((sum, item) => sum + item.count, 0), 4);
+    assert.equal(adminQuestionData.categories.some((item) => item.id === newTargetSource.categoryId), true);
 
     const deletedQuestionBank = await mf.dispatchFetch(`http://localhost/api/admin/question-banks/${encodeURIComponent(sourceId)}`, {
       method: "DELETE",
@@ -203,6 +256,13 @@ test("serves questions without leaking answers and merges uploaded CSV files", a
       headers: ownerHeaders,
     });
     assert.equal(deletedXlsx.status, 200);
+    for (const id of [existingTargetSourceId, newTargetSource.id]) {
+      const deletedTarget = await mf.dispatchFetch(`http://localhost/api/admin/question-banks/${encodeURIComponent(id)}`, {
+        method: "DELETE",
+        headers: ownerHeaders,
+      });
+      assert.equal(deletedTarget.status, 200);
+    }
   } finally {
     await mf.dispose();
   }

@@ -28,6 +28,7 @@ test("GitHub Pages classifies and filters selectable sub-banks", async () => {
       { id: "cpp", label: "C++", count: 1 },
       { id: "computer-fundamentals", label: "计算机基础", count: 1 },
       { id: "graphics", label: "图形学", count: 2 },
+      { id: "game-engine", label: "游戏引擎", count: 0 },
     ],
   );
   assert.deepEqual(
@@ -53,6 +54,39 @@ test("backend exposes the same category summary", () => {
       { id: "cpp", label: "C++", count: 1 },
       { id: "computer-fundamentals", label: "计算机基础", count: 1 },
       { id: "graphics", label: "图形学", count: 1 },
+      { id: "game-engine", label: "游戏引擎", count: 0 },
+    ],
+  );
+});
+
+test("explicit and custom sub-banks override automatic classification", async () => {
+  const questions = [
+    { id: "forced", question: "C++ 虚函数如何实现？", answer: "通过虚表。", category: "graphics" },
+    { id: "custom", question: "TCP 为什么需要三次握手？", answer: "同步序列号。", category: "mihoyo-client" },
+  ];
+  const customCategories = [{ id: "mihoyo-client", label: "米哈游客户端" }];
+  const script = await readFile(new URL("../question-categories.js", import.meta.url), "utf8");
+  const context = {};
+  vm.runInNewContext(script, context);
+
+  assert.deepEqual(
+    JSON.parse(JSON.stringify(context.QuestionCategories.summarize(questions, customCategories))),
+    [
+      { id: "cpp", label: "C++", count: 0 },
+      { id: "computer-fundamentals", label: "计算机基础", count: 0 },
+      { id: "graphics", label: "图形学", count: 1 },
+      { id: "game-engine", label: "游戏引擎", count: 0 },
+      { id: "mihoyo-client", label: "米哈游客户端", count: 1 },
+    ],
+  );
+  assert.deepEqual(
+    summarizeQuestionCategories(questions, customCategories),
+    [
+      { id: "cpp", label: "C++", count: 0 },
+      { id: "computer-fundamentals", label: "计算机基础", count: 0 },
+      { id: "graphics", label: "图形学", count: 1 },
+      { id: "game-engine", label: "游戏引擎", count: 0 },
+      { id: "mihoyo-client", label: "米哈游客户端", count: 1 },
     ],
   );
 });
@@ -66,4 +100,23 @@ test("classification follows the question topic instead of incidental answer wor
     classifyQuestion("解决网格类 BFS/DFS 问题。", "输入也可以来自 mesh 网格数据。"),
     "computer-fundamentals",
   );
+});
+
+test("game-engine architecture questions stay out of computer fundamentals", async () => {
+  const questions = [
+    "是否可以使用统一空间索引替代每座塔的碰撞器？",
+    "大量物体如何进行快速碰撞初筛？",
+    "NavMeshAgent 和 Rigidbody 同时使用有什么问题？",
+    "ECS 相比面向对象组件架构有什么优势？",
+  ];
+  const script = await readFile(new URL("../question-categories.js", import.meta.url), "utf8");
+  const context = {};
+  vm.runInNewContext(script, context);
+
+  for (const question of questions) {
+    assert.equal(context.QuestionCategories.classify({ question }), "game-engine");
+    assert.equal(classifyQuestion(question), "game-engine");
+  }
+  assert.equal(classifyQuestion("虚拟地址如何转换为物理地址？"), "computer-fundamentals");
+  assert.equal(classifyQuestion("四叉树、八叉树和 BVH 如何用于剔除？"), "graphics");
 });

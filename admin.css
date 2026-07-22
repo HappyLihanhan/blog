@@ -758,6 +758,38 @@ textarea:focus {
   gap: 14px;
 }
 
+.question-bank-target-picker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface-soft);
+}
+
+.question-bank-target-picker label {
+  display: grid;
+  align-content: start;
+  gap: 7px;
+}
+
+.question-bank-target-picker label > span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.question-bank-target-picker select,
+.question-bank-target-picker input {
+  width: 100%;
+}
+
+.question-bank-target-picker .field-help {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
 .question-bank-category-summary {
   display: grid;
   gap: 12px;
@@ -865,6 +897,10 @@ textarea:focus {
   }
 
   .question-bank-category-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .question-bank-target-picker {
     grid-template-columns: 1fr;
   }
 }

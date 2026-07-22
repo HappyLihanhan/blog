@@ -44,3 +44,26 @@ test("continues to read quoted csv cells", async () => {
     ["进程,线程有什么区别？", "进程拥有资源，线程共享进程资源。"],
   ]]);
 });
+
+test("reads namespaced worksheet XML produced by formatted workbook tools", async () => {
+  const workbook = zipSync({
+    "xl/worksheets/sheet1.xml": strToU8(`
+      <x:worksheet xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+        <x:sheetData>
+          <x:row r="4"><x:c r="A4" t="str"><x:v>序号</x:v></x:c><x:c r="B4" t="str"><x:v>题目</x:v></x:c></x:row>
+          <x:row r="5"><x:c r="A5"><x:v>1</x:v></x:c><x:c r="B5" t="str"><x:v>C++ 虚函数如何实现？</x:v></x:c></x:row>
+        </x:sheetData>
+      </x:worksheet>
+    `),
+  });
+  const file = new File([workbook], "formatted.xlsx", {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
+
+  const sheets = await readQuestionSheets(file);
+
+  assert.deepEqual(sheets, [[
+    ["序号", "题目"],
+    ["1", "C++ 虚函数如何实现？"],
+  ]]);
+});

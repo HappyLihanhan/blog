@@ -1,7 +1,16 @@
 import { getD1 } from "@/db";
 import { HttpError } from "@/lib/http";
 import { readQuestionSheets } from "@/lib/question-bank-import";
+import {
+  QUESTION_CATEGORIES,
+  questionCategoryDefinitions,
+  type QuestionCategoryDefinition,
+} from "@/lib/question-category";
 import { isQuestionInScope } from "@/lib/question-scope";
+import {
+  resolveQuestionBankUploadTarget,
+  type QuestionBankUploadTargetInput,
+} from "@/lib/question-bank-target";
 
 export type QuestionBankSource = {
   id: string;
@@ -9,6 +18,7 @@ export type QuestionBankSource = {
   importedAt: string;
   questionCount: number;
   answerCount: number;
+  categoryId?: string;
   preset?: boolean;
 };
 
@@ -17,10 +27,12 @@ export type InterviewQuestion = {
   sourceId: string;
   question: string;
   answer: string;
+  category?: string;
 };
 
 export type QuestionBankState = {
   version: number;
+  categories: QuestionCategoryDefinition[];
   sources: QuestionBankSource[];
   questions: InterviewQuestion[];
 };
@@ -58,6 +70,11 @@ function normalizeState(value: unknown): QuestionBankState | null {
   if (!value || typeof value !== "object") return null;
   const raw = value as Partial<QuestionBankState>;
   if (!Array.isArray(raw.sources) || !Array.isArray(raw.questions)) return null;
+  const builtInIds = new Set<string>(QUESTION_CATEGORIES.map((item) => item.id));
+  const categories = (Array.isArray(raw.categories) ? raw.categories : [])
+    .map((item) => ({ id: clean(item?.id), label: clean(item?.label) }))
+    .filter((item) => item.id && item.label && !builtInIds.has(item.id));
+  const categoryIds = new Set(questionCategoryDefinitions(categories).map((item) => item.id));
   const sources = raw.sources
     .map((source) => ({
       id: clean(source?.id),
@@ -65,6 +82,7 @@ function normalizeState(value: unknown): QuestionBankState | null {
       importedAt: clean(source?.importedAt),
       questionCount: Number(source?.questionCount) || 0,
       answerCount: Number(source?.answerCount) || 0,
+      categoryId: categoryIds.has(clean(source?.categoryId)) ? clean(source?.categoryId) : undefined,
       preset: source?.preset === true,
     }))
     .filter((source) => source.id && source.filename && !source.preset);
@@ -75,9 +93,10 @@ function normalizeState(value: unknown): QuestionBankState | null {
       sourceId: clean(item?.sourceId),
       question: clean(item?.question),
       answer: clean(item?.answer),
+      category: categoryIds.has(clean(item?.category)) ? clean(item?.category) : undefined,
     }))
     .filter((item) => item.id && item.question && sourceIds.has(item.sourceId));
-  return { version: 1, sources, questions };
+  return { version: 1, categories, sources, questions };
 }
 
 export async function getQuestionBankState(): Promise<QuestionBankState> {
@@ -91,7 +110,7 @@ export async function getQuestionBankState(): Promise<QuestionBankState> {
       // Fall back to the audited seed bundled with the site.
     }
   }
-  return { version: 1, sources: [], questions: [] };
+  return { version: 1, categories: [], sources: [], questions: [] };
 }
 
 function questionKey(value: string): string {
@@ -102,11 +121,14 @@ export async function listMergedQuestions(): Promise<InterviewQuestion[]> {
   const state = await getQuestionBankState();
   const merged = new Map<string, InterviewQuestion>();
   for (const item of state.questions) {
-    if (!isQuestionInScope(item.question, item.answer)) continue;
+    if (!item.category && !isQuestionInScope(item.question, item.answer)) continue;
     const key = questionKey(item.question);
     const current = merged.get(key);
     if (!current) merged.set(key, { ...item });
-    else if (!current.answer && item.answer) current.answer = item.answer;
+    else {
+      if (!current.answer && item.answer) current.answer = item.answer;
+      if (item.category) current.category = item.category;
+    }
   }
   return Array.from(merged.values());
 }
@@ -122,10 +144,14 @@ function headerKey(value: string): string {
   return value.trim().toLocaleLowerCase("zh-CN").replace(/[\s_-]+/g, "");
 }
 
-function readQuestionsFromSheets(file: File, sheets: string[][][], sourceId: string): InterviewQuestion[] {
+function readQuestionsFromSheets(
+  file: File,
+  sheets: string[][][],
+  sourceId: string,
+  categoryId?: string,
+): InterviewQuestion[] {
   const questions: InterviewQuestion[] = [];
   let foundQuestionHeader = false;
-  let foundAnswerHeader = false;
   for (const rows of sheets) {
     const headerRowIndex = rows.findIndex((row) => row.some((cell) => QUESTION_HEADERS.has(headerKey(cell))));
     if (headerRowIndex < 0) continue;
@@ -133,24 +159,22 @@ function readQuestionsFromSheets(file: File, sheets: string[][][], sourceId: str
     const headers = rows[headerRowIndex].map(headerKey);
     const questionColumn = headers.findIndex((header) => QUESTION_HEADERS.has(header));
     const answerColumn = headers.findIndex((header) => ANSWER_HEADERS.has(header));
-    if (answerColumn < 0) continue;
-    foundAnswerHeader = true;
     for (const row of rows.slice(headerRowIndex + 1)) {
       const question = clean(row[questionColumn]);
       if (!question) continue;
-      const answer = clean(row[answerColumn]);
-      if (!isQuestionInScope(question, answer)) continue;
+      const answer = answerColumn >= 0 ? clean(row[answerColumn]) : "";
+      if (!categoryId && !isQuestionInScope(question, answer)) continue;
       questions.push({
         id: `${sourceId}-${String(questions.length + 1).padStart(4, "0")}`,
         sourceId,
         question,
         answer,
+        category: categoryId,
       });
     }
   }
   if (!foundQuestionHeader) throw new HttpError(400, "没有找到题目列，请使用“问题/题目/question”作为表头");
-  if (!foundAnswerHeader) throw new HttpError(400, "没有找到答案列，请使用“答案/参考答案/个人答案/answer”作为表头");
-  if (!questions.length) throw new HttpError(400, `${file.name} 中没有符合 C++、计算机基础或图形学范围的题目`);
+  if (!questions.length) throw new HttpError(400, `${file.name} 中没有符合当前面试题库范围的题目`);
   return questions;
 }
 
@@ -165,10 +189,25 @@ async function saveState(state: QuestionBankState, actor: string, action: string
   ]);
 }
 
-export async function addQuestionBankFile(file: File, actor: string): Promise<QuestionBankSource> {
+export async function addQuestionBankFile(
+  file: File,
+  actor: string,
+  targetInput: QuestionBankUploadTargetInput = {},
+): Promise<QuestionBankSource> {
   if (!/\.(csv|xlsx)$/i.test(file.name)) throw new HttpError(400, "只支持 CSV 和 XLSX 文件");
   if (file.size > 5 * 1024 * 1024) throw new HttpError(400, "题库文件不能超过 5MB");
   const state = await getQuestionBankState();
+  let target;
+  try {
+    target = resolveQuestionBankUploadTarget(
+      targetInput,
+      questionCategoryDefinitions(state.categories),
+    );
+  } catch (error) {
+    throw new HttpError(400, error instanceof Error ? error.message : "题库归类方式无效");
+  }
+  const categoryId = target.mode === "auto" ? undefined : target.categoryId;
+  if (target.mode === "new") state.categories.push(target.category);
   const sourceId = `file-${crypto.randomUUID()}`;
   let sheets: string[][][];
   try {
@@ -176,13 +215,14 @@ export async function addQuestionBankFile(file: File, actor: string): Promise<Qu
   } catch (error) {
     throw new HttpError(400, error instanceof Error ? error.message : "题库文件读取失败");
   }
-  const questions = readQuestionsFromSheets(file, sheets, sourceId);
+  const questions = readQuestionsFromSheets(file, sheets, sourceId, categoryId);
   const source: QuestionBankSource = {
     id: sourceId,
     filename: file.name,
     importedAt: now(),
     questionCount: questions.length,
     answerCount: questions.filter((item) => item.answer).length,
+    categoryId,
   };
   state.sources.push(source);
   state.questions.push(...questions);
